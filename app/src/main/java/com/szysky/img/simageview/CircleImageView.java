@@ -14,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 
@@ -61,12 +62,12 @@ public class CircleImageView extends ImageView {
         super(context, attrs, defStyle);
         super.setScaleType(SCALE_TYPE);
 
-//        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CircleImageView, defStyle, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CircleImageView, defStyle, 0);
 
-//        mBorderWidth = a.getDimensionPixelSize(R.styleable.CircleImageView_cirborder_width, DEFAULT_BORDER_WIDTH);
-//        mBorderColor = a.getColor(R.styleable.CircleImageView_cirborder_color, DEFAULT_BORDER_COLOR);
+        mBorderWidth = a.getDimensionPixelSize(R.styleable.CircleImageView_cirborder_width, DEFAULT_BORDER_WIDTH);
+        mBorderColor = a.getColor(R.styleable.CircleImageView_cirborder_color, DEFAULT_BORDER_COLOR);
 
-//        a.recycle();
+        a.recycle();
 
         mReady = true;
 
@@ -180,6 +181,8 @@ public class CircleImageView extends ImageView {
     }
 
     private void setup() {
+        long l = System.nanoTime();
+
         if (!mReady) {
             mSetupPending = true;
             return;
@@ -209,6 +212,8 @@ public class CircleImageView extends ImageView {
         mDrawableRadius = Math.min(mDrawableRect.height() / 2, mDrawableRect.width() / 2);
 
         updateShaderMatrix();
+        Log.i("susu", "原作者()执行时间:"+ (System.nanoTime() - l));
+
         invalidate();
     }
 

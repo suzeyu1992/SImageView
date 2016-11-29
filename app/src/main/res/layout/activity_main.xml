@@ -12,14 +12,14 @@
     android:orientation="vertical">
 
     <com.szysky.img.simageview.SImageView
+        android:id="@+id/iv_main"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:src="@color/colorAccent"
         />
 
     <com.szysky.img.simageview.CircleImageView
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:src="@color/colorAccent"
+        android:src="@mipmap/icon_test"
         />
 </LinearLayout>

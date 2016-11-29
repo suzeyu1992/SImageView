@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Shader;
 
@@ -30,8 +32,83 @@ public class DrawCircle implements IDrawingStrategy {
     @Override
     public void algorithm(Canvas canvas , SImageView.ConfigInfo info) {
 
+        if (info.readyBmp.size() == 1){
+            onePicture(canvas, info);
 
-        int mBorderWidth = info.border;                   // 描边宽度
+        }else{
+            mulPicture(canvas, info);
+        }
+
+    }
+    private static final float[][] rotations = { new float[] { 360.0f }, new float[] { 45.0f, 360.0f },
+            new float[] { 120.0f, 0.0f, -120.0f }, new float[] { 90.0f, 180.0f, -90.0f, 0.0f },
+            new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
+    /**
+     * 多个图片处理
+     * @param canvas
+     * @param info
+     */
+    private void mulPicture(Canvas canvas , SImageView.ConfigInfo info){
+
+        int mBorderWidth = info.borderWidth;                   // 描边宽度
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+
+        for (int i = 0; i < info.readyBmp.size(); i++) {
+            Bitmap bitmap = info.readyBmp.get(i);
+            ILayoutManager.LayoutInfoGroup layoutInfoGroup = info.coordinates.get(i);
+
+            int mBitmapWidth = bitmap.getWidth();   // 需要处理的bitmap宽度和高度
+            int mBitmapHeight = bitmap.getHeight();
+            canvas.save();
+            // 缩放
+            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                    bitmap.getHeight(), layoutInfoGroup.matrix, true);
+            // 裁剪
+            Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
+                    newBitmap.getHeight(), (int) rotations[1][i], QQLayoutManager.sizes[1][i]);
+
+            canvas.drawBitmap(bitmapOk, 0, 0, paint);
+
+            canvas.restore();
+
+        }
+    }
+
+
+    public static final Bitmap createMaskBitmap(Bitmap bitmap, int viewBoxW, int viewBoxH,
+                                                int rotation, float gapSize) {
+
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+        final Paint paint = new Paint();
+        paint.setAntiAlias(true);// 抗锯齿
+        paint.setFilterBitmap(true);
+        int center = Math.round(viewBoxW / 2f);
+        canvas.drawCircle(center, center, center, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+
+        if (rotation != 360) {
+            Matrix matrix = new Matrix();
+            // 根据原图的中心位置旋转
+            matrix.setRotate(rotation, viewBoxW / 2, viewBoxH / 2);
+            canvas.setMatrix(matrix);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, paint);
+        }
+        return output;
+    }
+
+    /**
+     * 单个图片处理
+     */
+    private void onePicture(Canvas canvas , SImageView.ConfigInfo info) {
+
+
+
+        int mBorderWidth = info.borderWidth;                   // 描边宽度
         int mBitmapWidth = info.readyBmp.get(0).getWidth();   // 需要处理的bitmap宽度和高度
         int mBitmapHeight = info.readyBmp.get(0).getHeight();
 
@@ -49,8 +126,8 @@ public class DrawCircle implements IDrawingStrategy {
         // 创建描边画笔 并设置属性
         Paint borderPaint = new Paint();
         borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(info.border);
-        borderPaint.setColor(Color.BLACK);
+        borderPaint.setStrokeWidth(info.borderWidth);
+        borderPaint.setColor(info.borderColor);
 
 
         // 传入的bitmap最终要缩放的比值
@@ -82,13 +159,6 @@ public class DrawCircle implements IDrawingStrategy {
         // 显示内容, 和描边
         canvas.drawCircle(300, 300, 300, paint);
         canvas.drawCircle(300, 300, mBorderRadius, borderPaint);
-    }
-
-    private void updateShaderMatrix() {
-
-
-
-
 
 
     }

@@ -17,9 +17,5 @@
         android:layout_height="200dp"
         />
 
-    <com.szysky.img.simageview.CircleImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:src="@mipmap/icon_test"
-        />
+
 </LinearLayout>

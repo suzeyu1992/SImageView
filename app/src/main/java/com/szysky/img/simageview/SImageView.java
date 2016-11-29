@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Shader;
@@ -29,18 +30,30 @@ public class SImageView extends ImageView {
     private Bitmap mResultBmp;
     private ConfigInfo mInfo = new ConfigInfo();
 
+
+    private ILayoutManager mLayoutManager = new QQLayoutManager();
+
+
     public static class ConfigInfo{
+
         public int height;
         public int width;
         public ArrayList<Bitmap> readyBmp = new ArrayList<>();
-        public int border = 10;
+        public int borderWidth = 10;
+        public int borderColor = Color.BLACK;
+        public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;
+
     }
 
     public void setDrawStrategy(IDrawingStrategy mDrawStrategy) {
         this.mDrawStrategy = mDrawStrategy;
     }
 
-    private IDrawingStrategy mDrawStrategy = new DrawCircle();
+    private IDrawingStrategy mDrawStrategy ;
+
+    public void setLayoutManager(ILayoutManager mLayoutManager) {
+        this.mLayoutManager = mLayoutManager;
+    }
 
     public SImageView(Context context) {
         super(context);
@@ -71,6 +84,17 @@ public class SImageView extends ImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+
+        if (null != mLayoutManager){
+            long l = System.nanoTime();
+            mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
+
+            mDrawStrategy.algorithm(canvas, mInfo);
+            Log.i("susu", "2张图片ondraw()执行时间:"+ (System.nanoTime() - l));
+
+
+        }
+
         if (null != mDrawStrategy){
             long l = System.nanoTime();
             mDrawStrategy.algorithm(canvas, mInfo);
@@ -82,6 +106,11 @@ public class SImageView extends ImageView {
     @Override
     public void setImageResource(int resId) {
         mInfo.readyBmp.add(mBmp) ;
+        invalidate();
+    }
+
+    public void setImages(ArrayList<Bitmap> bitmaps){
+        mInfo.readyBmp = bitmaps ;
         invalidate();
     }
 

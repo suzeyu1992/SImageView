@@ -23,7 +23,7 @@ public interface ILayoutManager {
         public int maxHeight;
         public float[] centerPoint;
         public Matrix matrix;
-        public Point leftTopPoint;
+        public Point leftTopPoint = new Point();
         public Point rightBottomPoint;
     }
 }

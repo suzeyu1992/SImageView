@@ -3,12 +3,9 @@ package com.szysky.img.simageview;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
@@ -76,8 +73,8 @@ public class SImageView extends ImageView {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        mInfo.height = getWidth();
-        mInfo.width = getHeight();
+        mInfo.height = getHeight();
+        mInfo.width = getWidth();
     }
 
     @Override
@@ -86,11 +83,11 @@ public class SImageView extends ImageView {
 
 
         if (null != mLayoutManager){
-            long l = System.nanoTime();
+            long l = System.currentTimeMillis();
             mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
 
             mDrawStrategy.algorithm(canvas, mInfo);
-            Log.i("susu", "2张图片ondraw()执行时间:"+ (System.nanoTime() - l));
+            Log.i("susu", "2张图片ondraw()执行时间:"+ (System.currentTimeMillis() - l));
 
 
         }

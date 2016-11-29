@@ -1,10 +1,8 @@
 package com.szysky.img.simageview;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -51,22 +49,31 @@ public class DrawCircle implements IDrawingStrategy {
     private void mulPicture(Canvas canvas , SImageView.ConfigInfo info){
 
         int mBorderWidth = info.borderWidth;                   // 描边宽度
+
+        float[] v = rotations[info.readyBmp.size()-1];
         Paint paint = new Paint();
+
         paint.setAntiAlias(true);
 
         for (int i = 0; i < info.readyBmp.size(); i++) {
             Bitmap bitmap = info.readyBmp.get(i);
             ILayoutManager.LayoutInfoGroup layoutInfoGroup = info.coordinates.get(i);
 
+            float maxHeight = layoutInfoGroup.maxHeight;
+
             int mBitmapWidth = bitmap.getWidth();   // 需要处理的bitmap宽度和高度
             int mBitmapHeight = bitmap.getHeight();
             canvas.save();
+            Matrix matrix = new Matrix();
+            matrix.postScale( maxHeight/mBitmapWidth , maxHeight/mBitmapHeight);
+            canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
+
             // 缩放
             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                    bitmap.getHeight(), layoutInfoGroup.matrix, true);
+                    bitmap.getHeight(), matrix, true);
             // 裁剪
             Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
-                    newBitmap.getHeight(), (int) rotations[1][i], QQLayoutManager.sizes[1][i]);
+                    newBitmap.getHeight(), (int) v[i], 0.15f);
 
             canvas.drawBitmap(bitmapOk, 0, 0, paint);
 

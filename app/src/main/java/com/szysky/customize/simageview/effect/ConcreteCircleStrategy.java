@@ -1,4 +1,4 @@
-package com.szysky.img.simageview;
+package com.szysky.customize.simageview.effect;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -10,16 +10,20 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Shader;
 
+import com.szysky.customize.simageview.SImageView;
+import com.szysky.customize.simageview.range.ILayoutManager;
+
 
 /**
  * Author :  suzeyu
  * Time   :  2016-11-29  下午6:06
  * Blog   :  http://szysky.com
  * GitHub :  https://github.com/suzeyu1992
- * ClassDescription :
+ * ClassDescription :   具体内部元素的显示实现.
+ *                      实现效果: 圆形头像.  但控件需要展示多张图片为QQ群组元素样式
  */
 
-public class DrawCircle implements IDrawingStrategy {
+public class ConcreteCircleStrategy implements IDrawingStrategy {
 
     private final Matrix mShaderMatrix = new Matrix();
     /**
@@ -59,7 +63,7 @@ public class DrawCircle implements IDrawingStrategy {
             Bitmap bitmap = info.readyBmp.get(i);
             ILayoutManager.LayoutInfoGroup layoutInfoGroup = info.coordinates.get(i);
 
-            float maxHeight = layoutInfoGroup.maxHeight;
+            float maxHeight = layoutInfoGroup.innerHeight;
 
             int mBitmapWidth = bitmap.getWidth();   // 需要处理的bitmap宽度和高度
             int mBitmapHeight = bitmap.getHeight();

@@ -1,12 +1,12 @@
-package com.szysky.img.simageview;
+package com.szysky.customize.simageview;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+
+import com.szysky.customize.simageview.effect.ConcreteCircleStrategy;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         SImageView iv= (SImageView) findViewById(R.id.iv_main);
-        iv.setDrawStrategy(new DrawCircle());
+        iv.setDrawStrategy(new ConcreteCircleStrategy());
         long l = System.nanoTime();
         //iv.setImageResource(R.mipmap.icon_test);
         Log.i(TAG, "一张图片执行时间:"+ (System.nanoTime() - l));

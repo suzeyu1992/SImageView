@@ -1,4 +1,4 @@
-package com.szysky.img.simageview;
+package com.szysky.customize.simageview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +9,10 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
+
+import com.szysky.customize.simageview.effect.IDrawingStrategy;
+import com.szysky.customize.simageview.range.ILayoutManager;
+import com.szysky.customize.simageview.range.QQLayoutManager;
 
 import java.util.ArrayList;
 

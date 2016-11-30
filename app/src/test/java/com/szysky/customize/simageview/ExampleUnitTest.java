@@ -1,4 +1,4 @@
-package com.szysky.img.simageview;
+package com.szysky.customize.simageview;
 
 import org.junit.Test;
 

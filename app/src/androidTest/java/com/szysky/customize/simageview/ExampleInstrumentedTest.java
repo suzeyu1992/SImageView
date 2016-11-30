@@ -1,4 +1,4 @@
-package com.szysky.img.simageview;
+package com.szysky.customize.simageview;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.szysky.img.simageview", appContext.getPackageName());
+        assertEquals("com.szysky.customize.simageview", appContext.getPackageName());
     }
 }

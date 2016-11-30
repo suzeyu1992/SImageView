@@ -1,4 +1,4 @@
-package com.szysky.img.simageview;
+package com.szysky.customize.simageview.range;
 
 import android.graphics.Matrix;
 
@@ -9,10 +9,18 @@ import java.util.ArrayList;
  * Time   :  2016-11-29  下午9:11
  * Blog   :  http://szysky.com
  * GitHub :  https://github.com/suzeyu1992
- * ClassDescription : QQ 群组布局是实现
+ * ClassDescription : QQ 群组布局排列的具体实现
  */
 
 public class QQLayoutManager implements ILayoutManager {
+
+    /**
+     *  针对图片的数量, 对应的图片处理的配置系数
+     */
+    public static final float[][] sizes = { new float[] { 0.9f, 0.9f },
+            new float[] { 0.5f, 0.65f }, new float[] { 0.45f, 0.8f },
+            new float[] { 0.45f, 0.91f }, new float[] { 0.38f, 0.80f } };
+
 
     @Override
     public ArrayList<LayoutInfoGroup> calculate(int viewWidth, int viewHeight, int viewNum) {
@@ -23,11 +31,10 @@ public class QQLayoutManager implements ILayoutManager {
             throw new UnsupportedOperationException("不支持操作异常");
         }
 
-        // 控件正方形的边长
+        // 容错控件非正方形场景
         int min = Math.min(viewHeight, viewWidth);
 
-        // 获取角度集合
-        //float[] rotation = rotations[viewNum];
+
 
         // 获得对应缩放集合
         float[] size = sizes[viewNum-1];
@@ -48,32 +55,26 @@ public class QQLayoutManager implements ILayoutManager {
             int offsetY = (int) offset(viewNum, i, min, size)[1];
             layoutInfoGroup.leftTopPoint.set(offsetX, offsetY);
 
-            layoutInfoGroup.maxHeight = layoutInfoGroup.maxWidth = (int) (min * size[0]);
+            layoutInfoGroup.innerWidth = layoutInfoGroup.innerHeight = (int) (min * size[0]);
             infos.add(layoutInfoGroup);
         }
 
 
         return infos;
     }
-    public static final float[][] sizes = { new float[] { 0.9f, 0.9f },
-            new float[] { 0.5f, 0.65f }, new float[] { 0.45f, 0.8f },
-            new float[] { 0.45f, 0.91f }, new float[] { 0.38f, 0.80f } };
 
 
-    private static final float[][] rotations = { new float[] { 360.0f }, new float[] { 45.0f, 360.0f },
-            new float[] { 120.0f, 0.0f, -120.0f }, new float[] { 90.0f, 180.0f, -90.0f, 0.0f },
-            new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
+
 
 
     /**
      *  根据个数选择具体实现的布局排放
-     * @param index
-     *            下标
-     * @param dimension
-     *            画布边长（正方形）
-     * @param size
-     *            size[0]缩放 size[1]边距
-     * @return 下标index X，Y轴坐标
+     *
+     * @param index 下标
+     * @param dimension 画布边长（正方形）
+     * @param size size[0]缩放 size[1]边距
+     *
+     * @return 下标index的左上角X，Y轴坐标
      */
     public static float[] offset(int count, int index, float dimension, float[] size) {
         switch (count) {
@@ -86,38 +87,6 @@ public class QQLayoutManager implements ILayoutManager {
                 return offset4(index, dimension, size);
             case 5:
                 return offset5(index, dimension, size);
-            default:
-                break;
-        }
-        return new float[] { 0f, 0f };
-    }
-
-    /**
-     * 2个头像
-     *
-     */
-    private static float[] offset2(int index, float dimension, float[] size) {
-        // 圆的直径
-        float cd = (float) dimension * size[0];
-        // 边距
-        float s1 = cd * size[1];
-
-        float x1 = 0;
-        float y1 = 0;
-
-        float x2 = s1;
-        float y2 = s1;
-
-        // Log.d(TAG, "x1:" + x1 + "/y1:" + y1);
-        // Log.d(TAG, "x2:" + x2 + "/y2:" + y2);
-
-        // 居中 X轴偏移量
-        float xx1 = (dimension - cd - s1) / 2;
-        switch (index) {
-            case 0:
-                return new float[] { x1 + xx1, y1 + xx1 };
-            case 1:
-                return new float[] { x2 + xx1, y2 + xx1 };
             default:
                 break;
         }
@@ -181,9 +150,8 @@ public class QQLayoutManager implements ILayoutManager {
             case 4:
                 return new float[] { x5 + xxc1, y5 + xx1 };
             default:
-                break;
+                return new float[] { 0f, 0f };
         }
-        return new float[] { 0f, 0f };
     }
 
     /**
@@ -232,9 +200,8 @@ public class QQLayoutManager implements ILayoutManager {
             case 3:
                 return new float[] { x4 + xx1, y4 + xx1 };
             default:
-                break;
+                return new float[] { 0f, 0f };
         }
-        return new float[] { 0f, 0f };
     }
 
     /**
@@ -271,6 +238,36 @@ public class QQLayoutManager implements ILayoutManager {
                 return new float[] { x2 + xxc1, y2 + xx1 };
             case 2:
                 return new float[] { x3 + xxc1, y2 + xx1 };
+            default:
+                return new float[] { 0f, 0f };
+        }
+
+    }
+
+    /**
+     * 2个头像
+     *
+     */
+    private static float[] offset2(int index, float dimension, float[] size) {
+        // 圆的直径
+        float cd = (float) dimension * size[0];
+        // 边距
+        float s1 = cd * size[1];
+
+        float x1 = 0;
+        float y1 = 0;
+
+        float x2 = s1;
+        float y2 = s1;
+
+
+        // 从控件左边开始计算 X轴偏移量
+        float xx1 = (dimension - cd - s1) / 2;
+        switch (index) {
+            case 0:
+                return new float[] { x1 + xx1, y1 + xx1 };
+            case 1:
+                return new float[] { x2 + xx1, y2 + xx1 };
             default:
                 break;
         }

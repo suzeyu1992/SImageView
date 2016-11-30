@@ -1,10 +1,6 @@
-package com.szysky.img.simageview;
+package com.szysky.customize.simageview;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Shader;
 
 /**
  * Author :  suzeyu

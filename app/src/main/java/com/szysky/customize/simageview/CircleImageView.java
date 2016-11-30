@@ -1,4 +1,4 @@
-package com.szysky.img.simageview;
+package com.szysky.customize.simageview;
 
 import android.content.Context;
 import android.content.res.TypedArray;

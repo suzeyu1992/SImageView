@@ -88,20 +88,24 @@ public class SImageView extends ImageView {
 
         if (null != mLayoutManager){
             long l = System.currentTimeMillis();
+
             mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
+            Log.i("susu", "方法1()执行时间:"+ (System.currentTimeMillis() - l));
+
+             l = System.currentTimeMillis();
 
             mDrawStrategy.algorithm(canvas, mInfo);
-            Log.i("susu", "2张图片ondraw()执行时间:"+ (System.currentTimeMillis() - l));
 
+            Log.i("susu", "方法2()执行时间:"+ (System.currentTimeMillis() - l));
 
         }
 
-        if (null != mDrawStrategy){
-            long l = System.nanoTime();
-            mDrawStrategy.algorithm(canvas, mInfo);
-
-            Log.i("susu", "ondraw()执行时间:"+ (System.nanoTime() - l));
-        }
+//        if (null != mDrawStrategy){
+//            long l = System.nanoTime();
+//            mDrawStrategy.algorithm(canvas, mInfo);
+//
+//            Log.i("susu", "ondraw()执行时间:"+ (System.nanoTime() - l));
+//        }
     }
 
     @Override

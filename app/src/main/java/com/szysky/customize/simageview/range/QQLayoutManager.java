@@ -1,6 +1,7 @@
 package com.szysky.customize.simageview.range;
 
 import android.graphics.Matrix;
+import android.os.Message;
 
 import java.util.ArrayList;
 
@@ -31,35 +32,42 @@ public class QQLayoutManager implements ILayoutManager {
             throw new UnsupportedOperationException("不支持操作异常");
         }
 
-        // 容错控件非正方形场景
-        int min = Math.min(viewHeight, viewWidth);
+        // 容错控件非正方形场景处理
+        int layoutOffsetX = 0;
+        int layoutOffsetY = 0;
+        int layoutSquareSide = 0;       // 正方形边长
+        if (viewWidth != viewHeight){
+            int temp = viewHeight - viewWidth;
+            if (temp > 0){
+                layoutOffsetY += temp;
+                layoutOffsetY >>= 1;
+                layoutSquareSide = viewWidth;
+            }else{
+                layoutOffsetX -= temp;
+                layoutOffsetX >>= 1;
+                layoutSquareSide = viewHeight;
+            }
+        }
 
 
-
-        // 获得对应缩放集合
+        // 获得对应缩放系数集合
         float[] size = sizes[viewNum-1];
 
 
-
-        Matrix matrixJoin = new Matrix();
-        // scale as join size
-        matrixJoin.postScale(size[0], size[0]);
-
         ArrayList<LayoutInfoGroup> infos = new ArrayList<>();
 
+        // 计算各个子元素的位置
         for (int i = 0; i < viewNum; i++) {
             LayoutInfoGroup layoutInfoGroup = new LayoutInfoGroup();
 
             // 获得左上角坐标顶点
-            int offsetX = (int) offset(viewNum, i, min, size)[0];
-            int offsetY = (int) offset(viewNum, i, min, size)[1];
+            int offsetX = (int) offset(viewNum, i, layoutSquareSide, size)[0] + layoutOffsetX;
+            int offsetY = (int) offset(viewNum, i, layoutSquareSide, size)[1] + layoutOffsetY;
             layoutInfoGroup.leftTopPoint.set(offsetX, offsetY);
 
-            layoutInfoGroup.innerWidth = layoutInfoGroup.innerHeight = (int) (min * size[0]);
+            layoutInfoGroup.innerWidth = layoutInfoGroup.innerHeight = (int) (layoutSquareSide * size[0]);
             infos.add(layoutInfoGroup);
         }
-
-
         return infos;
     }
 

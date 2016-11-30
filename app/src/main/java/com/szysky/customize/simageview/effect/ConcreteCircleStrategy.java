@@ -9,6 +9,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Shader;
+import android.provider.Settings;
+import android.util.Log;
 
 import com.szysky.customize.simageview.SImageView;
 import com.szysky.customize.simageview.range.ILayoutManager;
@@ -59,6 +61,7 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
 
         paint.setAntiAlias(true);
 
+        Matrix matrix = new Matrix();
         for (int i = 0; i < info.readyBmp.size(); i++) {
             Bitmap bitmap = info.readyBmp.get(i);
             ILayoutManager.LayoutInfoGroup layoutInfoGroup = info.coordinates.get(i);
@@ -68,13 +71,13 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
             int mBitmapWidth = bitmap.getWidth();   // 需要处理的bitmap宽度和高度
             int mBitmapHeight = bitmap.getHeight();
             canvas.save();
-            Matrix matrix = new Matrix();
+
             matrix.postScale( maxHeight/mBitmapWidth , maxHeight/mBitmapHeight);
             canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
 
             // 缩放
-            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                    bitmap.getHeight(), matrix, true);
+            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, mBitmapWidth,
+                    mBitmapHeight, matrix, true);
             // 裁剪
             Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
                     newBitmap.getHeight(), (int) v[i], 0.15f);
@@ -82,7 +85,7 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
             canvas.drawBitmap(bitmapOk, 0, 0, paint);
 
             canvas.restore();
-
+            matrix.reset();
         }
     }
 
@@ -97,10 +100,11 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
         paint.setAntiAlias(true);// 抗锯齿
         paint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
+        long start = System.nanoTime();
         canvas.drawCircle(center, center, center, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, 0, 0, paint);
-
+        Log.e("susu", "setXfermode模式事件>>> "+(System.nanoTime()-start) );
         if (rotation != 360) {
             Matrix matrix = new Matrix();
             // 根据原图的中心位置旋转

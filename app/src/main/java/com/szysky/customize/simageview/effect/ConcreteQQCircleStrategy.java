@@ -28,7 +28,13 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     /**
      *  默认两张图片间隔距离系数
      */
-    private float mSpacing = 0.15f;
+    private float mSpacing = 0.3f;
+
+    /**
+     *  为true时, 为QQ群组的样式, 默认属性
+     *  为false时: 可去除两个图片重叠确实的效果
+     */
+    private boolean mIsPicRotate = false;
 
     public float getSpacingQuality() {
         return Math.round((mSpacing / 0.15f)*100)/100;
@@ -70,15 +76,23 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             int mBitmapHeight = bitmap.getHeight();
             canvas.save();
 
-            matrix.postScale( maxHeight/mBitmapWidth , maxHeight/mBitmapHeight);
+
+            if (!mIsPicRotate){
+                matrix.postScale( maxHeight/mBitmapWidth * 0.9f , maxHeight/mBitmapHeight * 0.9f );
+            }else{
+                matrix.postScale( maxHeight/mBitmapWidth , maxHeight/mBitmapHeight);
+
+            }
             canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
+
+
 
             // 缩放
             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, mBitmapWidth,
                     mBitmapHeight, matrix, true);
             // 裁剪
             Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
-                    newBitmap.getHeight(), (int) v[i], mSpacing);
+                    newBitmap.getHeight(), (int) v[i], mSpacing , mIsPicRotate);
 
             canvas.drawBitmap(bitmapOk, 0, 0, paint);
 
@@ -94,7 +108,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
 
     private static  Bitmap createMaskBitmap(Bitmap bitmap, int viewBoxW, int viewBoxH,
-                                                int rotation, float gapSize) {
+                                                int rotation, float gapSize ,boolean isRotate) {
 
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
                 Bitmap.Config.ARGB_8888);
@@ -108,7 +122,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, 0, 0, paint);
         Log.e("susu", "setXfermode模式事件>>> "+(System.nanoTime()-start) );
-        if (rotation != 360) {
+        if (rotation != 360 && isRotate ) {
             Matrix matrix = new Matrix();
             // 根据原图的中心位置旋转
             matrix.setRotate(rotation, viewBoxW / 2, viewBoxH / 2);
@@ -119,4 +133,12 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         return output;
     }
 
+
+    public boolean isIsPicRotate() {
+        return mIsPicRotate;
+    }
+
+    public void setIsPicRotate(boolean mIsPicRotate) {
+        this.mIsPicRotate = mIsPicRotate;
+    }
 }

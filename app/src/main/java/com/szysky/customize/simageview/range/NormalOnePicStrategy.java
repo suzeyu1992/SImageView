@@ -4,10 +4,13 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.Shader;
 
 import com.szysky.customize.simageview.SImageView;
 import com.szysky.customize.simageview.effect.IDrawingStrategy;
+import com.szysky.customize.simageview.util.GraphsTemplate;
 
 /**
  * Author :  suzeyu
@@ -42,6 +45,8 @@ public class NormalOnePicStrategy implements IDrawingStrategy {
                 layoutOffsetX >>= 1;
                 layoutSquareSide = viewHeight;
             }
+        }else{
+            layoutSquareSide = viewHeight;
         }
 
 
@@ -51,6 +56,7 @@ public class NormalOnePicStrategy implements IDrawingStrategy {
         // 创建内容画笔和描边画笔 并设置属性
         Paint paint =  new Paint();
         paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.FILL);
 
         Paint borderPaint = new Paint();
         borderPaint.setStyle(Paint.Style.STROKE);
@@ -88,8 +94,23 @@ public class NormalOnePicStrategy implements IDrawingStrategy {
         int centerX = viewWidth  >> 1 ;
         int centerY = viewHeight >> 1 ;
 
+
+        GraphsTemplate.drawFivePointedStar(canvas, layoutSquareSide/2, 0,0,paint);
+
+
+
+
+
         // 画内容和边框
-        canvas.drawCircle(centerX, centerY, (layoutSquareSide>>1) - (mBorderWidth>>1), paint);
-        canvas.drawCircle(centerX, centerY, (layoutSquareSide-mBorderWidth)>>1, borderPaint);
+//        canvas.drawCircle(centerX, centerY, (layoutSquareSide>>1) - (mBorderWidth>>1), paint);
+//        canvas.drawCircle(centerX, centerY, (layoutSquareSide-mBorderWidth)>>1, borderPaint);
+    }
+
+    float cos(int num){
+        return (float) Math.cos(num*Math.PI/180);
+    }
+
+    float sin(int num){
+        return (float) Math.sin(num*Math.PI/180);
     }
 }

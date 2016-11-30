@@ -45,6 +45,8 @@ public class QQLayoutManager implements ILayoutManager {
                 layoutOffsetX >>= 1;
                 layoutSquareSide = viewHeight;
             }
+        }else{
+            layoutSquareSide =  viewWidth;
         }
 
 

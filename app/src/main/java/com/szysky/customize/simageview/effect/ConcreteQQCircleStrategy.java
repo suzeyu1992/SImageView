@@ -7,11 +7,14 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.Log;
 
 import com.szysky.customize.simageview.SImageView;
 import com.szysky.customize.simageview.range.ILayoutManager;
+import com.szysky.customize.simageview.util.GraphsTemplate;
 
 
 /**
@@ -80,7 +83,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             if (!mIsPicRotate){
                 matrix.postScale( maxHeight/mBitmapWidth * 0.9f , maxHeight/mBitmapHeight * 0.9f );
             }else{
-                matrix.postScale( maxHeight/mBitmapWidth , maxHeight/mBitmapHeight);
+                matrix.postScale(  maxHeight/(float)mBitmapWidth , maxHeight/(float)mBitmapHeight);
 
             }
             canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
@@ -118,18 +121,38 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         paint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
         long start = System.nanoTime();
-        canvas.drawCircle(center, center, center, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-        Log.e("susu", "setXfermode模式事件>>> "+(System.nanoTime()-start) );
-        if (rotation != 360 && isRotate ) {
-            Matrix matrix = new Matrix();
-            // 根据原图的中心位置旋转
-            matrix.setRotate(rotation, viewBoxW / 2, viewBoxH / 2);
-            canvas.setMatrix(matrix);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, paint);
+//
+        int flag = 5;
+        if (flag == 1){
+            canvas.drawCircle(center, center, center, paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, paint);
+
+            if (rotation != 360 && isRotate ) {
+                Matrix matrix = new Matrix();
+                // 根据原图的中心位置旋转
+                matrix.setRotate(rotation, viewBoxW / 2, viewBoxH / 2);
+                canvas.setMatrix(matrix);
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+                canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, paint);
+            }
+        }else if (flag == 2){
+            canvas.drawBitmap(bitmap, 0, 0, paint);
+        }else if (flag == 3){
+            canvas.drawOval(new RectF(0, 0,viewBoxW, viewBoxH),  paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, paint);
+        }else{
+            GraphsTemplate.drawFivePointedStar(canvas, center, 0,0,paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, paint);
         }
+
+
+
+        Log.e("susu", "setXfermode模式事件>>> "+(System.nanoTime()-start) );
+
+
         return output;
     }
 
@@ -141,4 +164,6 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     public void setIsPicRotate(boolean mIsPicRotate) {
         this.mIsPicRotate = mIsPicRotate;
     }
+
+
 }

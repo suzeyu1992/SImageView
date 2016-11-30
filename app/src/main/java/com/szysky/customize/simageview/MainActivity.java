@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.szysky.customize.simageview.effect.ConcreteCircleStrategy;
+import com.szysky.customize.simageview.effect.ConcreteQQCircleStrategy;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         SImageView iv= (SImageView) findViewById(R.id.iv_main);
-        iv.setDrawStrategy(new ConcreteCircleStrategy());
+        ConcreteQQCircleStrategy concreteQQCircleStrategy = new ConcreteQQCircleStrategy();
+        concreteQQCircleStrategy.setSpacing(1f);
+        iv.setDrawStrategy(concreteQQCircleStrategy);
         long l = System.nanoTime();
         //iv.setImageResource(R.mipmap.icon_test);
         Log.i(TAG, "一张图片执行时间:"+ (System.nanoTime() - l));
@@ -30,11 +32,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
+
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
         bitmaps.add(bitmap);
         iv.setImages(bitmaps);
 

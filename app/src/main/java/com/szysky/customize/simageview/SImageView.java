@@ -35,6 +35,9 @@ public class SImageView extends ImageView {
     private ILayoutManager mLayoutManager = new QQLayoutManager();
 
 
+    /**
+     *  控件属性类
+     */
     public static class ConfigInfo{
 
         public int height;
@@ -85,20 +88,13 @@ public class SImageView extends ImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
-        if (null != mLayoutManager){
-            long l = System.currentTimeMillis();
-
-            mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
-            Log.i("susu", "方法1()执行时间:"+ (System.currentTimeMillis() - l));
-
-             l = System.currentTimeMillis();
+        if (mInfo.readyBmp.size() >0 && mInfo.readyBmp.size() == 1){
 
             mDrawStrategy.algorithm(canvas, mInfo);
-
-            Log.i("susu", "方法2()执行时间:"+ (System.currentTimeMillis() - l));
-
+        }else{
+            mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
         }
+
 
 //        if (null != mDrawStrategy){
 //            long l = System.nanoTime();

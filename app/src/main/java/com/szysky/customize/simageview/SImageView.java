@@ -89,8 +89,10 @@ public class SImageView extends ImageView {
         super.onDraw(canvas);
 
         if (mInfo.readyBmp.size() >0 && mInfo.readyBmp.size() == 1){
-
+            long l = System.nanoTime();
             mDrawStrategy.algorithm(canvas, mInfo);
+            Log.i("susu", "一张图片执行时间:"+ (System.nanoTime() - l));
+
         }else{
             mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
         }

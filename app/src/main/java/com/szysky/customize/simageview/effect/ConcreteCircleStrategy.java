@@ -7,9 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.Shader;
-import android.provider.Settings;
 import android.util.Log;
 
 import com.szysky.customize.simageview.SImageView;
@@ -27,11 +25,11 @@ import com.szysky.customize.simageview.range.ILayoutManager;
 
 public class ConcreteCircleStrategy implements IDrawingStrategy {
 
-    private final Matrix mShaderMatrix = new Matrix();
     /**
-     * 要设置的图片大小
+     *  实现Shader着色器显示单个圆形头像的矩阵
      */
-    private Rect mDrawableRect = new Rect();
+
+
 
     @Override
     public void algorithm(Canvas canvas , SImageView.ConfigInfo info) {
@@ -49,12 +47,8 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
             new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
     /**
      * 多个图片处理
-     * @param canvas
-     * @param info
      */
     private void mulPicture(Canvas canvas , SImageView.ConfigInfo info){
-
-        int mBorderWidth = info.borderWidth;                   // 描边宽度
 
         float[] v = rotations[info.readyBmp.size()-1];
         Paint paint = new Paint();
@@ -90,7 +84,7 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
     }
 
 
-    public static final Bitmap createMaskBitmap(Bitmap bitmap, int viewBoxW, int viewBoxH,
+    private static  Bitmap createMaskBitmap(Bitmap bitmap, int viewBoxW, int viewBoxH,
                                                 int rotation, float gapSize) {
 
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
@@ -119,15 +113,14 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
     /**
      * 单个图片处理
      */
-    private void onePicture(Canvas canvas , SImageView.ConfigInfo info) {
-
-
+    private  void onePicture(Canvas canvas , SImageView.ConfigInfo info) {
 
         int mBorderWidth = info.borderWidth;                   // 描边宽度
         int mBitmapWidth = info.readyBmp.get(0).getWidth();   // 需要处理的bitmap宽度和高度
         int mBitmapHeight = info.readyBmp.get(0).getHeight();
         int viewWidth = info.width;
         int viewHeight = info.height;
+
 
         // 容错控件非正方形场景处理
         int layoutOffsetX = 0;
@@ -146,45 +139,41 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
             }
         }
 
-        // 中间内容画笔
+
+        int bodySquareSide = layoutSquareSide - mBorderWidth*2;
+
+
+        // 创建内容画笔和描边画笔 并设置属性
         Paint paint =  new Paint();
         paint.setAntiAlias(true);
 
-        // 控件可绘制内容的矩形
-        Rect mBorderRect = new Rect();
-        mBorderRect.set(0, 0, layoutSquareSide, layoutSquareSide);
+        Paint borderPaint = new Paint();
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(info.borderWidth);
+        borderPaint.setColor(info.borderColor);
+        borderPaint.setAntiAlias(true);
+
 
         // 创建着色器 shader
         BitmapShader mBitmapShader = new BitmapShader(info.readyBmp.get(0), Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         paint.setShader(mBitmapShader);
 
-        // 创建描边画笔 并设置属性
-        Paint borderPaint = new Paint();
-        paint.setAntiAlias(true);
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(info.borderWidth);
-        borderPaint.setColor(info.borderColor);
-
-
-        // bitmap的对应矩形
-        mDrawableRect.set(mBorderWidth, mBorderWidth, mBorderRect.width() - mBorderWidth, mBorderRect.height() - mBorderWidth);
-        int mBorderRadius = Math.min((mBorderRect.height() - mBorderWidth) / 2, (mBorderRect.width() - mBorderWidth) / 2);
-
 
         // 获取 的位置调整的信息 和bitmap需要缩放的比值
-        float scale = 0;
+        float scale ;
         float dx = 0;
         float dy = 0;
 
         if (mBitmapWidth  >  mBitmapHeight) {
-            scale = mDrawableRect.height() / (float) mBitmapHeight;
-            dx = (mDrawableRect.width() - mBitmapWidth * scale) * 0.5f;
+            scale = bodySquareSide / (float) mBitmapHeight;
+            dx = (bodySquareSide - mBitmapWidth * scale) * 0.5f;
         } else {
-            scale = mDrawableRect.width() / (float) mBitmapWidth;
-            dy = (mDrawableRect.height() - mBitmapHeight * scale) * 0.5f;
+            scale = bodySquareSide / (float) mBitmapWidth;
+            dy = (bodySquareSide - mBitmapHeight * scale) * 0.5f;
         }
 
         // 进行调整
+        Matrix mShaderMatrix = new Matrix();
         mShaderMatrix.set(null);
         mShaderMatrix.setScale(scale, scale);
         mShaderMatrix.postTranslate((int) (dx + 0.5f) + mBorderWidth + layoutOffsetX, (int) (dy + 0.5f) + mBorderWidth + layoutOffsetY);
@@ -195,8 +184,8 @@ public class ConcreteCircleStrategy implements IDrawingStrategy {
         int centerY = viewHeight >> 1 ;
 
         // 画内容和边框
-        canvas.drawCircle(centerX, centerY, mBorderRadius-(mBorderWidth>>1), paint);
-        canvas.drawCircle(centerX, centerY, mBorderRadius, borderPaint);
+        canvas.drawCircle(centerX, centerY, (layoutSquareSide>>1) - (mBorderWidth>>1), paint);
+        canvas.drawCircle(centerX, centerY, (layoutSquareSide-mBorderWidth)>>1, borderPaint);
 
 
     }

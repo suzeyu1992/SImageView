@@ -1,7 +1,5 @@
 package com.szysky.customize.simageview.range;
 
-import android.graphics.Matrix;
-import android.os.Message;
 
 import java.util.ArrayList;
 
@@ -114,7 +112,7 @@ public class QQLayoutManager implements ILayoutManager {
      */
     private static float[] offset5(int index, float dimension, float[] size) {
         // 圆的直径
-        float cd = (float) dimension * size[0];
+        float cd =  dimension * size[0];
         // 边距
         float s1 = -cd * size[1];
 

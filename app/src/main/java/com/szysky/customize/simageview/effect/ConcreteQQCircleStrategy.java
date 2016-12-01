@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.szysky.customize.simageview.SImageView;
@@ -37,6 +38,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
      *  为false时: 可去除两个图片重叠确实的效果
      */
     private boolean mIsPicRotate = true;
+    private static Paint  mPaint = new Paint();
 
     public float getSpacingQuality() {
         return Math.round((mSpacing / 0.15f)*100)/100;
@@ -45,9 +47,6 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
         float[] v = rotations[info.readyBmp.size()-1];
-        Paint paint = new Paint();
-
-        paint.setAntiAlias(true);
 
         Matrix matrix = new Matrix();
 
@@ -70,11 +69,17 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         // 缩放
         Bitmap newBitmap = Bitmap.createBitmap(opeBitmap, 0, 0, mBitmapWidth,
                 mBitmapHeight, matrix, true);
-        // 裁剪
-        Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
+
+        adjustMaskBitmapDisplay(canvas,newBitmap, newBitmap.getWidth(),
                 newBitmap.getHeight(), (int) v[curChild-1], mSpacing , mIsPicRotate);
 
-        canvas.drawBitmap(bitmapOk, 0, 0, paint);
+//        // 裁剪
+//        Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
+//                newBitmap.getHeight(), (int) v[curChild-1], mSpacing , mIsPicRotate);
+////
+//        canvas.drawBitmap(bitmapOk, 0, 0, null);
+
+
 
         canvas.restore();
         matrix.reset();
@@ -99,48 +104,6 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         mSpacing *= spacingQuality;
     }
 
-    @Override
-    public void algorithm(Canvas canvas , SImageView.ConfigInfo info) {
-
-        float[] v = rotations[info.readyBmp.size()-1];
-        Paint paint = new Paint();
-
-        paint.setAntiAlias(true);
-
-        Matrix matrix = new Matrix();
-        for (int i = 0; i < info.readyBmp.size(); i++) {
-            Bitmap bitmap = info.readyBmp.get(i);
-            ILayoutManager.LayoutInfoGroup layoutInfoGroup = info.coordinates.get(i);
-
-            float maxHeight = layoutInfoGroup.innerHeight;
-
-            int mBitmapWidth = bitmap.getWidth();   // 需要处理的bitmap宽度和高度
-            int mBitmapHeight = bitmap.getHeight();
-            canvas.save();
-
-
-            if (!mIsPicRotate){
-                matrix.postScale( maxHeight/mBitmapWidth * 0.9f , maxHeight/mBitmapHeight * 0.9f );
-            }else{
-                matrix.postScale(  maxHeight/(float)mBitmapWidth , maxHeight/(float)mBitmapHeight);
-
-            }
-            canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
-
-
-            // 缩放
-            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, mBitmapWidth,
-                    mBitmapHeight, matrix, true);
-            // 裁剪
-            Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
-                    newBitmap.getHeight(), (int) v[i], mSpacing , mIsPicRotate);
-
-            canvas.drawBitmap(bitmapOk, 0, 0, paint);
-
-            canvas.restore();
-            matrix.reset();
-        }
-    }
 
 
     /**qq群组的不同数量时的对应旋转数组**/
@@ -149,42 +112,79 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
 
 
-    private static  Bitmap createMaskBitmap(Bitmap bitmap, int viewBoxW, int viewBoxH,
-                                                int rotation, float gapSize ,boolean isRotate) {
-
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);// 抗锯齿
-        paint.setFilterBitmap(true);
+    private static void adjustMaskBitmapDisplay(Canvas canvas, Bitmap bitmap ,int viewBoxW, int viewBoxH,
+                                                int rotation, float gapSize ,boolean isRotate){
+        mPaint.reset();
+        mPaint.setAntiAlias(true);// 抗锯齿
+        mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
         long start = System.nanoTime();
 //
         int flag = 1;
         if (flag == 1){
-            canvas.drawCircle(center, center, center, paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, paint);
+            canvas.drawCircle(center, center, center, mPaint);
+            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, mPaint);
 
             if (rotation != 360 && isRotate ) {
                 Matrix matrix = new Matrix();
                 // 根据原图的中心位置旋转
                 matrix.setRotate(rotation, viewBoxW / 2, viewBoxH / 2);
                 canvas.setMatrix(matrix);
-                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-                canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, paint);
+                mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+                canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, mPaint);
             }
         }else if (flag == 2){
-            canvas.drawBitmap(bitmap, 0, 0, paint);
+            canvas.drawBitmap(bitmap, 0, 0, mPaint);
         }else if (flag == 3){
-            canvas.drawOval(new RectF(0, 0,viewBoxW, viewBoxH),  paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, paint);
+            canvas.drawOval(new RectF(viewBoxW*0.05f, viewBoxH*0.2f,viewBoxW*0.95f, viewBoxH*0.8f), mPaint);
+            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, mPaint);
         }else{
-            GraphsTemplate.drawFivePointedStar(canvas, center, 0,0,paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, paint);
+            GraphsTemplate.drawFivePointedStar(canvas, (int)(center * 0.9f), 0,0, mPaint);
+            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, mPaint);
+        }
+    }
+
+    private static  Bitmap createMaskBitmap(Bitmap bitmap, int viewBoxW, int viewBoxH,
+                                                int rotation, float gapSize ,boolean isRotate) {
+//        long tempStart = System.nanoTime();
+//        Log.d("susu", ">>>>临时测速---- "+ (System.nanoTime()-tempStart)/1000000f +"毫秒");
+
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+        mPaint.reset();
+        mPaint.setAntiAlias(true);// 抗锯齿
+        mPaint.setFilterBitmap(true);
+        int center = Math.round(viewBoxW / 2f);
+        long start = System.nanoTime();
+//
+        int flag = 1;
+        if (flag == 1){
+            canvas.drawCircle(center, center, center, mPaint);
+            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, mPaint);
+
+            if (rotation != 360 && isRotate ) {
+                Matrix matrix = new Matrix();
+                // 根据原图的中心位置旋转
+                matrix.setRotate(rotation, viewBoxW / 2, viewBoxH / 2);
+                canvas.setMatrix(matrix);
+                mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+                canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, mPaint);
+            }
+        }else if (flag == 2){
+            canvas.drawBitmap(bitmap, 0, 0, mPaint);
+        }else if (flag == 3){
+            canvas.drawOval(new RectF(0, 0,viewBoxW, viewBoxH), mPaint);
+            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, mPaint);
+        }else{
+            GraphsTemplate.drawFivePointedStar(canvas, center, 0,0, mPaint);
+            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, mPaint);
         }
 
 

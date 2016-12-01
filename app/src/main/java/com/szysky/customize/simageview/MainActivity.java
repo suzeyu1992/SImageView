@@ -25,9 +25,6 @@ public class MainActivity extends AppCompatActivity {
         ConcreteQQCircleStrategy concreteQQCircleStrategy = new ConcreteQQCircleStrategy();
         concreteQQCircleStrategy.setSpacing(1f);
         iv.setDrawStrategy(concreteQQCircleStrategy);
-        long l = System.nanoTime();
-        //iv.setImageResource(R.mipmap.icon_test);
-        Log.i(TAG, "一张图片执行时间:"+ (System.nanoTime() - l));
 
 
 

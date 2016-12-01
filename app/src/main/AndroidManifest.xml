@@ -9,6 +9,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="com.szysky.customize.simageview.MainActivity">
+
+        </activity>
+
+        <activity android:name=".ListPlayActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

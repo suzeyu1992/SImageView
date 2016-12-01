@@ -58,7 +58,7 @@ public class SImageView extends ImageView {
      */
     private IDrawingStrategy mNormalOnePicStrategy = new NormalOnePicStrategy();
 
-    private IDrawingStrategy mDrawStrategy ;
+    private IDrawingStrategy mDrawStrategy = new ConcreteQQCircleStrategy();
 
     public boolean isCloseNormalOnePicLoad() {
         return mCloseNormalOnePicLoad;
@@ -125,14 +125,14 @@ public class SImageView extends ImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Paint mLayoutPaint = new Paint();
-        long startCur = System.currentTimeMillis();
+
+        long startCur = System.nanoTime();
 
 
         if ( mInfo.readyBmp.size() == 1 && !mCloseNormalOnePicLoad){
             long l = System.nanoTime();
             mNormalOnePicStrategy.algorithm(canvas,1,1,mInfo.readyBmp.get(0), mInfo);
-            Log.i("susu", "一张图片执行时间:"+ (System.nanoTime() - l));
+            Log.i("susu", "一张图片执行时间:"+ (System.nanoTime() - l)/1000000f+"毫秒");
 
         }else if (mInfo.readyBmp.size() > 0 ){
             // measure布局参数
@@ -148,54 +148,28 @@ public class SImageView extends ImageView {
                 int offsetX = childInfo.leftTopPoint.x;
                 int offsetY = childInfo.leftTopPoint.y;
 
-                // 创建子元素的矩形范围
-                RectF childRectF = new RectF(childInfo.leftTopPoint.x, childInfo.leftTopPoint.y, offsetX+childInfo.innerWidth, offsetY+childInfo.innerHeight);
 
-                //新建图层
-                int layerID = canvas.saveLayer(0, 0, getWidth(), getHeight(), null, Canvas.ALL_SAVE_FLAG);
-
-
-
-                canvas.translate(offsetX, offsetY);
-
-
-                Paint paint = new Paint();
-                paint.setStyle(Paint.Style.FILL);
-                paint.setColor(Color.GREEN);
                 Bitmap tempBmp = Bitmap.createBitmap(childInfo.innerWidth, childInfo.innerWidth, Bitmap.Config.ARGB_8888);
 
 
                 // 首先关联一个bitmap, 并把关联的canvas对外提供出去
                 mExternalUseCanvas.setBitmap(tempBmp);
 
-                // 用户具体操作mExternalUseCanvas进行子元素绘制
-//                mExternalUseCanvas.drawCircle(childInfo.innerWidth/2, childInfo.innerHeight/2, childInfo.innerHeight/2, paint);
+                // **重点**. 具体实现由使用者通过mExternalUseCanvas定义.
                 mDrawStrategy.algorithm(mExternalUseCanvas,mInfo.coordinates.size(),index ,mInfo.readyBmp.get(index-1),mInfo );
 
-                canvas.drawBitmap(tempBmp,0,0,null);
 
+                canvas.drawBitmap(tempBmp,offsetX,offsetY,null);
 
 
                 // 取消关联的bitmap  并 清空对外提供的canvas
                 mExternalUseCanvas.setBitmap(null);
                 mExternalUseCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
-
-
-                canvas.translate(-offsetX, -offsetY);
-
-                //还原图层
-                canvas.restoreToCount(layerID);
-
-
-
-
             }
-
-            //mDrawStrategy.algorithm(canvas,mInfo);
         }
 
-        Log.i("susu", "onDraw的执行时间:"+ (System.currentTimeMillis() - startCur));
+        Log.i("susu", "onDraw的执行时间:"+ (System.nanoTime() - startCur)/1000000f +"毫秒");
 
 
     }

@@ -20,7 +20,5 @@ public interface IDrawingStrategy {
      * @param canvas    {@link SImageView#onDraw(Canvas)} 中的画布
      * @param info      每个内部元素应该摆放的位置信息类
      */
-    void algorithm(Canvas canvas , SImageView.ConfigInfo info);
-
     void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info);
 }

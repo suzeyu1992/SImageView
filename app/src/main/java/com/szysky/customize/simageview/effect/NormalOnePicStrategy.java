@@ -20,10 +20,6 @@ import com.szysky.customize.simageview.util.GraphsTemplate;
  */
 
 public class  NormalOnePicStrategy implements IDrawingStrategy {
-    @Override
-    public void algorithm(Canvas canvas, SImageView.ConfigInfo info) {
-
-    }
 
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
@@ -99,15 +95,15 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         int centerY = viewHeight >> 1 ;
 
 
-        GraphsTemplate.drawFivePointedStar(canvas, layoutSquareSide/2, 0,0,paint);
+        GraphsTemplate.drawFivePointedStar(canvas, layoutSquareSide/2, layoutOffsetX,layoutOffsetY,paint);
 
 
 
 
 
         // 画内容和边框
-        //        canvas.drawCircle(centerX, centerY, (layoutSquareSide>>1) - (mBorderWidth>>1), paint);
-        //        canvas.drawCircle(centerX, centerY, (layoutSquareSide-mBorderWidth)>>1, borderPaint);
+//                canvas.drawCircle(centerX, centerY, (layoutSquareSide>>1) - (mBorderWidth>>1), paint);
+//                canvas.drawCircle(centerX, centerY, (layoutSquareSide-mBorderWidth)>>1, borderPaint);
     }
 
 

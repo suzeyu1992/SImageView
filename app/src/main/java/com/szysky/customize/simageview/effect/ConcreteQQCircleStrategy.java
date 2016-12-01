@@ -89,7 +89,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
 
 
-
+            bitmap.recycle();
             // 缩放
             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, mBitmapWidth,
                     mBitmapHeight, matrix, true);
@@ -122,7 +122,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         int center = Math.round(viewBoxW / 2f);
         long start = System.nanoTime();
 //
-        int flag = 5;
+        int flag = 1;
         if (flag == 1){
             canvas.drawCircle(center, center, center, paint);
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));

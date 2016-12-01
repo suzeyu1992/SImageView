@@ -15,7 +15,6 @@
         android:id="@+id/iv_main"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:background="@color/colorAccent"
 
         />
 

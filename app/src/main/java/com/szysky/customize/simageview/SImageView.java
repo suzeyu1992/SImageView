@@ -6,6 +6,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
@@ -17,6 +20,7 @@ import com.szysky.customize.simageview.range.NormalOnePicStrategy;
 import com.szysky.customize.simageview.range.QQLayoutManager;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Author :  suzeyu
@@ -32,6 +36,12 @@ public class SImageView extends ImageView {
     private Bitmap mBmp;
     private Bitmap mResultBmp;
     private ConfigInfo mInfo = new ConfigInfo();
+
+    /**
+     *  对外提供的画布
+     */
+    private Canvas mExternalUseCanvas= new Canvas();
+
 
     /**
      *  默认单图片处理的开关标记
@@ -116,7 +126,7 @@ public class SImageView extends ImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
+        Paint mLayoutPaint = new Paint();
 
         if ( mInfo.readyBmp.size() == 1 && !mCloseNormalOnePicLoad){
             long l = System.nanoTime();
@@ -124,8 +134,59 @@ public class SImageView extends ImageView {
             Log.i("susu", "一张图片执行时间:"+ (System.nanoTime() - l));
 
         }else if (mInfo.readyBmp.size() > 0 ){
+            // measure布局参数
             mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
-            mDrawStrategy.algorithm(canvas,mInfo);
+
+            // layout 子元素布局
+            Iterator<ILayoutManager.LayoutInfoGroup> iterator = mInfo.coordinates.iterator();
+
+            while (iterator.hasNext()){
+                ILayoutManager.LayoutInfoGroup childInfo = iterator.next();
+
+                int offsetX = childInfo.leftTopPoint.x;
+                int offsetY = childInfo.leftTopPoint.y;
+
+                // 创建子元素的矩形范围
+                RectF childRectF = new RectF(childInfo.leftTopPoint.x, childInfo.leftTopPoint.y, offsetX+childInfo.innerWidth, offsetY+childInfo.innerHeight);
+
+                //新建图层
+                int layerID = canvas.saveLayer(0, 0, getWidth(), getHeight(), null, Canvas.ALL_SAVE_FLAG);
+
+
+
+                canvas.translate(offsetX, offsetY);
+
+                Paint paint = new Paint();
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.GREEN);
+                Bitmap tempBmp = Bitmap.createBitmap(childInfo.innerWidth, childInfo.innerWidth, Bitmap.Config.ARGB_8888);
+
+
+                // 首先关联一个bitmap, 并把关联的canvas对外提供出去
+                mExternalUseCanvas.setBitmap(tempBmp);
+                mExternalUseCanvas.drawCircle(childInfo.innerWidth/2, childInfo.innerHeight/2, childInfo.innerHeight/2, paint);
+
+                // 用户具体操作mExternalUseCanvas进行子元素绘制
+
+                canvas.drawBitmap(tempBmp,0,0,null);
+
+
+
+                // 取消关联的bitmap  并 清空对外提供的canvas
+                mExternalUseCanvas.setBitmap(null);
+                mExternalUseCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+
+
+                canvas.translate(-offsetX, -offsetY);
+
+                //还原图层
+                canvas.restoreToCount(layerID);
+
+
+            }
+
+            //mDrawStrategy.algorithm(canvas,mInfo);
         }
 
 

@@ -73,11 +73,6 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         adjustMaskBitmapDisplay(canvas,newBitmap, newBitmap.getWidth(),
                 newBitmap.getHeight(), (int) v[curChild-1], mSpacing , mIsPicRotate);
 
-//        // 裁剪
-//        Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
-//                newBitmap.getHeight(), (int) v[curChild-1], mSpacing , mIsPicRotate);
-////
-//        canvas.drawBitmap(bitmapOk, 0, 0, null);
 
 
 
@@ -118,8 +113,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         mPaint.setAntiAlias(true);// 抗锯齿
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
-        long start = System.nanoTime();
-//
+
         int flag = 1;
         if (flag == 1){
             canvas.drawCircle(center, center, center, mPaint);
@@ -147,53 +141,6 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         }
     }
 
-    private static  Bitmap createMaskBitmap(Bitmap bitmap, int viewBoxW, int viewBoxH,
-                                                int rotation, float gapSize ,boolean isRotate) {
-//        long tempStart = System.nanoTime();
-//        Log.d("susu", ">>>>临时测速---- "+ (System.nanoTime()-tempStart)/1000000f +"毫秒");
-
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-        mPaint.reset();
-        mPaint.setAntiAlias(true);// 抗锯齿
-        mPaint.setFilterBitmap(true);
-        int center = Math.round(viewBoxW / 2f);
-        long start = System.nanoTime();
-//
-        int flag = 1;
-        if (flag == 1){
-            canvas.drawCircle(center, center, center, mPaint);
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, mPaint);
-
-            if (rotation != 360 && isRotate ) {
-                Matrix matrix = new Matrix();
-                // 根据原图的中心位置旋转
-                matrix.setRotate(rotation, viewBoxW / 2, viewBoxH / 2);
-                canvas.setMatrix(matrix);
-                mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-                canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, mPaint);
-            }
-        }else if (flag == 2){
-            canvas.drawBitmap(bitmap, 0, 0, mPaint);
-        }else if (flag == 3){
-            canvas.drawOval(new RectF(0, 0,viewBoxW, viewBoxH), mPaint);
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, mPaint);
-        }else{
-            GraphsTemplate.drawFivePointedStar(canvas, center, 0,0, mPaint);
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, mPaint);
-        }
-
-
-
-        Log.e("susu", "setXfermode模式事件>>> "+(System.nanoTime()-start) );
-
-
-        return output;
-    }
 
 
     public boolean isIsPicRotate() {

@@ -5,8 +5,10 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.provider.Settings;
@@ -114,11 +116,11 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 1;
+        int flag = 3;
         if (flag == 1){
-            canvas.drawCircle(center, center, center, mPaint);
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, mPaint);
+            // qq群组效果
+            // 先处理成圆形头像
+            GraphsTemplate.drawCircle(canvas, bitmap, center, center,center,mPaint);
 
             if (rotation != 360 && isRotate ) {
                 Matrix matrix = new Matrix();
@@ -127,19 +129,27 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
                 canvas.setMatrix(matrix);
                 mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
                 canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, mPaint);
+                mPaint.setXfermode(null);
             }
-        }else if (flag == 2){
+        }else if (flag == 2){       // 原图头像
+
             canvas.drawBitmap(bitmap, 0, 0, mPaint);
         }else if (flag == 3){
-            canvas.drawOval(new RectF(viewBoxW*0.05f, viewBoxH*0.2f,viewBoxW*0.95f, viewBoxH*0.8f), mPaint);
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, mPaint);
-        }else{
-            GraphsTemplate.drawFivePointedStar(canvas, (int)(center * 0.9f), 0,0, mPaint);
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, 0, 0, mPaint);
+
+            // 椭圆头像
+            GraphsTemplate.drawOval(canvas, bitmap, new RectF(viewBoxW*0.05f, viewBoxH*0.2f,viewBoxW*0.95f, viewBoxH*0.8f),0,0,mPaint );
+
+        }else if (flag == 4){
+
+            // 五角星头像
+            GraphsTemplate.drawFivePointedStar(canvas, bitmap, (int)(center * 0.9f), 0,0, mPaint);
+
+        }else if (flag == 5){
+            // 有圆角的头像
+           GraphsTemplate.drawCornerRect(canvas, bitmap, viewBoxW, viewBoxH, viewBoxW/8, viewBoxW/8,0,0,mPaint);
         }
     }
+
 
 
 

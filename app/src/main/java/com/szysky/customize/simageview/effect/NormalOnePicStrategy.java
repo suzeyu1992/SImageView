@@ -95,7 +95,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         int centerY = viewHeight >> 1 ;
 
 
-        GraphsTemplate.drawFivePointedStar(canvas, layoutSquareSide/2, layoutOffsetX,layoutOffsetY,paint);
+        GraphsTemplate.drawFivePointedStar(canvas, opeBitmap,layoutSquareSide/2, layoutOffsetX,layoutOffsetY,paint);
 
 
 

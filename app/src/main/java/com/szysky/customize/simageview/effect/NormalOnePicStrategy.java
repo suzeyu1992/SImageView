@@ -5,6 +5,9 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.graphics.Shader;
 
 import com.szysky.customize.simageview.SImageView;
@@ -95,10 +98,33 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         int centerY = viewHeight >> 1 ;
 
 
-        GraphsTemplate.drawFivePointedStar(canvas, opeBitmap,layoutSquareSide/2, layoutOffsetX,layoutOffsetY,paint);
+        //GraphsTemplate.drawFivePointedStar(canvas, opeBitmap,layoutSquareSide/2, layoutOffsetX,layoutOffsetY,paint);
 
 
+        int flag = 5;
+        if (flag == 1){
+            // qq群组效果
+            // 先处理成圆形头像
+            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth>>1),paint);
 
+
+        }else if (flag == 2){       // 原图头像
+
+            canvas.drawBitmap(opeBitmap, layoutOffsetX, layoutOffsetY, paint);
+        }else if (flag == 3){
+
+            // 椭圆头像
+            GraphsTemplate.drawOval(canvas, null, new RectF(layoutSquareSide*0.05f, layoutSquareSide*0.2f,layoutSquareSide*0.95f, layoutSquareSide*0.8f),layoutOffsetX,layoutOffsetY,paint );
+
+        }else if (flag == 4){
+
+            // 五角星头像
+            GraphsTemplate.drawFivePointedStar(canvas, null, (int)(layoutSquareSide / 2 * 1f), layoutOffsetX,layoutOffsetY, paint);
+
+        }else if (flag == 5){
+            // 有圆角的头像
+            GraphsTemplate.drawCornerRect(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/8, layoutSquareSide/8,layoutOffsetX,layoutOffsetY,paint);
+        }
 
 
         // 画内容和边框

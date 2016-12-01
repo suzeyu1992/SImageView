@@ -36,15 +36,17 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     private float mSpacing = 0.15f;
 
     /**
-     *  为true时, 为QQ群组的样式, 默认属性
-     *  为false时: 可去除两个图片重叠确实的效果
+     *  控制是开启qq群组图片去除两张图片重叠的效果
      */
     private boolean mIsPicRotate = true;
     private static Paint  mPaint = new Paint();
 
-    public float getSpacingQuality() {
-        return Math.round((mSpacing / 0.15f)*100)/100;
-    }
+    /**qq群组的不同数量时的对应旋转数组**/
+    private static final float[][] rotations = { new float[] { 360.0f }, new float[] { 45.0f, 360.0f },
+            new float[] { 120.0f, 0.0f, -120.0f }, new float[] { 90.0f, 180.0f, -90.0f, 0.0f },
+            new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
+
+
 
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
@@ -77,36 +79,10 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
 
 
-
         canvas.restore();
         matrix.reset();
 
     }
-
-
-    /**
-     *  设置两张图片的间距
-     *
-     * @param spacingQuality 接收处理范围 0~2 ; 2的时候空隙为最大, 0的时候会重叠. 默认为1
-     */
-    public void setSpacing(float spacingQuality) {
-
-        if (spacingQuality > 2){
-            spacingQuality = 2;
-        }else if (spacingQuality < 0){
-            spacingQuality = 0;
-        }
-
-
-        mSpacing *= spacingQuality;
-    }
-
-
-
-    /**qq群组的不同数量时的对应旋转数组**/
-    private static final float[][] rotations = { new float[] { 360.0f }, new float[] { 45.0f, 360.0f },
-            new float[] { 120.0f, 0.0f, -120.0f }, new float[] { 90.0f, 180.0f, -90.0f, 0.0f },
-            new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
 
 
     private static void adjustMaskBitmapDisplay(Canvas canvas, Bitmap bitmap ,int viewBoxW, int viewBoxH,
@@ -116,7 +92,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 3;
+        int flag = 2;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像
@@ -151,16 +127,40 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     }
 
 
+    /**
+     *  设置两张图片的间距
+     *
+     * @param spacingQuality 接收处理范围 0~2 ; 2的时候空隙为最大, 0的时候会重叠. 默认为1
+     */
+    public void setSpacing(float spacingQuality) {
 
+        if (spacingQuality > 2){
+            spacingQuality = 2;
+        }else if (spacingQuality < 0){
+            spacingQuality = 0;
+        }
+
+
+        mSpacing *= spacingQuality;
+    }
 
     public boolean isIsPicRotate() {
         return mIsPicRotate;
     }
 
+
+    /**
+     * 设置qq群组图片去除重叠方法
+     *
+     * @param mIsPicRotate 为true时, 为QQ群组的样式, 默认属性
+     *                      为false时: 可去除两个图片重叠确实的效果
+     */
     public void setIsPicRotate(boolean mIsPicRotate) {
         this.mIsPicRotate = mIsPicRotate;
     }
 
-
+    public float getSpacingQuality() {
+        return Math.round((mSpacing / 0.15f)*100)/100;
+    }
 
 }

@@ -37,8 +37,9 @@ public class GraphsTemplate {
         path.lineTo(half * 1.62f + offsetX, half * 1.9f + offsetY);//C
         path.close();
         canvas.drawPath(path, paint);
+        if (null == bitmap) return; // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, 0, 0, paint);
+        canvas.drawBitmap(bitmap, offsetX, offsetY, paint);
         paint.setXfermode(null);
     }
 
@@ -59,6 +60,9 @@ public class GraphsTemplate {
         //画出一个圆角矩形
         RectF rectF = new RectF(0, 0, sideWidth, sideHeight);
         canvas.drawRoundRect(rectF,cornerX,cornerY,paint);
+
+        if (null == bitmap) return; // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
+
         //设置混合的模式
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, offsetX, offsetY, paint);
@@ -75,6 +79,10 @@ public class GraphsTemplate {
      */
     public static void drawCircle(Canvas canvas, Bitmap bitmap, float centerX, float centerY, float radius, Paint paint){
         canvas.drawCircle(centerX, centerY, radius, paint);
+
+        if (null == bitmap) return; // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
+
+
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, 0, 0, paint);
         paint.setXfermode(null);
@@ -90,7 +98,16 @@ public class GraphsTemplate {
      * @param offsetY 是否要偏移画布, 移动原点位置, 不需要传入0即可
      */
     public static void drawOval(Canvas canvas, Bitmap bitmap, RectF rectF, float offsetX, float offsetY,Paint paint){
+        // 位置校正
+        rectF.right += offsetX;
+        rectF.left += offsetX;
+        rectF.top += offsetY;
+        rectF.bottom += offsetY;
         canvas.drawOval(rectF, paint);
+
+        if (null == bitmap) return; // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
+
+
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, offsetX, offsetY, paint);
         paint.setXfermode(null);

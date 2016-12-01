@@ -43,10 +43,9 @@ public class WeCharLayoutManager implements ILayoutManager {
 
 
         ArrayList<LayoutInfoGroup> infos = new ArrayList<>();
+        int half = layoutSquareSide / 2;
 
         if (viewNum == 2){
-            int half = layoutSquareSide / 2;
-
 
             // 第一个元素
             LayoutInfoGroup layoutInfoGroup = new LayoutInfoGroup();
@@ -59,6 +58,31 @@ public class WeCharLayoutManager implements ILayoutManager {
             layoutInfoGroup2.innerHeight = layoutInfoGroup2.innerWidth = layoutSquareSide/2;
             layoutInfoGroup2.leftTopPoint = new Point(viewWidth/4*3 - half/2, (viewHeight-half)/2);
             infos.add(layoutInfoGroup2);
+        }else if (viewNum == 3){
+
+            LayoutInfoGroup layoutInfoGroup1 = new LayoutInfoGroup();
+            layoutInfoGroup1.innerHeight = layoutInfoGroup1.innerWidth = (int) (layoutSquareSide/2*0.9f);
+            layoutInfoGroup1.leftTopPoint = new Point(viewWidth/2 - half/2 , viewHeight/2 - half);
+            infos.add(layoutInfoGroup1);
+
+            // 第一个元素
+            LayoutInfoGroup layoutInfoGroup2 = new LayoutInfoGroup();
+            layoutInfoGroup2.innerHeight = layoutInfoGroup2.innerWidth = (int) (layoutSquareSide/2*0.9f);
+            layoutInfoGroup2.leftTopPoint = new Point(viewWidth/2 - half , (viewHeight-half)/2 + half/2);
+            infos.add(layoutInfoGroup2);
+
+            // 第二个元素
+            LayoutInfoGroup layoutInfoGroup3 = new LayoutInfoGroup();
+            layoutInfoGroup3.innerHeight = layoutInfoGroup3.innerWidth = (int) (layoutSquareSide/2*0.9f);
+            layoutInfoGroup3.leftTopPoint = new Point(viewWidth/2 , (viewHeight-half)/2 + half/2);
+            infos.add(layoutInfoGroup3);
+        }else if (viewNum == 4){
+
+            // 第一个元素
+            LayoutInfoGroup layoutInfoGroup1 = new LayoutInfoGroup();
+            layoutInfoGroup1.innerHeight = layoutInfoGroup1.innerWidth = layoutSquareSide/2;
+            layoutInfoGroup1.leftTopPoint = new Point(viewWidth/2 - half , (viewHeight-half)/2 + half/2);
+
         }
 
 

@@ -1,11 +1,10 @@
-package com.szysky.customize.simageview.range;
+package com.szysky.customize.simageview.effect;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.Shader;
 
 import com.szysky.customize.simageview.SImageView;
@@ -20,12 +19,17 @@ import com.szysky.customize.simageview.util.GraphsTemplate;
  * ClassDescription :  默认但图片处理策略
  */
 
-public class NormalOnePicStrategy implements IDrawingStrategy {
+public class  NormalOnePicStrategy implements IDrawingStrategy {
     @Override
     public void algorithm(Canvas canvas, SImageView.ConfigInfo info) {
+
+    }
+
+    @Override
+    public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
         int mBorderWidth = info.borderWidth;                   // 描边宽度
-        int mBitmapWidth = info.readyBmp.get(0).getWidth();   // 需要处理的bitmap宽度和高度
-        int mBitmapHeight = info.readyBmp.get(0).getHeight();
+        int mBitmapWidth = opeBitmap.getWidth();   // 需要处理的bitmap宽度和高度
+        int mBitmapHeight = opeBitmap.getHeight();
         int viewWidth = info.width;
         int viewHeight = info.height;
 
@@ -66,7 +70,7 @@ public class NormalOnePicStrategy implements IDrawingStrategy {
 
 
         // 创建着色器 shader
-        BitmapShader mBitmapShader = new BitmapShader(info.readyBmp.get(0), Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        BitmapShader mBitmapShader = new BitmapShader(opeBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         paint.setShader(mBitmapShader);
 
 
@@ -102,15 +106,9 @@ public class NormalOnePicStrategy implements IDrawingStrategy {
 
 
         // 画内容和边框
-//        canvas.drawCircle(centerX, centerY, (layoutSquareSide>>1) - (mBorderWidth>>1), paint);
-//        canvas.drawCircle(centerX, centerY, (layoutSquareSide-mBorderWidth)>>1, borderPaint);
+        //        canvas.drawCircle(centerX, centerY, (layoutSquareSide>>1) - (mBorderWidth>>1), paint);
+        //        canvas.drawCircle(centerX, centerY, (layoutSquareSide-mBorderWidth)>>1, borderPaint);
     }
 
-    float cos(int num){
-        return (float) Math.cos(num*Math.PI/180);
-    }
 
-    float sin(int num){
-        return (float) Math.sin(num*Math.PI/180);
-    }
 }

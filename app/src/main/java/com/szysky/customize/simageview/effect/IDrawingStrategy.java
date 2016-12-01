@@ -1,5 +1,6 @@
 package com.szysky.customize.simageview.effect;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 import com.szysky.customize.simageview.SImageView;
@@ -20,4 +21,6 @@ public interface IDrawingStrategy {
      * @param info      每个内部元素应该摆放的位置信息类
      */
     void algorithm(Canvas canvas , SImageView.ConfigInfo info);
+
+    void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info);
 }

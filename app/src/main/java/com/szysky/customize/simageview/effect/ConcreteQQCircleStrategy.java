@@ -7,7 +7,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.Log;
@@ -31,17 +30,57 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     /**
      *  默认两张图片间隔距离系数
      */
-    private float mSpacing = 0.3f;
+    private float mSpacing = 0.15f;
 
     /**
      *  为true时, 为QQ群组的样式, 默认属性
      *  为false时: 可去除两个图片重叠确实的效果
      */
-    private boolean mIsPicRotate = false;
+    private boolean mIsPicRotate = true;
 
     public float getSpacingQuality() {
         return Math.round((mSpacing / 0.15f)*100)/100;
     }
+
+    @Override
+    public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
+        float[] v = rotations[info.readyBmp.size()-1];
+        Paint paint = new Paint();
+
+        paint.setAntiAlias(true);
+
+        Matrix matrix = new Matrix();
+
+        ILayoutManager.LayoutInfoGroup layoutInfoGroup = info.coordinates.get(curChild-1);
+
+        float maxHeight = layoutInfoGroup.innerHeight;
+
+        int mBitmapWidth = opeBitmap.getWidth();   // 需要处理的bitmap宽度和高度
+        int mBitmapHeight = opeBitmap.getHeight();
+        canvas.save();
+
+
+        if (!mIsPicRotate){
+            matrix.postScale( maxHeight/mBitmapWidth * 0.9f , maxHeight/mBitmapHeight * 0.9f );
+        }else{
+            matrix.postScale(  maxHeight/(float)mBitmapWidth , maxHeight/(float)mBitmapHeight);
+
+        }
+//        canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
+        // 缩放
+        Bitmap newBitmap = Bitmap.createBitmap(opeBitmap, 0, 0, mBitmapWidth,
+                mBitmapHeight, matrix, true);
+        // 裁剪
+        Bitmap bitmapOk = createMaskBitmap(newBitmap, newBitmap.getWidth(),
+                newBitmap.getHeight(), (int) v[curChild-1], mSpacing , mIsPicRotate);
+
+        canvas.drawBitmap(bitmapOk, 0, 0, paint);
+
+        canvas.restore();
+        matrix.reset();
+
+    }
+
 
     /**
      *  设置两张图片的间距
@@ -89,7 +128,6 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
 
 
-            bitmap.recycle();
             // 缩放
             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, mBitmapWidth,
                     mBitmapHeight, matrix, true);
@@ -103,6 +141,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             matrix.reset();
         }
     }
+
 
     /**qq群组的不同数量时的对应旋转数组**/
     private static final float[][] rotations = { new float[] { 360.0f }, new float[] { 45.0f, 360.0f },
@@ -164,6 +203,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     public void setIsPicRotate(boolean mIsPicRotate) {
         this.mIsPicRotate = mIsPicRotate;
     }
+
 
 
 }

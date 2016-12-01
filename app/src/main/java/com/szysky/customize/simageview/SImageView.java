@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -15,8 +14,8 @@ import android.widget.ImageView;
 
 import com.szysky.customize.simageview.effect.ConcreteQQCircleStrategy;
 import com.szysky.customize.simageview.effect.IDrawingStrategy;
+import com.szysky.customize.simageview.effect.NormalOnePicStrategy;
 import com.szysky.customize.simageview.range.ILayoutManager;
-import com.szysky.customize.simageview.range.NormalOnePicStrategy;
 import com.szysky.customize.simageview.range.QQLayoutManager;
 
 import java.util.ArrayList;
@@ -127,10 +126,12 @@ public class SImageView extends ImageView {
         super.onDraw(canvas);
 
         Paint mLayoutPaint = new Paint();
+        long startCur = System.currentTimeMillis();
+
 
         if ( mInfo.readyBmp.size() == 1 && !mCloseNormalOnePicLoad){
             long l = System.nanoTime();
-            mNormalOnePicStrategy.algorithm(canvas, mInfo);
+            mNormalOnePicStrategy.algorithm(canvas,1,1,mInfo.readyBmp.get(0), mInfo);
             Log.i("susu", "一张图片执行时间:"+ (System.nanoTime() - l));
 
         }else if (mInfo.readyBmp.size() > 0 ){
@@ -139,8 +140,9 @@ public class SImageView extends ImageView {
 
             // layout 子元素布局
             Iterator<ILayoutManager.LayoutInfoGroup> iterator = mInfo.coordinates.iterator();
-
+            int index = 0;
             while (iterator.hasNext()){
+                index++;
                 ILayoutManager.LayoutInfoGroup childInfo = iterator.next();
 
                 int offsetX = childInfo.leftTopPoint.x;
@@ -156,6 +158,7 @@ public class SImageView extends ImageView {
 
                 canvas.translate(offsetX, offsetY);
 
+
                 Paint paint = new Paint();
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(Color.GREEN);
@@ -164,9 +167,10 @@ public class SImageView extends ImageView {
 
                 // 首先关联一个bitmap, 并把关联的canvas对外提供出去
                 mExternalUseCanvas.setBitmap(tempBmp);
-                mExternalUseCanvas.drawCircle(childInfo.innerWidth/2, childInfo.innerHeight/2, childInfo.innerHeight/2, paint);
 
                 // 用户具体操作mExternalUseCanvas进行子元素绘制
+//                mExternalUseCanvas.drawCircle(childInfo.innerWidth/2, childInfo.innerHeight/2, childInfo.innerHeight/2, paint);
+                mDrawStrategy.algorithm(mExternalUseCanvas,mInfo.coordinates.size(),index ,mInfo.readyBmp.get(index-1),mInfo );
 
                 canvas.drawBitmap(tempBmp,0,0,null);
 
@@ -184,11 +188,14 @@ public class SImageView extends ImageView {
                 canvas.restoreToCount(layerID);
 
 
+
+
             }
 
             //mDrawStrategy.algorithm(canvas,mInfo);
         }
 
+        Log.i("susu", "onDraw的执行时间:"+ (System.currentTimeMillis() - startCur));
 
 
     }

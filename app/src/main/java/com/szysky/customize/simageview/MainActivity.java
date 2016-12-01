@@ -34,10 +34,10 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
-        bitmaps.add(bitmap);
-        bitmaps.add(bitmap);
-        bitmaps.add(bitmap);
-        bitmaps.add(bitmap);
+//        bitmaps.add(bitmap);
+//        bitmaps.add(bitmap);
+//        bitmaps.add(bitmap);
+//        bitmaps.add(bitmap);
         bitmaps.add(bitmap);
         iv.setImages(bitmaps);
 

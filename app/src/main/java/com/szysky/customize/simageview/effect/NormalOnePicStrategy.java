@@ -24,9 +24,12 @@ import com.szysky.customize.simageview.util.GraphsTemplate;
 
 public class  NormalOnePicStrategy implements IDrawingStrategy {
 
+    private int mBorderWidth;
+
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
-        int mBorderWidth = info.borderWidth;                   // 描边宽度
+        // 描边宽度
+        mBorderWidth = info.borderWidth;
         int mBitmapWidth = opeBitmap.getWidth();   // 需要处理的bitmap宽度和高度
         int mBitmapHeight = opeBitmap.getHeight();
         int viewWidth = info.width;
@@ -53,7 +56,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         }
 
 
-        int bodySquareSide = layoutSquareSide - mBorderWidth*2;
+        int bodySquareSide = layoutSquareSide - mBorderWidth *2;
 
 
         // 创建内容画笔和描边画笔 并设置属性
@@ -82,10 +85,9 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
             scale = bodySquareSide / (float) mBitmapHeight;
             dx = (bodySquareSide - mBitmapWidth * scale) * 0.5f;
         } else {
-            scale = bodySquareSide / (float) mBitmapWidth;
+            scale = bodySquareSide / (float) mBitmapWidth * 1.0f;
             dy = (bodySquareSide - mBitmapHeight * scale) * 0.5f;
         }
-
         // 进行调整
         Matrix mShaderMatrix = new Matrix();
         mShaderMatrix.set(null);
@@ -105,11 +107,17 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像
-            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth>>1),paint);
+            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth >>1),paint);
 
 
         }else if (flag == 2){       // 原图头像
-
+            RectF rectF = new RectF(0 + layoutOffsetX, 0 + layoutOffsetY, layoutSquareSide + layoutOffsetX, layoutSquareSide + layoutOffsetY);
+            canvas.drawRect( rectF,paint);
+            rectF.bottom -= mBorderWidth/2;
+            rectF.top += mBorderWidth/2;
+            rectF.right -= mBorderWidth/2;
+            rectF.left += mBorderWidth/2;
+            canvas.drawRect(rectF, borderPaint);
             canvas.drawBitmap(opeBitmap, layoutOffsetX, layoutOffsetY, paint);
         }else if (flag == 3){
 
@@ -123,7 +131,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
 
         }else if (flag == 5){
             // 有圆角的头像
-            GraphsTemplate.drawCornerRect(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/8, layoutSquareSide/8,layoutOffsetX,layoutOffsetY,paint);
+            GraphsTemplate.drawCornerRectBorder(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/8, layoutSquareSide/8,layoutOffsetX,layoutOffsetY,paint,mBorderWidth,borderPaint);
         }
 
 

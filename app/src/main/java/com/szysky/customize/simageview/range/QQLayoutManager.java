@@ -26,7 +26,7 @@ public class QQLayoutManager implements ILayoutManager {
 
         if (viewNum > 5){
             viewNum = 5;
-        }else if (viewNum < 2){
+        }else if (viewNum < 1){
             throw new UnsupportedOperationException("不支持操作异常");
         }
 
@@ -86,7 +86,8 @@ public class QQLayoutManager implements ILayoutManager {
      */
     public static float[] offset(int count, int index, float dimension, float[] size) {
         switch (count) {
-
+            case 1:
+                return offset1(index, dimension);
             case 2:
                 return offset2(index, dimension, size);
             case 3:
@@ -99,6 +100,13 @@ public class QQLayoutManager implements ILayoutManager {
                 break;
         }
         return new float[] { 0f, 0f };
+    }
+
+    private static float[] offset1(int index, float dimension) {
+        // 圆的直径
+        float cd = (float) dimension * 0.9f;
+        float offset = (dimension - cd) / 2;
+        return new float[] { offset, offset };
     }
 
     /**
@@ -133,18 +141,13 @@ public class QQLayoutManager implements ILayoutManager {
         float x5 = (float) (-s1 * Math.cos(19 * Math.PI / 180));
         float y5 = (float) (s1 * Math.sin(18 * Math.PI / 180));
 
-        // Log.d(TAG, "x1:" + x1 + "/y1:" + y1);
-        // Log.d(TAG, "x2:" + x2 + "/y2:" + y2);
-        // Log.d(TAG, "x3:" + x3 + "/y3:" + y3);
-        // Log.d(TAG, "x4:" + x4 + "/y4:" + y4);
-        // Log.d(TAG, "x5:" + x5 + "/y5:" + y5);
+
 
         // 居中 Y轴偏移量
         float xx1 = (dimension - cd - y3 - s1) / 2;
         // 居中 X轴偏移量
         float xxc1 = (dimension - cd) / 2;
-        // xx1 = xxc1 = -s1;
-        // xx1 = xxc1 = 0;
+
         switch (index) {
             case 0:
                 // return new float[] { s1 + xxc1, xx1 };
@@ -191,10 +194,7 @@ public class QQLayoutManager implements ILayoutManager {
         float x4 = x1;
         float y4 = y3;
 
-        // Log.d(TAG, "x1:" + x1 + "/y1:" + y1);
-        // Log.d(TAG, "x2:" + x2 + "/y2:" + y2);
-        // Log.d(TAG, "x3:" + x3 + "/y3:" + y3);
-        // Log.d(TAG, "x4:" + x4 + "/y4:" + y4);
+
 
         // 居中 X轴偏移量
         float xx1 = (dimension - cd - s1) / 2;

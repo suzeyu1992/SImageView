@@ -3,6 +3,7 @@ package com.szysky.customize.simageview.effect;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -47,9 +48,39 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
 
 
+    private int mBorderWidth;
+
+    /**
+     *  描边画笔
+     */
+    private final Paint mBorderPaint;
+
+    /**
+     *  子元素内容画笔
+     */
+    private final Paint bodyPaint;
+
+
+    public ConcreteQQCircleStrategy(){
+        // 创建内容画笔和描边画笔 并设置属性
+        bodyPaint = new Paint();
+        bodyPaint.setAntiAlias(true);
+        bodyPaint.setStyle(Paint.Style.FILL);
+
+        mBorderPaint = new Paint();
+        mBorderPaint.setStyle(Paint.Style.STROKE);
+        mBorderPaint.setStrokeWidth(1);
+        mBorderPaint.setColor(Color.BLACK);
+        mBorderPaint.setAntiAlias(true);
+    }
 
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
+
+        // 描边宽度
+        mBorderWidth = info.borderWidth;
+        mBorderPaint.setColor(info.borderColor);
+        mBorderPaint.setStrokeWidth(mBorderWidth);
 
         Matrix matrix = new Matrix();
 
@@ -63,7 +94,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
 
         if (!mIsPicRotate){
-            matrix.postScale( maxHeight/mBitmapWidth * 0.9f , maxHeight/mBitmapHeight * 0.9f );
+            matrix.postScale( maxHeight/(float)mBitmapWidth , maxHeight/(float)mBitmapHeight );
         }else{
             matrix.postScale(  maxHeight/(float)mBitmapWidth , maxHeight/(float)mBitmapHeight);
 
@@ -87,14 +118,14 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     }
 
 
-    private static void adjustMaskBitmapDisplay(Canvas canvas, Bitmap bitmap ,int viewBoxW, int viewBoxH,
+    private  void adjustMaskBitmapDisplay(Canvas canvas, Bitmap bitmap ,int viewBoxW, int viewBoxH,
                                                 float rotation, float gapSize ,boolean isRotate){
         mPaint.reset();
         mPaint.setAntiAlias(true);// 抗锯齿
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 2;
+        int flag = 4;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像
@@ -120,11 +151,11 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         }else if (flag == 4){
 
             // 五角星头像
-            GraphsTemplate.drawFivePointedStar(canvas, bitmap, (int)(center * 0.9f), 0,0, mPaint);
+            GraphsTemplate.drawFivePointedStar(canvas, bitmap, (int)(center * 0.9f), 0,0, mPaint ,mBorderWidth ,mBorderPaint);
 
         }else if (flag == 5){
             // 有圆角的头像
-           GraphsTemplate.drawCornerRect(canvas, bitmap, viewBoxW, viewBoxH, viewBoxW/8, viewBoxW/8,0,0,mPaint);
+           GraphsTemplate.drawCornerRectBorder(canvas, bitmap, viewBoxW, viewBoxH, viewBoxW/8, viewBoxW/8,0,0,mPaint, mBorderWidth ,mBorderPaint);
         }
     }
 

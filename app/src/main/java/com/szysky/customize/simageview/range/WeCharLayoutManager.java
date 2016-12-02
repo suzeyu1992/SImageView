@@ -192,7 +192,7 @@ public class WeCharLayoutManager implements ILayoutManager {
     }
 
     /**
-     * 快速创建一个水平线两个子元素的场景, 如微信群组的, 二人, 三人, 四人, 5人, 8人
+     * 快速创建一个水平线两个子元素的场景, 如微信群组的, 2人, 3人, 4人, 5人, 8人
      * @param viewWidth 控件的宽度
      * @param positiveY 这一个水平线两张图片的左上角的y点
      * @param side  子元素的边长

@@ -1,5 +1,6 @@
 package com.szysky.customize.simageview.range;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
 
@@ -18,11 +19,12 @@ import java.util.ArrayList;
 public interface ILayoutManager {
 
     /**
-     * 布局排列计算方法, 具体规则由子类实现
+     * 布局measure排列计算方法, 具体规则由子类实现
+     *
      * @param viewWidth 控件的宽
      * @param viewHeight 控件的高
      * @param viewNum   控件需要在内部显示几张图片
-     * @return  返回一个信息集合, 提供 {@link com.szysky.customize.simageview.effect.IDrawingStrategy#algorithm(Canvas, SImageView.ConfigInfo)}使用
+     * @return  返回一个信息集合, 提供 {@link com.szysky.customize.simageview.effect.IDrawingStrategy#algorithm(Canvas, int, int, Bitmap, SImageView.ConfigInfo)}使用
      */
     ArrayList<LayoutInfoGroup> calculate(int viewWidth, int viewHeight, int viewNum);
 

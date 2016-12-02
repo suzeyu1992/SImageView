@@ -3,6 +3,8 @@ package com.szysky.customize.simageview.range;
 import android.content.Context;
 import android.graphics.Point;
 
+import com.szysky.customize.simageview.util.UIUtils;
+
 import java.util.ArrayList;
 
 /**
@@ -10,7 +12,7 @@ import java.util.ArrayList;
  * Time   :  2016-12-01  下午11:14
  * Blog   :  http://szysky.com
  * GitHub :  https://github.com/suzeyu1992
- * ClassDescription :  微信布局接口
+ * ClassDescription :  微信 measure测量布局实现
  */
 
 public class WeCharLayoutManager implements ILayoutManager {
@@ -26,6 +28,11 @@ public class WeCharLayoutManager implements ILayoutManager {
      * 布局子元素的下标
      */
     private int curCachePoint ;
+
+    /**
+     *  子元素的空隙, 例如两个图片的距离. 单位dp
+     */
+    private float mSpacing = 1f;
 
     public WeCharLayoutManager(Context context) {
         this.context = context;
@@ -47,6 +54,7 @@ public class WeCharLayoutManager implements ILayoutManager {
         // 缓存集合清除无用信息
         cleanMaskCache();
 
+        // 默认微信群组效果只支持9张最大图片
         if (viewNum > 9){
             viewNum = 9;
         }else if (viewNum < 1){
@@ -68,54 +76,60 @@ public class WeCharLayoutManager implements ILayoutManager {
         // 返回的所有子元素布局信息集合
         ArrayList<LayoutInfoGroup> infos = new ArrayList<>();
 
+        int half =0;      // 子元素的边长
+
         // 开始测量布局
         if (viewNum == 1){
 
-            int half = layoutSquareSide / 2;
+            half = layoutSquareSide ;
             infos.add(createChildrenForTop(viewWidth/2 - half/2 , viewHeight/2 - half/2,half));
 
         }else if(viewNum == 2){
 
-            int half = layoutSquareSide / 2;
+            half = layoutSquareSide / 2;
             fastTwoChild(viewWidth,(viewHeight-half)/2,half, infos );
 
         }else if (viewNum == 3){
-            int half = layoutSquareSide / 2;
+            half = layoutSquareSide / 2;
             infos.add(createChildrenForTop(viewWidth/2 - half/2 , viewHeight/2 - half,half));
             fastTwoChild(viewWidth,viewHeight/2,half, infos );
 
         }else if (viewNum == 4){
-            int half = layoutSquareSide / 2;
+            half = layoutSquareSide / 2;
             fastTwoChild(viewWidth,viewHeight/2 - half,half, infos );
             fastTwoChild(viewWidth,viewHeight/2 ,half, infos );
 
         }else if (viewNum == 5){
-            int half = layoutSquareSide / 3;
+            half = layoutSquareSide / 3;
             fastTwoChild(viewWidth,viewHeight/2 - half,half, infos );
             fastThreeChild(viewWidth, viewHeight/2, half, infos);
         }else if (viewNum == 6){
-            int half = layoutSquareSide / 3;
+            half = layoutSquareSide / 3;
             fastThreeChild(viewWidth, viewHeight/2 - half, half, infos);
             fastThreeChild(viewWidth, viewHeight/2, half, infos);
 
         }else if (viewNum == 7){
-            int half = layoutSquareSide / 3;
+            half = layoutSquareSide / 3;
             infos.add(createChildrenForTop(viewWidth/2 - half/2 , viewHeight/2 - half/2*3,half));
             fastThreeChild(viewWidth, viewHeight/2 - half/2, half, infos);
             fastThreeChild(viewWidth, viewHeight/2 + half/2, half, infos);
 
         }else if (viewNum == 8){
-            int half = layoutSquareSide / 3;
+            half = layoutSquareSide / 3;
             fastTwoChild(viewWidth, viewHeight/2 - half/2*3 ,half,infos );
             fastThreeChild(viewWidth, viewHeight/2 - half/2, half, infos);
             fastThreeChild(viewWidth, viewHeight/2 + half/2, half, infos);
         }else if (viewNum == 9){
-            int half = layoutSquareSide / 3;
+            half = layoutSquareSide / 3;
             fastThreeChild(viewWidth, viewHeight/2 - half/2*3, half, infos);
             fastThreeChild(viewWidth, viewHeight/2 - half/2, half, infos);
             fastThreeChild(viewWidth, viewHeight/2 + half/2, half, infos);
         }
 
+        // 添加子元素之间的空隙
+        if (mSpacing > 0 && half > 0){
+            addSpacing(mSpacing, half, infos);
+        }
 
         return infos;
     }
@@ -129,8 +143,20 @@ public class WeCharLayoutManager implements ILayoutManager {
         }
         curCachePoint = 0;
     }
+    /**对布局元素中的每个子元素添加空隙**/
+    private void addSpacing(float dp, int side , ArrayList<LayoutInfoGroup> datas){
+        int addPixel = UIUtils.dip2px(context, dp);
 
+        // 每个子元素的空隙不得超出子元素边长的三分之一
+        addPixel = addPixel > side/3 ? side/3 : addPixel ;
 
+        // 开始添加空隙
+        for (LayoutInfoGroup data : datas) {
+            data.innerHeight = data.innerWidth = data.innerWidth-2*addPixel;
+            data.rightBottomPoint.set(data.rightBottomPoint.x - addPixel, data.rightBottomPoint.y - addPixel);
+            data.leftTopPoint.set(data.leftTopPoint.x + addPixel, data.leftTopPoint.y + addPixel);
+        }
+    }
 
 
 
@@ -191,5 +217,21 @@ public class WeCharLayoutManager implements ILayoutManager {
         mLayouts.add(createChildrenForTop(viewWidth/2 - side/2*3 , positiveY, side ));
         mLayouts.add(createChildrenForTop(viewWidth/2 - side/2 , positiveY, side ));
         mLayouts.add(createChildrenForTop(viewWidth/2 + side/2 , positiveY, side ));
+    }
+
+    /**
+     * 获取子元素的空隙
+     * @return 返回单位dp
+     */
+    public float getSpacing() {
+        return mSpacing;
+    }
+
+    /**
+     * 设置子元素间的空隙
+     * @param mSpacing 单位dp
+     */
+    public void setSpacing(float mSpacing) {
+        this.mSpacing = mSpacing;
     }
 }

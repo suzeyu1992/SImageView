@@ -35,8 +35,8 @@ public class WeCharLayoutManager implements ILayoutManager {
         // 缓存集合清除无用信息
         cleanMaskCache();
 
-        if (viewNum > 5){
-            viewNum = 5;
+        if (viewNum > 8){
+            viewNum = 8;
         }else if (viewNum < 2){
             throw new UnsupportedOperationException("不支持操作异常");
         }
@@ -62,22 +62,29 @@ public class WeCharLayoutManager implements ILayoutManager {
 
 
         ArrayList<LayoutInfoGroup> infos = new ArrayList<>();
-        // 子元素头像的边长
-        int half = layoutSquareSide / 2;
 
         if (viewNum == 2){
-
+            int half = layoutSquareSide / 2;
             fastMaxTwoChild(viewWidth,(viewHeight-half)/2,half, infos );
 
         }else if (viewNum == 3){
-
+            int half = layoutSquareSide / 2;
             infos.add(createChildrenForTop(viewWidth/2 - half/2 , viewHeight/2 - half,half));
             fastMaxTwoChild(viewWidth,viewHeight/2,half, infos );
 
         }else if (viewNum == 4){
-
+            int half = layoutSquareSide / 2;
             fastMaxTwoChild(viewWidth,viewHeight/2 - half,half, infos );
             fastMaxTwoChild(viewWidth,viewHeight/2 ,half, infos );
+
+        }else if (viewNum == 5){
+            int half = layoutSquareSide / 3;
+            fastMaxTwoChild(viewWidth,viewHeight/2 - half,half, infos );
+            fastThreeChild(viewWidth, viewHeight/2, half, infos);
+        }else if (viewNum == 6){
+            int half = layoutSquareSide / 3;
+            fastThreeChild(viewWidth, viewHeight/2 - half, half, infos);
+            fastThreeChild(viewWidth, viewHeight/2, half, infos);
 
         }
 
@@ -139,5 +146,12 @@ public class WeCharLayoutManager implements ILayoutManager {
         mLayouts.add(createChildrenForTop(viewWidth/2 - side , positiveY, side ));
         // 第二个元素
         mLayouts.add(createChildrenForTop(viewWidth/2  , positiveY, side ));
+    }
+
+    private void fastThreeChild(int viewWidth, int positiveY, int side, ArrayList<LayoutInfoGroup> mLayouts){
+
+        mLayouts.add(createChildrenForTop(viewWidth/2 - side/2*3 , positiveY, side ));
+        mLayouts.add(createChildrenForTop(viewWidth/2 - side/2 , positiveY, side ));
+        mLayouts.add(createChildrenForTop(viewWidth/2 + side/2 , positiveY, side ));
     }
 }

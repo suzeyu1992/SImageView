@@ -50,7 +50,6 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
-        float[] v = rotations[info.readyBmp.size()-1];
 
         Matrix matrix = new Matrix();
 
@@ -74,8 +73,11 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         Bitmap newBitmap = Bitmap.createBitmap(opeBitmap, 0, 0, mBitmapWidth,
                 mBitmapHeight, matrix, true);
 
+
+
+
         adjustMaskBitmapDisplay(canvas,newBitmap, newBitmap.getWidth(),
-                newBitmap.getHeight(), (int) v[curChild-1], mSpacing , mIsPicRotate);
+                newBitmap.getHeight(), childTotal > 5 ? 360:rotations[childTotal-1][curChild-1], mSpacing , mIsPicRotate);
 
 
 
@@ -86,19 +88,19 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
 
     private static void adjustMaskBitmapDisplay(Canvas canvas, Bitmap bitmap ,int viewBoxW, int viewBoxH,
-                                                int rotation, float gapSize ,boolean isRotate){
+                                                float rotation, float gapSize ,boolean isRotate){
         mPaint.reset();
         mPaint.setAntiAlias(true);// 抗锯齿
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 5;
+        int flag = 1;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像
             GraphsTemplate.drawCircle(canvas, bitmap, center, center,center,mPaint);
 
-            if (rotation != 360 && isRotate ) {
+            if ( isRotate  &&   rotation != 360f  ) {
                 Matrix matrix = new Matrix();
                 // 根据原图的中心位置旋转
                 matrix.setRotate(rotation, viewBoxW / 2, viewBoxH / 2);

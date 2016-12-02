@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
 //        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
         bitmaps.add(bitmap);
         bitmaps.add(bitmap);
         iv.setImages(bitmaps);

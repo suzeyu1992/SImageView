@@ -62,38 +62,22 @@ public class WeCharLayoutManager implements ILayoutManager {
 
 
         ArrayList<LayoutInfoGroup> infos = new ArrayList<>();
+        // 子元素头像的边长
         int half = layoutSquareSide / 2;
 
         if (viewNum == 2){
 
-            // 第一个元素
-            infos.add(createChildrenForTop(viewWidth/2 - half , (viewHeight-half)/2, half ));
-            // 第二个元素
-            infos.add(createChildrenForTop(viewWidth/2  , (viewHeight-half)/2, half ));
+            fastMaxTwoChild(viewWidth,(viewHeight-half)/2,half, infos );
+
         }else if (viewNum == 3){
 
-            LayoutInfoGroup layoutInfoGroup1 = new LayoutInfoGroup();
-            layoutInfoGroup1.innerHeight = layoutInfoGroup1.innerWidth = (int) (layoutSquareSide/2*0.9f);
-            layoutInfoGroup1.leftTopPoint = new Point(viewWidth/2 - half/2 , viewHeight/2 - half);
-            infos.add(layoutInfoGroup1);
+            infos.add(createChildrenForTop(viewWidth/2 - half/2 , viewHeight/2 - half,half));
+            fastMaxTwoChild(viewWidth,viewHeight/2,half, infos );
 
-            // 第一个元素
-            LayoutInfoGroup layoutInfoGroup2 = new LayoutInfoGroup();
-            layoutInfoGroup2.innerHeight = layoutInfoGroup2.innerWidth = (int) (layoutSquareSide/2*0.9f);
-            layoutInfoGroup2.leftTopPoint = new Point(viewWidth/2 - half , (viewHeight-half)/2 + half/2);
-            infos.add(layoutInfoGroup2);
-
-            // 第二个元素
-            LayoutInfoGroup layoutInfoGroup3 = new LayoutInfoGroup();
-            layoutInfoGroup3.innerHeight = layoutInfoGroup3.innerWidth = (int) (layoutSquareSide/2*0.9f);
-            layoutInfoGroup3.leftTopPoint = new Point(viewWidth/2 , (viewHeight-half)/2 + half/2);
-            infos.add(layoutInfoGroup3);
         }else if (viewNum == 4){
 
-            // 第一个元素
-            LayoutInfoGroup layoutInfoGroup1 = new LayoutInfoGroup();
-            layoutInfoGroup1.innerHeight = layoutInfoGroup1.innerWidth = layoutSquareSide/2;
-            layoutInfoGroup1.leftTopPoint = new Point(viewWidth/2 - half , (viewHeight-half)/2 + half/2);
+            fastMaxTwoChild(viewWidth,viewHeight/2 - half,half, infos );
+            fastMaxTwoChild(viewWidth,viewHeight/2 ,half, infos );
 
         }
 
@@ -143,7 +127,17 @@ public class WeCharLayoutManager implements ILayoutManager {
         return childLayout;
     }
 
-//    private void fastMaxTwoChild(int viewWidth, int positiveY, int side, ArrayList<LayoutInfoGroup> mLayouts){
-//
-//    }
+    /**
+     * 快速创建一个水平线两个子元素的场景, 如微信群组的, 二人, 三人, 四人时
+     * @param viewWidth 控件的宽度
+     * @param positiveY 这一个水平线两张图片的左上角的y点
+     * @param side  子元素的边长
+     * @param mLayouts 布局集合
+     */
+    private void fastMaxTwoChild(int viewWidth, int positiveY, int side, ArrayList<LayoutInfoGroup> mLayouts){
+        // 第一个元素
+        mLayouts.add(createChildrenForTop(viewWidth/2 - side , positiveY, side ));
+        // 第二个元素
+        mLayouts.add(createChildrenForTop(viewWidth/2  , positiveY, side ));
+    }
 }

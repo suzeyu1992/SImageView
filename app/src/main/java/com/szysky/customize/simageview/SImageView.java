@@ -52,7 +52,7 @@ public class SImageView extends ImageView {
      *  具体子元素图片显示样式策略, 默认下,对于一张图片会使用 mNormalOnePicStrategy 变量, 如果实现了自定义策略,
      *  并且策略内部包含了一张图片的显示逻辑, 可以通过变量强制关闭单图片的默认处理.
      */
-    private ILayoutManager mLayoutManager = new QQLayoutManager();
+    private ILayoutManager mLayoutManager = new WeCharLayoutManager();
 
     /**
      *  默认单个图片加载策略

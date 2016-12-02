@@ -94,7 +94,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 1;
+        int flag = 5;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像

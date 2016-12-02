@@ -1,5 +1,6 @@
 package com.szysky.customize.simageview.range;
 
+import android.content.Context;
 import android.graphics.Point;
 
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 
 public class WeCharLayoutManager implements ILayoutManager {
 
+    private final Context context;
+
     /**
      * 缓存返回子元素布局对象
      */
@@ -24,7 +27,8 @@ public class WeCharLayoutManager implements ILayoutManager {
      */
     private int curCachePoint ;
 
-    public WeCharLayoutManager(){
+    public WeCharLayoutManager(Context context) {
+        this.context = context;
         // 创建子元素的布局对象集合, 用于后续使用
         mCacheList = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
@@ -35,6 +39,7 @@ public class WeCharLayoutManager implements ILayoutManager {
         }
         curCachePoint = 8;
     }
+
 
     @Override
     public ArrayList<LayoutInfoGroup> calculate(int viewWidth, int viewHeight, int viewNum) {
@@ -115,7 +120,7 @@ public class WeCharLayoutManager implements ILayoutManager {
         return infos;
     }
 
-
+    /**存储子元素测量数据初始化**/
     private void cleanMaskCache() {
         for (LayoutInfoGroup layoutInfoGroup : mCacheList) {
             layoutInfoGroup.leftTopPoint.set(0,0);
@@ -124,6 +129,9 @@ public class WeCharLayoutManager implements ILayoutManager {
         }
         curCachePoint = 0;
     }
+
+
+
 
 
     /**

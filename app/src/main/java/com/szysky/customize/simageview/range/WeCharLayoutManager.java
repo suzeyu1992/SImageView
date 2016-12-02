@@ -13,8 +13,27 @@ import java.util.ArrayList;
  */
 
 public class WeCharLayoutManager implements ILayoutManager {
+
+
+    private final ArrayList<LayoutInfoGroup> mCacheList;
+    private int curCachePoint ;
+
+    public WeCharLayoutManager(){
+        mCacheList = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            LayoutInfoGroup layout = new LayoutInfoGroup();
+            layout.leftTopPoint = new Point();
+            layout.rightBottomPoint = new Point();
+            mCacheList.add(layout);
+        }
+        curCachePoint = 8;
+    }
+
     @Override
     public ArrayList<LayoutInfoGroup> calculate(int viewWidth, int viewHeight, int viewNum) {
+
+        // 缓存集合清除无用信息
+        cleanMaskCache();
 
         if (viewNum > 5){
             viewNum = 5;
@@ -48,16 +67,9 @@ public class WeCharLayoutManager implements ILayoutManager {
         if (viewNum == 2){
 
             // 第一个元素
-            LayoutInfoGroup layoutInfoGroup = new LayoutInfoGroup();
-            layoutInfoGroup.innerHeight = layoutInfoGroup.innerWidth = layoutSquareSide/2;
-            layoutInfoGroup.leftTopPoint = new Point(viewWidth/4 - half/2, (viewHeight-half)/2);
-            infos.add(layoutInfoGroup);
-
+            infos.add(createChildrenForTop(viewWidth/2 - half , (viewHeight-half)/2, half ));
             // 第二个元素
-            LayoutInfoGroup layoutInfoGroup2 = new LayoutInfoGroup();
-            layoutInfoGroup2.innerHeight = layoutInfoGroup2.innerWidth = layoutSquareSide/2;
-            layoutInfoGroup2.leftTopPoint = new Point(viewWidth/4*3 - half/2, (viewHeight-half)/2);
-            infos.add(layoutInfoGroup2);
+            infos.add(createChildrenForTop(viewWidth/2  , (viewHeight-half)/2, half ));
         }else if (viewNum == 3){
 
             LayoutInfoGroup layoutInfoGroup1 = new LayoutInfoGroup();
@@ -88,4 +100,50 @@ public class WeCharLayoutManager implements ILayoutManager {
 
         return infos;
     }
+
+
+    private void cleanMaskCache() {
+        for (LayoutInfoGroup layoutInfoGroup : mCacheList) {
+            layoutInfoGroup.leftTopPoint.set(0,0);
+            layoutInfoGroup.rightBottomPoint.set(0,0);
+            layoutInfoGroup.innerHeight = layoutInfoGroup.innerWidth = 0;
+        }
+        curCachePoint = 0;
+    }
+
+
+    /**
+     * 通过左上点  创建子元素布局信息
+     * @param left 右上点的x
+     * @param top  右上点的y
+     * @param side 需要画出子元素的边长
+     */
+    private  LayoutInfoGroup createChildrenForTop(int left, int top, int side){
+
+        LayoutInfoGroup childLayout = mCacheList.get(curCachePoint);
+        childLayout.innerHeight = childLayout.innerWidth = side;
+        childLayout.leftTopPoint.set(left, top);
+        childLayout.rightBottomPoint.set(left + side, top+side);
+        curCachePoint++;
+        return childLayout;
+    }
+
+    /**
+     * 通过右下点 创建子元素布局信息
+     * @param right 右下点的x
+     * @param bottom 右下点的y
+     * @param side 需要画出子元素的边长
+     */
+    private  LayoutInfoGroup createChildrenForBottom(int right, int bottom, int side){
+        LayoutInfoGroup childLayout = mCacheList.get(curCachePoint);
+        childLayout.innerHeight = childLayout.innerWidth = side;
+        childLayout.leftTopPoint.set(right-side, bottom-side);
+        childLayout.rightBottomPoint.set(right, bottom);
+        curCachePoint++;
+        return childLayout;
+    }
+
+//    private void fastMaxTwoChild(int viewWidth, int positiveY, int side, ArrayList<LayoutInfoGroup> mLayouts){
+//
+//    }
 }

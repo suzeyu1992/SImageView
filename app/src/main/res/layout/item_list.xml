@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="300dp">
 
-    <com.szysky.customize.simageview.SImageView
+    <com.szysky.customize.siv.SImageView
         android:id="@+id/siv"
         android:layout_width="100dp"
         android:layout_height="100dp"

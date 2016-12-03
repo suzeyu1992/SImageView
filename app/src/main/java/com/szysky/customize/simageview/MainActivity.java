@@ -2,15 +2,16 @@ package com.szysky.customize.simageview;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.szysky.customize.simageview.effect.ConcreteQQCircleStrategy;
+
+import com.szysky.customize.siv.SImageView;
 
 import java.util.ArrayList;
+
+import static com.szysky.customize.simageview.R.styleable.SImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        final SImageView iv= (SImageView) findViewById(R.id.iv_main);
+         com.szysky.customize.siv.SImageView iv= (com.szysky.customize.siv.SImageView) findViewById(R.id.iv_main);
 
 
 

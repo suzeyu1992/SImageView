@@ -1,17 +1,14 @@
-package com.szysky.customize.simageview;
+package com.szysky.customize.siv;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.icu.text.IDNA;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
@@ -19,13 +16,13 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.szysky.customize.simageview.effect.ConcreteQQCircleStrategy;
-import com.szysky.customize.simageview.effect.IDrawingStrategy;
-import com.szysky.customize.simageview.effect.NormalOnePicStrategy;
-import com.szysky.customize.simageview.range.ILayoutManager;
-import com.szysky.customize.simageview.range.QQLayoutManager;
-import com.szysky.customize.simageview.range.WeCharLayoutManager;
-import com.szysky.customize.simageview.util.UIUtils;
+
+import com.szysky.customize.siv.effect.ConcreteQQCircleStrategy;
+import com.szysky.customize.siv.effect.IDrawingStrategy;
+import com.szysky.customize.siv.effect.NormalOnePicStrategy;
+import com.szysky.customize.siv.range.ILayoutManager;
+import com.szysky.customize.siv.range.QQLayoutManager;
+import com.szysky.customize.siv.util.UIUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

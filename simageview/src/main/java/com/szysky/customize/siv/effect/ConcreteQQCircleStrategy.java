@@ -1,4 +1,4 @@
-package com.szysky.customize.simageview.effect;
+package com.szysky.customize.siv.effect;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,9 +9,9 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
-import com.szysky.customize.simageview.SImageView;
-import com.szysky.customize.simageview.range.ILayoutManager;
-import com.szysky.customize.simageview.util.GraphsTemplate;
+import com.szysky.customize.siv.SImageView;
+import com.szysky.customize.siv.range.ILayoutManager;
+import com.szysky.customize.siv.util.GraphsTemplate;
 
 
 /**

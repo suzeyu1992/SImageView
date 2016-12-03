@@ -1,4 +1,4 @@
-package com.szysky.customize.simageview.util;
+package com.szysky.customize.siv.util;
 
 import android.content.Context;
 import android.util.DisplayMetrics;

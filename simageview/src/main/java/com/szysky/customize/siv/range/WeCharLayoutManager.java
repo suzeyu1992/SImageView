@@ -1,9 +1,9 @@
-package com.szysky.customize.simageview.range;
+package com.szysky.customize.siv.range;
 
 import android.content.Context;
 import android.graphics.Point;
 
-import com.szysky.customize.simageview.util.UIUtils;
+import com.szysky.customize.siv.util.UIUtils;
 
 import java.util.ArrayList;
 

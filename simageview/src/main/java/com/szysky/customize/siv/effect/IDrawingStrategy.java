@@ -1,9 +1,10 @@
-package com.szysky.customize.simageview.effect;
+package com.szysky.customize.siv.effect;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-import com.szysky.customize.simageview.SImageView;
+import com.szysky.customize.siv.SImageView;
+
 
 /**
  * Author :  suzeyu

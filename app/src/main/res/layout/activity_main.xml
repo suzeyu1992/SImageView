@@ -12,7 +12,7 @@
     tools:context="com.szysky.customize.simageview.MainActivity"
     android:orientation="vertical">
 
-    <com.szysky.customize.simageview.SImageView
+    <com.szysky.customize.siv.SImageView
         android:id="@+id/iv_main"
         android:layout_width="300dp"
         android:layout_height="100dp"

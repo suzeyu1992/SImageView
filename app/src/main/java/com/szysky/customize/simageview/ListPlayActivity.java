@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import com.szysky.customize.siv.SImageView;
+
 import java.util.ArrayList;
 import java.util.Random;
 

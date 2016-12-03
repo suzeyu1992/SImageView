@@ -13,7 +13,7 @@
 
     <com.szysky.customize.simageview.SImageView
         android:id="@+id/iv_main"
-        android:layout_width="100dp"
+        android:layout_width="300dp"
         android:layout_height="100dp"
         android:background="@color/colorAccent"
         />

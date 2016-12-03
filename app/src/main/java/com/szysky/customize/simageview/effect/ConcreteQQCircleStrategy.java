@@ -92,16 +92,27 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         ILayoutManager.LayoutInfoGroup layoutInfoGroup = info.coordinates.get(curChild-1);
 
         float maxHeight = layoutInfoGroup.innerHeight;
+        float maxWidth = layoutInfoGroup.innerWidth;
+
+
+
 
         int mBitmapWidth = opeBitmap.getWidth();   // 需要处理的bitmap宽度和高度
         int mBitmapHeight = opeBitmap.getHeight();
+
+        // 布局调整
+        float scaleX = maxWidth/(float)mBitmapWidth;
+        float scaleY = maxHeight/(float)mBitmapHeight;
+        float scaleResult = (scaleX > scaleY ? scaleX :scaleY);
+
+
         canvas.save();
 
 
         if (!mIsPicRotate){
-            matrix.postScale( maxHeight/(float)mBitmapWidth , maxHeight/(float)mBitmapHeight );
+            matrix.postScale( scaleResult , scaleResult );
         }else{
-            matrix.postScale(  maxHeight/(float)mBitmapWidth , maxHeight/(float)mBitmapHeight);
+            matrix.postScale(scaleResult , scaleResult);
 
         }
         // 缩放

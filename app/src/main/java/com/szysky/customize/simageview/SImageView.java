@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.RectF;
 import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -35,13 +34,12 @@ import java.util.Iterator;
 
 public class SImageView extends ImageView {
 
+    private static final String TAG = SImageView.class.getName();
     private Paint mPaint = new Paint();
-    private Bitmap mBmp;
-    private Bitmap mResultBmp;
     private ConfigInfo mInfo = new ConfigInfo();
 
     /**
-     *  对外提供的画布
+     *  对具体绘图抽象过程提供的一个可利用的画布.
      */
     private Canvas mExternalUseCanvas= new Canvas();
 
@@ -49,19 +47,25 @@ public class SImageView extends ImageView {
     /**
      *  默认单图片处理策略的开关标记  true: 关闭   false: 开启
      */
-    private boolean mCloseNormalOnePicLoad = false;
+    private boolean mCloseNormalOnePicLoad = true;
 
     /**
-     *  具体子元素的测量策略, 默认下,对于一张图片会使用 mNormalOnePicStrategy 变量, 如果实现了自定义策略,
-     *  并且策略内部包含了一张图片的显示逻辑, 可以通过变量强制关闭单图片的默认处理.
+     *  具体子元素的 measure布局 策略,
+     *  默认下,对于一张图片会使用 mNormalOnePicStrategy 变量, 如果实现了自定义策略,
+     *  并且策略内部包含了一张图片的布局逻辑, 可以通过变量强制关闭单图片的默认处理.
      */
     private ILayoutManager mLayoutManager = new QQLayoutManager();
 
     /**
-     *  默认单个图片加载策略
+     *  单个图片默认加载策略, 优先级高于多张图,
+     *      可以通过{@link #setCloseNormalOnePicLoad(boolean)}设置为true强制关闭此策略
      */
     private IDrawingStrategy mNormalOnePicStrategy = new NormalOnePicStrategy();
 
+
+    /**
+     *  具体
+     */
     private IDrawingStrategy mDrawStrategy = new ConcreteQQCircleStrategy();
 
 
@@ -69,7 +73,7 @@ public class SImageView extends ImageView {
     /**
      *  控件属性类
      */
-    public static class ConfigInfo{
+    public static class ConfigInfo implements Cloneable{
 
         public int height;                                      // 控件的高度
         public int width;                                       // 控件的宽度
@@ -78,8 +82,26 @@ public class SImageView extends ImageView {
         public int borderColor = Color.BLACK;                   // 描边颜色
         public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;  // 测量过程返回的每个元素的对应位置信息
         public boolean isNormalImpl = true;                     // 此标记只在具体实现画图显示为qq策略才有用
-        public int displayType;                        // 子元素的显示类型
+        public int displayType;                                 // 子元素的显示类型
 
+        @Override
+        protected Object clone() {
+            ConfigInfo clone = null;
+            try {
+                clone = (ConfigInfo) super.clone();
+                if (coordinates != null){
+                    clone.coordinates = (ArrayList<ILayoutManager.LayoutInfoGroup>) coordinates.clone();
+                }
+                clone.readyBmp = (ArrayList<Bitmap>) readyBmp.clone();
+            } catch (CloneNotSupportedException e) {
+                Log.w(TAG, "图片信息 clone is error" );
+                e.printStackTrace();
+                return this;
+            }
+
+
+            return clone;
+        }
     }
 
 
@@ -107,7 +129,6 @@ public class SImageView extends ImageView {
     public SImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        mBmp = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
 
         //init();
     }
@@ -134,13 +155,14 @@ public class SImageView extends ImageView {
 
         if ( mInfo.readyBmp.size() == 1 && !mCloseNormalOnePicLoad){
             long l = System.nanoTime();
-            mNormalOnePicStrategy.algorithm(canvas,1,1,mInfo.readyBmp.get(0), mInfo);
-            Log.i("susu", "一张图片执行时间:"+ (System.nanoTime() - l)/1000000f+"毫秒");
+            mNormalOnePicStrategy.algorithm(canvas,1,1,mInfo.readyBmp.get(0), (ConfigInfo) mInfo.clone());
+            Log.i(TAG, "一张图片执行时间: "+ (System.nanoTime() - l)/1000000f+"毫秒");
 
         }else if (mInfo.readyBmp.size() > 0 ){
             // measure布局参数
             mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
 
+            if (mInfo.coordinates == null) return;
             // layout 子元素布局
             Iterator<ILayoutManager.LayoutInfoGroup> iterator = mInfo.coordinates.iterator();
             int index = 0;
@@ -152,14 +174,14 @@ public class SImageView extends ImageView {
                 int offsetY = childInfo.leftTopPoint.y;
 
 
-                Bitmap tempBmp = Bitmap.createBitmap(childInfo.innerWidth, childInfo.innerWidth, Bitmap.Config.ARGB_8888);
+                Bitmap tempBmp = Bitmap.createBitmap(childInfo.innerWidth, childInfo.innerHeight, Bitmap.Config.ARGB_8888);
 
 
                 // 首先关联一个bitmap, 并把关联的canvas对外提供出去
                 mExternalUseCanvas.setBitmap(tempBmp);
 
                 // **重点**. 具体实现由使用者通过mExternalUseCanvas定义.
-                mDrawStrategy.algorithm(mExternalUseCanvas,mInfo.coordinates.size(),index ,mInfo.readyBmp.get(index-1),mInfo );
+                mDrawStrategy.algorithm(mExternalUseCanvas,mInfo.coordinates.size(),index ,mInfo.readyBmp.get(index-1), (ConfigInfo) mInfo.clone());
 
 
                 canvas.drawBitmap(tempBmp,offsetX,offsetY,null);
@@ -170,17 +192,20 @@ public class SImageView extends ImageView {
                 mExternalUseCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
             }
+            // 清除布局消息
+            mInfo.coordinates = null;
+
+            Log.i(TAG, "多张图执行时间: "+ (System.nanoTime() - startCur)/1000000f +"毫秒");
         }
 
-        Log.i("susu", "onDraw的执行时间:"+ (System.nanoTime() - startCur)/1000000f +"毫秒");
 
 
     }
 
     @Override
     public void setImageResource(int resId) {
-        mInfo.readyBmp.add(mBmp) ;
-        invalidate();
+
+//        invalidate();
     }
 
     public void setImages(ArrayList<Bitmap> bitmaps){
@@ -193,22 +218,42 @@ public class SImageView extends ImageView {
 
     }
 
+    /**
+     *  返回 是否使用了默认的单张绘图显示策略.
+     */
     public boolean isCloseNormalOnePicLoad() {
         return mCloseNormalOnePicLoad;
     }
 
+    /**
+     * 设置 是否关闭单张图片时, 使用特定的单图绘制策略. true为关闭, false为开启, 默认为false
+     * 注明: 如果是默认值, 那么只有多个图片显示的时候才会使用{@link #mDrawStrategy}策略, 一张图片的时候会使用
+     *      内置的单张图片处理策略{@link #mNormalOnePicStrategy}.
+     *      如果通过{@link #setDrawStrategy(IDrawingStrategy)}实现了自定义策略, 那么单张图片开关标记将会
+     *      自动设置为关闭.
+     */
     public void setCloseNormalOnePicLoad(boolean isClose) {
         this.mCloseNormalOnePicLoad = isClose;
     }
 
+    /**
+     * 设置子元素 绘制图片 的具体显示策略
+     */
     public void setDrawStrategy(IDrawingStrategy mDrawStrategy) {
         this.mDrawStrategy = mDrawStrategy;
         if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
             mInfo.isNormalImpl = mLayoutManager instanceof QQLayoutManager ;
+            mCloseNormalOnePicLoad = false;
+        }else{
+            mInfo.isNormalImpl = false;
+            mCloseNormalOnePicLoad = true;
         }
     }
 
 
+    /**
+     * 设置 测量布局 规则
+     */
     public void setLayoutManager(ILayoutManager mLayoutManager) {
         this.mLayoutManager = mLayoutManager;
 

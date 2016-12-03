@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         SImageView iv= (SImageView) findViewById(R.id.iv_main);
         ConcreteQQCircleStrategy concreteQQCircleStrategy = new ConcreteQQCircleStrategy();
         concreteQQCircleStrategy.setSpacing(1f);
-        iv.setDrawStrategy(concreteQQCircleStrategy);
+//        iv.setDrawStrategy(concreteQQCircleStrategy);
 
 
 
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 //        bitmaps.add(bitmap);
 //        bitmaps.add(bitmap);
         bitmaps.add(bitmap);
-        iv.setDisplayShape(SImageView.TYPE_OVAL);
+        iv.setDisplayShape(SImageView.TYPE_CIRCLE);
         iv.setImages(bitmaps);
 
     }

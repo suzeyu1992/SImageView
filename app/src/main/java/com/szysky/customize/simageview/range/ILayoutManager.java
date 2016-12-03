@@ -32,7 +32,7 @@ public interface ILayoutManager {
     /**
      * 封装控件内部单个元素显示的布局信息
      */
-    class LayoutInfoGroup{
+    class LayoutInfoGroup implements Cloneable{
         /**
          * 组合头像时, 每个单独元素可分配的最大宽高
          */
@@ -44,5 +44,14 @@ public interface ILayoutManager {
          */
         public Point leftTopPoint = new Point();
         public Point rightBottomPoint = new Point();
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            LayoutInfoGroup clone = (LayoutInfoGroup) super.clone();
+            clone.leftTopPoint.set(leftTopPoint.x, leftTopPoint.y);
+            clone.rightBottomPoint.set(rightBottomPoint.x, rightBottomPoint.y);
+
+            return clone;
+        }
     }
 }

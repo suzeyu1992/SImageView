@@ -87,7 +87,7 @@ public class ListPlayActivity extends ListActivity {
             }else{
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            viewHolder.siv.setImages(mData.get(position));
+            //viewHolder.siv.setImages(mData.get(position));
 
             return convertView;
         }

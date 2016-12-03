@@ -7,6 +7,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -24,6 +29,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Author :  suzeyu
@@ -36,8 +42,10 @@ import java.util.Iterator;
 public class SImageView extends ImageView {
 
     private static final String TAG = SImageView.class.getName();
-    private Paint mPaint = new Paint();
+    private static final Bitmap.Config BITMAP_CONFIG = Bitmap.Config.ARGB_8888;
     private ConfigInfo mInfo = new ConfigInfo();
+
+    private Context mContext;
 
     /**
      *  对具体绘图抽象过程提供的一个可利用的画布.
@@ -48,7 +56,7 @@ public class SImageView extends ImageView {
     /**
      *  默认单图片处理策略的开关标记  true: 关闭   false: 开启
      */
-    private boolean mCloseNormalOnePicLoad = true;
+    private boolean mCloseNormalOnePicLoad = false;
 
     /**
      *  具体子元素的 measure布局 策略,
@@ -65,7 +73,7 @@ public class SImageView extends ImageView {
 
 
     /**
-     *  具体
+     *  具体的子图片绘制的策略对象
      */
     private IDrawingStrategy mDrawStrategy = new ConcreteQQCircleStrategy();
 
@@ -98,8 +106,6 @@ public class SImageView extends ImageView {
                 e.printStackTrace();
                 return this;
             }
-
-
             return clone;
         }
     }
@@ -128,6 +134,9 @@ public class SImageView extends ImageView {
 
     public SImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = getContext();
+
+
 
 
         //init();
@@ -283,5 +292,79 @@ public class SImageView extends ImageView {
      */
     public float getBorderWidth(){
         return UIUtils.px2dip(getContext(), mInfo.borderWidth);
+    }
+
+    /**
+     * 设置描边颜色
+     */
+    public void setBorderColor(@ColorInt int color){
+        mInfo.borderColor = color;
+    }
+
+    public @ColorInt int getBorderColor(){
+        return mInfo.borderColor;
+    }
+
+    /**
+     * 传入drawable资源id
+     */
+    public void setIdRes(@DrawableRes int id){
+        if (id != 0) {
+            Drawable drawable = getResources().getDrawable(id);
+            if ( null != drawable){
+                updateForOne(getBitmapFromDrawable(drawable));
+            }
+        }
+    }
+
+    public void setDrawable(Drawable drawable){
+        updateForOne(getBitmapFromDrawable(drawable));
+    }
+
+    private void updateForOne(Bitmap bitmap){
+        if (null != bitmap){
+            mInfo.readyBmp.clear();
+            mInfo.readyBmp.add(bitmap);
+            invalidate();
+        }
+    }
+
+    private void updateForList(List<Bitmap> bitmaps) {
+
+        if (null != bitmaps){
+            mInfo.readyBmp.clear();
+            for (Bitmap bitmap : bitmaps) {
+                mInfo.readyBmp.add(bitmap);
+            }
+            invalidate();
+        }
+
+    }
+
+    private Bitmap getBitmapFromDrawable(Drawable drawable) {
+        if (drawable == null) {
+            return null;
+        }
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+
+        try {
+            Bitmap bitmap;
+
+            if (drawable instanceof ColorDrawable) {
+                bitmap = Bitmap.createBitmap(1, 1, BITMAP_CONFIG);
+            } else {
+                bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), BITMAP_CONFIG);
+            }
+
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+            return bitmap;
+        } catch (OutOfMemoryError e) {
+            return null;
+        }
     }
 }

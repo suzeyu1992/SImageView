@@ -2,11 +2,14 @@ package com.szysky.customize.simageview.util;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.os.Build;
+import android.util.Log;
 
 /**
  * Author :  suzeyu
@@ -19,7 +22,9 @@ import android.graphics.RectF;
 public class GraphsTemplate {
 
 
-    public static void drawRect(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight,
+    private static final String TAG = GraphsTemplate.class.getName();
+
+    static void drawRect(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight,
                                 int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint ){
         // 画矩形
         RectF rectF = new RectF(0 + offsetX, 0 + offsetY, sideWidth + offsetX, sideHeight + offsetY);
@@ -59,10 +64,10 @@ public class GraphsTemplate {
      * @param borderWidth 描边宽度
      * @param borderPaint 描边的画笔
      */
-    public static void drawCornerRectBorder(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight, float cornerX, float cornerY,
+    static void drawCornerRectBorder(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight, float cornerX, float cornerY,
                                             int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint ) {
         //画出一个圆角矩形
-        RectF rectF = new RectF(0+offsetX, 0+offsetY, sideWidth+offsetX, sideHeight+offsetY);
+        RectF rectF = new RectF(offsetX, offsetY, sideWidth+offsetX, sideHeight+offsetY);
         canvas.drawRoundRect(rectF,cornerX,cornerY,paint);
 
         // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
@@ -93,7 +98,7 @@ public class GraphsTemplate {
      * @param borderWidth  描边宽度 , 不需要可以设置0
      * @param borderPaint  描边画笔  不需要可以设置null
      */
-    public static void drawCircle(Canvas canvas, Bitmap bitmap, float centerX, float centerY, float radius,
+    static void drawCircle(Canvas canvas, Bitmap bitmap, float centerX, float centerY, float radius,
                                   Paint paint, int borderWidth, Paint borderPaint){
 
         canvas.drawCircle(centerX, centerY, radius, paint);
@@ -125,7 +130,7 @@ public class GraphsTemplate {
      * @param borderWidth  描边宽度 , 不需要可以设置0
      * @param borderPaint  描边画笔  不需要可以设置null
      */
-    public static void drawOval(Canvas canvas, Bitmap bitmap, RectF rectF, float offsetX, float offsetY,Paint paint, int borderWidth, Paint borderPaint){
+    static void drawOval(Canvas canvas, Bitmap bitmap, RectF rectF, float offsetX, float offsetY,Paint paint, int borderWidth, Paint borderPaint){
         // 位置校正
         rectF.right += offsetX;
         rectF.left += offsetX;
@@ -164,45 +169,117 @@ public class GraphsTemplate {
      * @param borderWidth  描边宽度 , 不需要可以设置0
      * @param borderPaint  描边画笔  不需要可以设置null
      */
-    public static void drawFivePointedStar(Canvas canvas,Bitmap bitmap, int radius, int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint) {
+    static void drawFivePointedStar(Canvas canvas,Bitmap bitmap, int radius, int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint) {
         int half = radius;
         Path path = new Path();
 
+        boolean isSupportBorder = true;          // 判断是否支持描边
+        int layoutId = -1;                       // 图层id
+        boolean isOneStrategy = false;                   // 是否是单图片处理调用
 
 
+        if (Build.VERSION.SDK_INT < 21){
+            isSupportBorder = false;
+            Log.w(TAG, "此操作版本不支持五角星的描边绘制");
+        }
+
+        // 开始画描边
+        if (isSupportBorder && borderWidth > 0 && borderPaint != null){
+
+            // 对描边进行边界的最大长度进行判断 不得超过半径的1/6
+            if (borderWidth*3 > half){
+                borderWidth = half/3;
+                borderPaint.setStrokeWidth(borderWidth);
+            }
+
+            canvas.translate(borderWidth*2f,borderWidth*2f);
+            half -= borderWidth*2f;
+            // E --> B --> D --> A --> C
+            path.moveTo(offsetX, half * 0.73f + offsetY);   //E
+            path.lineTo(half * 2 + offsetX, half * 0.73f + offsetY);//B
+            path.lineTo(half * 0.38f + offsetX, half * 1.9f + offsetY);//D
+            path.lineTo(half + offsetX, offsetY);//A
+            path.lineTo(half * 1.62f + offsetX, half * 1.9f + offsetY);//C
+            path.close();
+            canvas.drawPath(path, borderPaint);
+            canvas.translate(-borderWidth*2,-borderWidth*2);
+
+            half -= borderWidth * 1.5f ;
+        }
+
+        // 提取图层, 此方法需要sdk21, 已经加了判断
+        if (bitmap != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            layoutId = canvas.saveLayer(new RectF(0, 0, (radius+offsetX)*2  , (radius+offsetY)*2), null);
+        }
+
+        // 提供给 单张图片处理策略使用
+        if (paint == null && bitmap != null){
+            isOneStrategy = true;
+            paint = new Paint();
+            paint.setAntiAlias(true);
+
+
+            Matrix matrix = new Matrix();
+            float scale = 0;
+            if (bitmap.getHeight() > bitmap.getWidth()){
+                scale = (radius * 2f -borderWidth)/bitmap.getWidth();
+            }else{
+                scale = (radius * 2f -borderWidth)/bitmap.getHeight();
+            }
+            matrix.postScale(scale , scale);
+            // 缩放
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                    bitmap.getWidth(), matrix, true);
+
+        }
+
+
+        // 开始画出五角星
         // E --> B --> D --> A --> C
-        path.moveTo(0 + offsetX, half * 0.73f + offsetY);   //E
+        path.reset();
+        if (isSupportBorder && borderWidth > 0 && borderPaint != null){
+            canvas.translate(borderWidth*3.5f,borderWidth*3.6f);
+        }
+        path.moveTo(offsetX, half * 0.73f + offsetY);   //E
         path.lineTo(half * 2 + offsetX, half * 0.73f + offsetY);//B
         path.lineTo(half * 0.38f + offsetX, half * 1.9f + offsetY);//D
-        path.lineTo(half + offsetX, 0 + offsetY);//A
+        path.lineTo(half + offsetX, offsetY);//A
         path.lineTo(half * 1.62f + offsetX, half * 1.9f + offsetY);//C
-        path.close();
+
         canvas.drawPath(path, paint);
+
+        if (bitmap != null && isSupportBorder &&borderWidth > 0 && borderPaint != null ){
+            canvas.translate(-borderWidth*3.5f,-borderWidth*3.6f);
+        }
 
 
 
         // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
         if (null != bitmap) {
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, offsetX, offsetY, paint);
+
+            if (isOneStrategy){
+                canvas.drawBitmap(bitmap, radius + offsetX -bitmap.getWidth()/2, radius + offsetY -bitmap.getHeight()/2, paint);
+
+            }else{
+                canvas.drawBitmap(bitmap, 0, 0, paint);
+            }
             paint.setXfermode(null);
         }
 
-        // 先确认描边
-        if (borderWidth > 0 && borderPaint != null){
-//            canvas.translate(borderWidth,borderWidth);
-//            half -= borderWidth;
-//            // E --> B --> D --> A --> C
-//            path.moveTo(0 + offsetX, half * 0.73f + offsetY);   //E
-//            path.lineTo(half * 2 + offsetX, half * 0.73f + offsetY);//B
-//            path.lineTo(half * 0.38f + offsetX, half * 1.9f + offsetY);//D
-//            path.lineTo(half + offsetX, 0 + offsetY);//A
-//            path.lineTo(half * 1.62f + offsetX, half * 1.9f + offsetY);//C
-//            path.close();
-//            canvas.drawPath(path, borderPaint);
-//
-//            canvas.translate(-borderWidth,-borderWidth);
 
+        if (bitmap != null && isSupportBorder &&borderWidth > 0 && borderPaint != null  && layoutId != -1){
+            canvas.restore();
         }
+
+
+    }
+
+    static float cos(int num){
+        return (float) Math.cos(num*Math.PI/180);
+    }
+
+    static float sin(int num){
+        return (float) Math.sin(num*Math.PI/180);
     }
 }

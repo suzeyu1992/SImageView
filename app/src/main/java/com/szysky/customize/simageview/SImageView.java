@@ -44,9 +44,9 @@ public class SImageView extends ImageView {
 
 
     /**
-     *  默认单图片处理的开关标记
+     *  默认单图片处理策略的开关标记  true: 关闭   false: 开启
      */
-    private boolean mCloseNormalOnePicLoad = true;
+    private boolean mCloseNormalOnePicLoad = false;
 
     /**
      *  具体子元素图片显示样式策略, 默认下,对于一张图片会使用 mNormalOnePicStrategy 变量, 如果实现了自定义策略,
@@ -71,7 +71,7 @@ public class SImageView extends ImageView {
         public int height;
         public int width;
         public ArrayList<Bitmap> readyBmp = new ArrayList<>();
-        public int borderWidth = 10;
+        public int borderWidth = 5;
         public int borderColor = Color.BLACK;
         public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;
         public boolean isNormalImpl = true;   // 此标记只在具体实现画图显示为qq策略才有用

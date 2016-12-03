@@ -1,19 +1,13 @@
 package com.szysky.customize.simageview.effect;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Shader;
-import android.provider.Settings;
-import android.util.Log;
 
 import com.szysky.customize.simageview.SImageView;
 import com.szysky.customize.simageview.range.ILayoutManager;
@@ -77,10 +71,18 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
 
+
+
+        // 对描边进行边界的最大长度进行判断 不得超过半径的1/6
+        if (mBorderWidth*6 > (opeBitmap.getWidth() > opeBitmap.getHeight() ? opeBitmap.getHeight() :opeBitmap.getWidth()) ){
+            mBorderWidth = (opeBitmap.getWidth() > opeBitmap.getHeight() ? opeBitmap.getHeight() :opeBitmap.getWidth())/6;
+        }
         // 描边宽度
         mBorderWidth = info.borderWidth;
         mBorderPaint.setColor(info.borderColor);
         mBorderPaint.setStrokeWidth(mBorderWidth);
+
+
 
         Matrix matrix = new Matrix();
 
@@ -99,13 +101,9 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             matrix.postScale(  maxHeight/(float)mBitmapWidth , maxHeight/(float)mBitmapHeight);
 
         }
-//        canvas.translate(layoutInfoGroup.leftTopPoint.x , layoutInfoGroup.leftTopPoint.y);
         // 缩放
         Bitmap newBitmap = Bitmap.createBitmap(opeBitmap, 0, 0, mBitmapWidth,
                 mBitmapHeight, matrix, true);
-
-
-
 
         adjustMaskBitmapDisplay(canvas,newBitmap, newBitmap.getWidth(),
                 newBitmap.getHeight(), childTotal > 5 ? 360:rotations[childTotal-1][curChild-1], mSpacing , mIsPicRotate);
@@ -121,11 +119,11 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     private  void adjustMaskBitmapDisplay(Canvas canvas, Bitmap bitmap ,int viewBoxW, int viewBoxH,
                                                 float rotation, float gapSize ,boolean isRotate){
         mPaint.reset();
-        mPaint.setAntiAlias(true);// 抗锯齿
+        mPaint.setAntiAlias(true);
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 2;
+        int flag = 4;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像

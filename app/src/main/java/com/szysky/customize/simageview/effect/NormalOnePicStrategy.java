@@ -34,6 +34,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         int mBitmapHeight = opeBitmap.getHeight();
         int viewWidth = info.width;
         int viewHeight = info.height;
+        int flag = 4;
 
 
         // 容错控件非正方形场景处理
@@ -55,6 +56,11 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
             layoutSquareSide = viewHeight;
         }
 
+        // 描边宽度不能超多绘制内容的 1/8
+        if (mBorderWidth * 6 > layoutSquareSide ){
+            mBorderWidth = layoutSquareSide/6;
+        }
+
 
         int bodySquareSide = layoutSquareSide - mBorderWidth *2;
 
@@ -66,9 +72,10 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
 
         Paint borderPaint = new Paint();
         borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(info.borderWidth);
+        borderPaint.setStrokeWidth(mBorderWidth);
         borderPaint.setColor(info.borderColor);
         borderPaint.setAntiAlias(true);
+
 
 
         // 创建着色器 shader
@@ -85,9 +92,12 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
             scale = bodySquareSide / (float) mBitmapHeight;
             dx = (bodySquareSide - mBitmapWidth * scale) * 0.5f;
         } else {
-            scale = bodySquareSide / (float) mBitmapWidth * 1.0f;
+            scale = bodySquareSide / (float) mBitmapWidth ;
             dy = (bodySquareSide - mBitmapHeight * scale) * 0.5f;
         }
+
+
+
         // 进行调整
         Matrix mShaderMatrix = new Matrix();
         mShaderMatrix.set(null);
@@ -100,25 +110,14 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         int centerY = viewHeight >> 1 ;
 
 
-        //GraphsTemplate.drawFivePointedStar(canvas, opeBitmap,layoutSquareSide/2, layoutOffsetX,layoutOffsetY,paint);
 
 
-        int flag = 2;
         if (flag == 1){
             // qq群组效果
-            // 先处理成圆形头像
             GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth >>1),paint , mBorderWidth ,borderPaint);
 
+        }else if (flag == 2){
 
-        }else if (flag == 2){       // 原图头像
-//            RectF rectF = new RectF(0 + layoutOffsetX, 0 + layoutOffsetY, layoutSquareSide + layoutOffsetX, layoutSquareSide + layoutOffsetY);
-//            canvas.drawRect( rectF,paint);
-//            rectF.bottom -= mBorderWidth/2;
-//            rectF.top += mBorderWidth/2;
-//            rectF.right -= mBorderWidth/2;
-//            rectF.left += mBorderWidth/2;
-//            canvas.drawRect(rectF, borderPaint);
-//            canvas.drawBitmap(opeBitmap, layoutOffsetX, layoutOffsetY, paint);
             // 矩形图像
             GraphsTemplate.drawRect(canvas, null, layoutSquareSide, layoutSquareSide, layoutOffsetX, layoutOffsetY, paint, mBorderWidth, borderPaint);
 
@@ -128,19 +127,13 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
             GraphsTemplate.drawOval(canvas, null, new RectF(layoutSquareSide*0.05f, layoutSquareSide*0.2f,layoutSquareSide*0.95f, layoutSquareSide*0.8f),layoutOffsetX,layoutOffsetY,paint , mBorderWidth ,borderPaint);
 
         }else if (flag == 4){
-
             // 五角星头像
-            //GraphsTemplate.drawFivePointedStar(canvas, null, (int)(layoutSquareSide / 2 * 1f), layoutOffsetX,layoutOffsetY, paint);
-
+            GraphsTemplate.drawFivePointedStar(canvas, opeBitmap, (int)(layoutSquareSide / 2f), layoutOffsetX,layoutOffsetY, null ,mBorderWidth ,borderPaint);
         }else if (flag == 5){
             // 有圆角的头像
             GraphsTemplate.drawCornerRectBorder(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/8, layoutSquareSide/8,layoutOffsetX,layoutOffsetY,paint,mBorderWidth,borderPaint);
         }
 
-
-        // 画内容和边框
-//                canvas.drawCircle(centerX, centerY, (layoutSquareSide>>1) - (mBorderWidth>>1), paint);
-//                canvas.drawCircle(centerX, centerY, (layoutSquareSide-mBorderWidth)>>1, borderPaint);
     }
 
 

@@ -19,17 +19,8 @@ import android.graphics.RectF;
 public class GraphsTemplate {
 
 
-    public static void drawFivePointedStar(Canvas canvas,Bitmap bitmap, int radius, int offsetX, int offsetY, Paint paint){
-
-    }
-
-
-
-
-
-
     /**
-     *  合成一个圆角图片
+     *  合成一个圆角矩形图片
      * @param canvas  画布
      * @param bitmap  要处理的成圆角的 Bitmap图片
      * @param sideWidth 圆角矩形的宽度
@@ -73,15 +64,25 @@ public class GraphsTemplate {
      * @param centerY 圆心点的y坐标
      * @param radius  圆的半径
      */
-    public static void drawCircle(Canvas canvas, Bitmap bitmap, float centerX, float centerY, float radius, Paint paint){
+    public static void drawCircle(Canvas canvas, Bitmap bitmap, float centerX, float centerY, float radius,
+                                  Paint paint, int borderWidth, Paint borderPaint){
+
         canvas.drawCircle(centerX, centerY, radius, paint);
 
-        if (null == bitmap) return; // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
+        // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
+        if (null != bitmap) {
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, 0, 0, paint);
+            paint.setXfermode(null);
+        }
+
+        // 描边处理
+        if (borderWidth > 0 && borderPaint != null){
+            canvas.drawCircle(centerX, centerY, radius - borderWidth/2, borderPaint);
+
+        }
 
 
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-        paint.setXfermode(null);
     }
 
 

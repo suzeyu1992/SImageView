@@ -103,11 +103,11 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         //GraphsTemplate.drawFivePointedStar(canvas, opeBitmap,layoutSquareSide/2, layoutOffsetX,layoutOffsetY,paint);
 
 
-        int flag = 5;
+        int flag = 1;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像
-            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth >>1),paint);
+            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth >>1),paint , mBorderWidth ,borderPaint);
 
 
         }else if (flag == 2){       // 原图头像
@@ -127,7 +127,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         }else if (flag == 4){
 
             // 五角星头像
-            GraphsTemplate.drawFivePointedStar(canvas, null, (int)(layoutSquareSide / 2 * 1f), layoutOffsetX,layoutOffsetY, paint);
+            //GraphsTemplate.drawFivePointedStar(canvas, null, (int)(layoutSquareSide / 2 * 1f), layoutOffsetX,layoutOffsetY, paint);
 
         }else if (flag == 5){
             // 有圆角的头像

@@ -125,11 +125,11 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 3;
+        int flag = 1;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像
-            GraphsTemplate.drawCircle(canvas, bitmap, center, center,center,mPaint);
+            GraphsTemplate.drawCircle(canvas, bitmap, center, center,center,mPaint ,isRotate ? 0:mBorderWidth ,mBorderPaint);
 
             if ( isRotate  &&   rotation != 360f  ) {
                 Matrix matrix = new Matrix();

@@ -46,7 +46,7 @@ public class SImageView extends ImageView {
     /**
      *  默认单图片处理的开关标记
      */
-    private boolean mCloseNormalOnePicLoad = true;
+    private boolean mCloseNormalOnePicLoad = false;
 
     /**
      *  具体子元素图片显示样式策略, 默认下,对于一张图片会使用 mNormalOnePicStrategy 变量, 如果实现了自定义策略,
@@ -61,13 +61,7 @@ public class SImageView extends ImageView {
 
     private IDrawingStrategy mDrawStrategy = new ConcreteQQCircleStrategy();
 
-    public boolean isCloseNormalOnePicLoad() {
-        return mCloseNormalOnePicLoad;
-    }
 
-    public void setCloseNormalOnePicLoad(boolean isClose) {
-        this.mCloseNormalOnePicLoad = isClose;
-    }
 
     /**
      *  控件属性类
@@ -189,5 +183,13 @@ public class SImageView extends ImageView {
     private void init(){
 
 
+    }
+
+    public boolean isCloseNormalOnePicLoad() {
+        return mCloseNormalOnePicLoad;
+    }
+
+    public void setCloseNormalOnePicLoad(boolean isClose) {
+        this.mCloseNormalOnePicLoad = isClose;
     }
 }

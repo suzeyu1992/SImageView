@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
+import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
@@ -19,6 +20,8 @@ import com.szysky.customize.simageview.range.ILayoutManager;
 import com.szysky.customize.simageview.range.QQLayoutManager;
 import com.szysky.customize.simageview.range.WeCharLayoutManager;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -49,7 +52,7 @@ public class SImageView extends ImageView {
     private boolean mCloseNormalOnePicLoad = false;
 
     /**
-     *  具体子元素图片显示样式策略, 默认下,对于一张图片会使用 mNormalOnePicStrategy 变量, 如果实现了自定义策略,
+     *  具体子元素的测量策略, 默认下,对于一张图片会使用 mNormalOnePicStrategy 变量, 如果实现了自定义策略,
      *  并且策略内部包含了一张图片的显示逻辑, 可以通过变量强制关闭单图片的默认处理.
      */
     private ILayoutManager mLayoutManager = new QQLayoutManager();
@@ -68,28 +71,33 @@ public class SImageView extends ImageView {
      */
     public static class ConfigInfo{
 
-        public int height;
-        public int width;
-        public ArrayList<Bitmap> readyBmp = new ArrayList<>();
-        public int borderWidth = 5;
-        public int borderColor = Color.BLACK;
-        public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;
-        public boolean isNormalImpl = true;   // 此标记只在具体实现画图显示为qq策略才有用
+        public int height;                                      // 控件的高度
+        public int width;                                       // 控件的宽度
+        public ArrayList<Bitmap> readyBmp = new ArrayList<>();  // 需要显示的图片集合
+        public int borderWidth = 1;                             // 描边宽度
+        public int borderColor = Color.BLACK;                   // 描边颜色
+        public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;  // 测量过程返回的每个元素的对应位置信息
+        public boolean isNormalImpl = true;                     // 此标记只在具体实现画图显示为qq策略才有用
+        public int displayType;                        // 子元素的显示类型
 
     }
 
-    public void setDrawStrategy(IDrawingStrategy mDrawStrategy) {
-        this.mDrawStrategy = mDrawStrategy;
-        if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
-            mInfo.isNormalImpl = mLayoutManager instanceof QQLayoutManager ;
-        }
-    }
 
 
-    public void setLayoutManager(ILayoutManager mLayoutManager) {
-        this.mLayoutManager = mLayoutManager;
+    public static final int TYPE_CIRCLE = 0;
+    public static final int TYPE_RECT = 1;
+    public static final int TYPE_ROUND_RECT = 2;
+    public static final int TYPE_FIVE_POINTED_STAR = 3;
+    public static final int TYPE_OVAL = 4;
 
-    }
+    @IntDef({TYPE_CIRCLE, TYPE_RECT, TYPE_ROUND_RECT ,TYPE_FIVE_POINTED_STAR, TYPE_OVAL})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ShapeDisplay{}
+
+    /**显示类型,默认为上面五种定义类型**/
+    @ShapeDisplay private int mCurrentDisplayShape = TYPE_CIRCLE;
+
+
 
     public SImageView(Context context) {
         super(context);
@@ -191,5 +199,36 @@ public class SImageView extends ImageView {
 
     public void setCloseNormalOnePicLoad(boolean isClose) {
         this.mCloseNormalOnePicLoad = isClose;
+    }
+
+    public void setDrawStrategy(IDrawingStrategy mDrawStrategy) {
+        this.mDrawStrategy = mDrawStrategy;
+        if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
+            mInfo.isNormalImpl = mLayoutManager instanceof QQLayoutManager ;
+        }
+    }
+
+
+    public void setLayoutManager(ILayoutManager mLayoutManager) {
+        this.mLayoutManager = mLayoutManager;
+
+    }
+
+
+    /**
+     * 返回当前控件的显示类型 如圆形, 矩形, 五角星等等...
+     */
+    @ShapeDisplay
+    public int getDisplayShape() {
+        return mCurrentDisplayShape;
+    }
+
+    /**
+     * 设置当前控件的显示类型, 如圆形, 矩形, 五角星等等...
+     * @param mCurrentDisplayShape  只能@{@link ShapeDisplay}类型
+     */
+    public void setDisplayShape(@ShapeDisplay int mCurrentDisplayShape) {
+        this.mCurrentDisplayShape = mCurrentDisplayShape;
+        mInfo.displayType = mCurrentDisplayShape;
     }
 }

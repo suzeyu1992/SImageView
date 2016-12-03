@@ -24,7 +24,7 @@ public class GraphsTemplate {
 
     private static final String TAG = GraphsTemplate.class.getName();
 
-    static void drawRect(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight,
+    public static void drawRect(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight,
                                 int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint ){
         // 画矩形
         RectF rectF = new RectF(0 + offsetX, 0 + offsetY, sideWidth + offsetX, sideHeight + offsetY);
@@ -64,7 +64,7 @@ public class GraphsTemplate {
      * @param borderWidth 描边宽度
      * @param borderPaint 描边的画笔
      */
-    static void drawCornerRectBorder(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight, float cornerX, float cornerY,
+    public static void drawCornerRectBorder(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight, float cornerX, float cornerY,
                                             int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint ) {
         //画出一个圆角矩形
         RectF rectF = new RectF(offsetX, offsetY, sideWidth+offsetX, sideHeight+offsetY);
@@ -98,7 +98,7 @@ public class GraphsTemplate {
      * @param borderWidth  描边宽度 , 不需要可以设置0
      * @param borderPaint  描边画笔  不需要可以设置null
      */
-    static void drawCircle(Canvas canvas, Bitmap bitmap, float centerX, float centerY, float radius,
+    public static void drawCircle(Canvas canvas, Bitmap bitmap, float centerX, float centerY, float radius,
                                   Paint paint, int borderWidth, Paint borderPaint){
 
         canvas.drawCircle(centerX, centerY, radius, paint);
@@ -130,7 +130,7 @@ public class GraphsTemplate {
      * @param borderWidth  描边宽度 , 不需要可以设置0
      * @param borderPaint  描边画笔  不需要可以设置null
      */
-    static void drawOval(Canvas canvas, Bitmap bitmap, RectF rectF, float offsetX, float offsetY,Paint paint, int borderWidth, Paint borderPaint){
+    public static void drawOval(Canvas canvas, Bitmap bitmap, RectF rectF, float offsetX, float offsetY,Paint paint, int borderWidth, Paint borderPaint){
         // 位置校正
         rectF.right += offsetX;
         rectF.left += offsetX;
@@ -169,7 +169,7 @@ public class GraphsTemplate {
      * @param borderWidth  描边宽度 , 不需要可以设置0
      * @param borderPaint  描边画笔  不需要可以设置null
      */
-    static void drawFivePointedStar(Canvas canvas,Bitmap bitmap, int radius, int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint) {
+    public static void drawFivePointedStar(Canvas canvas,Bitmap bitmap, int radius, int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint) {
         int half = radius;
         Path path = new Path();
 

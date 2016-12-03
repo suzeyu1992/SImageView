@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 //        bitmaps.add(bitmap);
 //        bitmaps.add(bitmap);
         bitmaps.add(bitmap);
+        iv.setDisplayShape(SImageView.TYPE_OVAL);
         iv.setImages(bitmaps);
 
     }

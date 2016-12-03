@@ -5,13 +5,10 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.Shader;
 
 import com.szysky.customize.simageview.SImageView;
-import com.szysky.customize.simageview.effect.IDrawingStrategy;
 import com.szysky.customize.simageview.util.GraphsTemplate;
 
 /**
@@ -32,15 +29,16 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         mBorderWidth = info.borderWidth;
         int mBitmapWidth = opeBitmap.getWidth();   // 需要处理的bitmap宽度和高度
         int mBitmapHeight = opeBitmap.getHeight();
-        int viewWidth = info.width;
+
+        int viewWidth = info.width;                // 控件的宽高
         int viewHeight = info.height;
-        int flag = 4;
+        int display = info.displayType;            // 显示的类型
 
 
         // 容错控件非正方形场景处理
         int layoutOffsetX = 0;
         int layoutOffsetY = 0;
-        int layoutSquareSide = 0;       // 正方形边长
+        int layoutSquareSide = 0;                  // 正方形边长
         if (viewWidth != viewHeight){
             int temp = viewHeight - viewWidth;
             if (temp > 0){
@@ -112,24 +110,27 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
 
 
 
-        if (flag == 1){
+        if (SImageView.TYPE_CIRCLE == display){
             // qq群组效果
             GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth >>1),paint , mBorderWidth ,borderPaint);
 
-        }else if (flag == 2){
+        }else if (SImageView.TYPE_RECT == display){
 
             // 矩形图像
             GraphsTemplate.drawRect(canvas, null, layoutSquareSide, layoutSquareSide, layoutOffsetX, layoutOffsetY, paint, mBorderWidth, borderPaint);
 
-        }else if (flag == 3){
+        }else if (SImageView.TYPE_OVAL == display){
 
             // 椭圆头像
             GraphsTemplate.drawOval(canvas, null, new RectF(layoutSquareSide*0.05f, layoutSquareSide*0.2f,layoutSquareSide*0.95f, layoutSquareSide*0.8f),layoutOffsetX,layoutOffsetY,paint , mBorderWidth ,borderPaint);
 
-        }else if (flag == 4){
+        }else if (SImageView.TYPE_FIVE_POINTED_STAR == display){
+
             // 五角星头像
             GraphsTemplate.drawFivePointedStar(canvas, opeBitmap, (int)(layoutSquareSide / 2f), layoutOffsetX,layoutOffsetY, null ,mBorderWidth ,borderPaint);
-        }else if (flag == 5){
+
+        }else if (SImageView.TYPE_ROUND_RECT == display){
+
             // 有圆角的头像
             GraphsTemplate.drawCornerRectBorder(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/8, layoutSquareSide/8,layoutOffsetX,layoutOffsetY,paint,mBorderWidth,borderPaint);
         }

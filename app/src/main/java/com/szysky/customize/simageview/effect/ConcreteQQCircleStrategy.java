@@ -82,6 +82,9 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         mBorderPaint.setColor(info.borderColor);
         mBorderPaint.setStrokeWidth(mBorderWidth);
 
+        int display = info.displayType;            // 显示的类型
+
+
 
 
         Matrix matrix = new Matrix();
@@ -106,7 +109,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
                 mBitmapHeight, matrix, true);
 
         adjustMaskBitmapDisplay(canvas,newBitmap, newBitmap.getWidth(),
-                newBitmap.getHeight(), childTotal > 5 ? 360:rotations[childTotal-1][curChild-1], mSpacing , mIsPicRotate);
+                newBitmap.getHeight(), childTotal > 5 ? 360:rotations[childTotal-1][curChild-1], mSpacing , mIsPicRotate , display);
 
 
 
@@ -117,17 +120,16 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
 
     private  void adjustMaskBitmapDisplay(Canvas canvas, Bitmap bitmap ,int viewBoxW, int viewBoxH,
-                                                float rotation, float gapSize ,boolean isRotate){
+                                                float rotation, float gapSize ,boolean isRotate , int displayType){
         mPaint.reset();
         mPaint.setAntiAlias(true);
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 4;
-        if (flag == 1){
+        if (SImageView.TYPE_CIRCLE == displayType){
             // qq群组效果
             // 先处理成圆形头像
-            GraphsTemplate.drawCircle(canvas, bitmap, center, center,center,mPaint ,isRotate ? 0:mBorderWidth ,mBorderPaint);
+            GraphsTemplate.drawCircle(canvas, bitmap, center, center,center,mPaint ,isRotate ? 0:mBorderWidth ,mBorderPaint );
 
             if ( isRotate  &&   rotation != 360f  ) {
                 Matrix matrix = new Matrix();
@@ -138,21 +140,21 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
                 canvas.drawCircle(viewBoxW * (1.5f - gapSize), center, center, mPaint);
                 mPaint.setXfermode(null);
             }
-        }else if (flag == 2){
+        }else if (SImageView.TYPE_RECT == displayType){
             // 原图头像
             GraphsTemplate.drawRect(canvas, bitmap, viewBoxW, viewBoxH, 0, 0, mPaint, mBorderWidth, mBorderPaint);
 
-        }else if (flag == 3){
+        }else if (SImageView.TYPE_OVAL == displayType){
 
             // 椭圆头像
             GraphsTemplate.drawOval(canvas, bitmap, new RectF(viewBoxW*0.05f, viewBoxH*0.2f,viewBoxW*0.95f, viewBoxH*0.8f),0,0,mPaint , mBorderWidth ,mBorderPaint);
 
-        }else if (flag == 4){
+        }else if (SImageView.TYPE_FIVE_POINTED_STAR == displayType){
 
             // 五角星头像
             GraphsTemplate.drawFivePointedStar(canvas, bitmap, (int)(center * 0.9f), 0,0, mPaint ,mBorderWidth ,mBorderPaint);
 
-        }else if (flag == 5){
+        }else if (SImageView.TYPE_ROUND_RECT == displayType){
             // 有圆角的头像
            GraphsTemplate.drawCornerRectBorder(canvas, bitmap, viewBoxW, viewBoxH, viewBoxW/8, viewBoxW/8,0,0,mPaint, mBorderWidth ,mBorderPaint);
         }

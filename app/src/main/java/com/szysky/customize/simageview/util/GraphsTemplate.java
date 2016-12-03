@@ -91,9 +91,11 @@ public class GraphsTemplate {
      * @param bitmap  要处理的成圆角的 Bitmap图片
      * @param rectF   椭圆对应的矩形
      * @param offsetX 是否要偏移画布, 移动原点位置, 不需要传入0即可
-     * @param offsetY 是否要偏移画布, 移动原点位置, 不需要传入0即可
+     * @param offsetY 是否要偏移画布, 移动原点位置, 不需要传入0
+     * @param borderWidth  描边宽度 , 不需要可以设置0
+     * @param borderPaint  描边画笔  不需要可以设置null
      */
-    public static void drawOval(Canvas canvas, Bitmap bitmap, RectF rectF, float offsetX, float offsetY,Paint paint){
+    public static void drawOval(Canvas canvas, Bitmap bitmap, RectF rectF, float offsetX, float offsetY,Paint paint, int borderWidth, Paint borderPaint){
         // 位置校正
         rectF.right += offsetX;
         rectF.left += offsetX;
@@ -101,12 +103,24 @@ public class GraphsTemplate {
         rectF.bottom += offsetY;
         canvas.drawOval(rectF, paint);
 
-        if (null == bitmap) return; // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
+        // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
+        if (null != bitmap) {
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, offsetX, offsetY, paint);
+            paint.setXfermode(null);
+        }
 
+        // 开始描边
+        if (borderWidth > 0 && borderPaint != null){
+            // 位置校正
+            float off = borderWidth / 2f;
+            rectF.right -= off;
+            rectF.left += off;
+            rectF.top += off;
+            rectF.bottom -= off;
+            canvas.drawOval(rectF, borderPaint);
+        }
 
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, offsetX, offsetY, paint);
-        paint.setXfermode(null);
     }
 
 

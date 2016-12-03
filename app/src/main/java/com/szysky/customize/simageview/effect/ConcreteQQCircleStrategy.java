@@ -125,7 +125,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         mPaint.setFilterBitmap(true);
         int center = Math.round(viewBoxW / 2f);
 
-        int flag = 4;
+        int flag = 3;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像
@@ -146,7 +146,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
         }else if (flag == 3){
 
             // 椭圆头像
-            GraphsTemplate.drawOval(canvas, bitmap, new RectF(viewBoxW*0.05f, viewBoxH*0.2f,viewBoxW*0.95f, viewBoxH*0.8f),0,0,mPaint );
+            GraphsTemplate.drawOval(canvas, bitmap, new RectF(viewBoxW*0.05f, viewBoxH*0.2f,viewBoxW*0.95f, viewBoxH*0.8f),0,0,mPaint , mBorderWidth ,mBorderPaint);
 
         }else if (flag == 4){
 

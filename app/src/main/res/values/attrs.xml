@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="CircleImageView">
-        <attr name="cirborder_width" format="dimension" />
-        <attr name="cirborder_color" format="color" />
+    <declare-styleable name="SImageView">
+        <attr name="border_width" format="dimension"/>
+        <attr name="border_color" format="color"/>
+        <attr name="img" format="reference"/>
+        <attr name="displayType" format="enum">
+            <enum name="circle" value="0" />
+            <enum name="rect" value="1" />
+            <enum name="round_rect" value="2" />
+            <enum name="five_pointed_star" value="3" />
+            <enum name="oval" value="4" />
+        </attr>
+
     </declare-styleable>
 </resources>

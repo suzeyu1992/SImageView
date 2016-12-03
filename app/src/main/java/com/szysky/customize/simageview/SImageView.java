@@ -1,6 +1,7 @@
 package com.szysky.customize.simageview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.icu.text.IDNA;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
@@ -87,7 +89,7 @@ public class SImageView extends ImageView {
         public int height;                                      // 控件的高度
         public int width;                                       // 控件的宽度
         public ArrayList<Bitmap> readyBmp = new ArrayList<>();  // 需要显示的图片集合
-        public float borderWidth = 1;                             // 描边宽度
+        public float borderWidth = 0;                             // 描边宽度
         public int borderColor = Color.BLACK;                   // 描边颜色
         public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;  // 测量过程返回的每个元素的对应位置信息
         public int displayType ;                                 // 子元素的显示类型
@@ -129,22 +131,30 @@ public class SImageView extends ImageView {
 
     public SImageView(Context context) {
         super(context);
-        init();
+
     }
 
     public SImageView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mContext = getContext();
-
-
-
-
-        //init();
+        this(context, attrs, 0);
     }
 
     public SImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+
+        // 获得xml属性
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SImageView, defStyleAttr, 0);
+
+        mInfo.borderWidth = typedArray.getDimensionPixelSize(R.styleable.SImageView_border_width, 1);
+        mInfo.borderColor = typedArray.getColor(R.styleable.SImageView_border_color, Color.BLACK);
+        mInfo.displayType = typedArray.getInt(R.styleable.SImageView_displayType, 0);
+        Drawable drawable = typedArray.getDrawable(R.styleable.SImageView_img);
+        if ( null != drawable ){
+            mInfo.readyBmp.clear();
+            mInfo.readyBmp.add(getBitmapFromDrawable(drawable));
+        }
+
+        typedArray.recycle();
+
     }
 
     @Override

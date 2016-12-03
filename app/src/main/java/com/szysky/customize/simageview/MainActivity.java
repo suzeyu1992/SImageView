@@ -40,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
 //        bitmaps.add(bitmap);
 //        bitmaps.add(bitmap);
        // bitmaps.add(bitmap);
-        iv.setBorderWidth(10);
-        iv.setDisplayShape(SImageView.TYPE_CIRCLE);
+//        iv.setBorderWidth(10);
+//        iv.setDisplayShape(SImageView.TYPE_CIRCLE);
       //  iv.setCloseNormalOnePicLoad(true);
-        iv.setBorderColor(getResources().getColor(R.color.testColor));
+       // iv.setBorderColor(getResources().getColor(R.color.testColor));
 
         new Thread(new Runnable() {
             @Override
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                                iv.setIdRes(R.mipmap.icon_test);
+                               // iv.setIdRes(R.mipmap.icon_test);
 
                     }
                 });

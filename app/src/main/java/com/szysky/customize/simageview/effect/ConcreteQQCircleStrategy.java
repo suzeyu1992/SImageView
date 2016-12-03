@@ -33,7 +33,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     /**
      *  控制是开启qq群组图片去除两张图片重叠的效果
      */
-    private boolean mIsPicRotate = true;
+    private boolean mIsPicRotate = false;
     private static Paint  mPaint = new Paint();
 
     /**qq群组的不同数量时的对应旋转数组**/
@@ -42,7 +42,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
             new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
 
 
-    private int mBorderWidth;
+    private float mBorderWidth;
 
     /**
      *  描边画笔
@@ -70,7 +70,6 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
-
 
 
         // 对描边进行边界的最大长度进行判断 不得超过半径的1/6
@@ -198,7 +197,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
      * 设置qq群组图片去除重叠方法
      *
      * @param mIsPicRotate 为true时, 为QQ群组的样式, 默认属性
-     *                      为false时: 可去除两个图片重叠确实的效果
+     *                     为false时: 可去除两个图片重叠确实的效果
      */
     public void setIsPicRotate(boolean mIsPicRotate) {
         this.mIsPicRotate = mIsPicRotate;

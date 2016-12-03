@@ -18,6 +18,7 @@ import com.szysky.customize.simageview.effect.NormalOnePicStrategy;
 import com.szysky.customize.simageview.range.ILayoutManager;
 import com.szysky.customize.simageview.range.QQLayoutManager;
 import com.szysky.customize.simageview.range.WeCharLayoutManager;
+import com.szysky.customize.simageview.util.UIUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -58,7 +59,7 @@ public class SImageView extends ImageView {
 
     /**
      *  单个图片默认加载策略, 优先级高于多张图,
-     *      可以通过{@link #setCloseNormalOnePicLoad(boolean)}设置为true强制关闭此策略
+     *  可以通过{@link #setCloseNormalOnePicLoad(boolean)}设置为true强制关闭此策略
      */
     private IDrawingStrategy mNormalOnePicStrategy = new NormalOnePicStrategy();
 
@@ -78,15 +79,14 @@ public class SImageView extends ImageView {
         public int height;                                      // 控件的高度
         public int width;                                       // 控件的宽度
         public ArrayList<Bitmap> readyBmp = new ArrayList<>();  // 需要显示的图片集合
-        public int borderWidth = 1;                             // 描边宽度
+        public float borderWidth = 1;                             // 描边宽度
         public int borderColor = Color.BLACK;                   // 描边颜色
         public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;  // 测量过程返回的每个元素的对应位置信息
-        public boolean isNormalImpl = true;                     // 此标记只在具体实现画图显示为qq策略才有用
-        public int displayType;                                 // 子元素的显示类型
+        public int displayType ;                                 // 子元素的显示类型
 
         @Override
         protected Object clone() {
-            ConfigInfo clone = null;
+            ConfigInfo clone ;
             try {
                 clone = (ConfigInfo) super.clone();
                 if (coordinates != null){
@@ -202,11 +202,7 @@ public class SImageView extends ImageView {
 
     }
 
-    @Override
-    public void setImageResource(int resId) {
 
-//        invalidate();
-    }
 
     public void setImages(ArrayList<Bitmap> bitmaps){
         mInfo.readyBmp = bitmaps ;
@@ -242,10 +238,8 @@ public class SImageView extends ImageView {
     public void setDrawStrategy(IDrawingStrategy mDrawStrategy) {
         this.mDrawStrategy = mDrawStrategy;
         if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
-            mInfo.isNormalImpl = mLayoutManager instanceof QQLayoutManager ;
             mCloseNormalOnePicLoad = false;
         }else{
-            mInfo.isNormalImpl = false;
             mCloseNormalOnePicLoad = true;
         }
     }
@@ -275,5 +269,19 @@ public class SImageView extends ImageView {
     public void setDisplayShape(@ShapeDisplay int mCurrentDisplayShape) {
         this.mCurrentDisplayShape = mCurrentDisplayShape;
         mInfo.displayType = mCurrentDisplayShape;
+    }
+
+    /**
+     * 设置图片描边宽度
+     */
+    public void setBorderWidth(float dp){
+        mInfo.borderWidth = (int) UIUtils.dip2px(getContext(), dp);
+    }
+
+    /**
+     * 获得描边的宽度 单位dp
+     */
+    public float getBorderWidth(){
+        return UIUtils.px2dip(getContext(), mInfo.borderWidth);
     }
 }

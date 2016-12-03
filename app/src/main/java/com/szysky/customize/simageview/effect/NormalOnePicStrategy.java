@@ -21,7 +21,7 @@ import com.szysky.customize.simageview.util.GraphsTemplate;
 
 public class  NormalOnePicStrategy implements IDrawingStrategy {
 
-    private int mBorderWidth;
+    private float mBorderWidth;
 
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
@@ -60,7 +60,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         }
 
 
-        int bodySquareSide = layoutSquareSide - mBorderWidth *2;
+        int bodySquareSide = (int) (layoutSquareSide - mBorderWidth *2);
 
 
         // 创建内容画笔和描边画笔 并设置属性
@@ -112,7 +112,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
 
         if (SImageView.TYPE_CIRCLE == display){
             // qq群组效果
-            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth >>1),paint , mBorderWidth ,borderPaint);
+            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth/2),paint , mBorderWidth ,borderPaint);
 
         }else if (SImageView.TYPE_RECT == display){
 

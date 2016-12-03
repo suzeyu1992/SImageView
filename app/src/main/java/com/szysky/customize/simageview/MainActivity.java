@@ -40,8 +40,12 @@ public class MainActivity extends AppCompatActivity {
 //        bitmaps.add(bitmap);
 //        bitmaps.add(bitmap);
         bitmaps.add(bitmap);
+        iv.setBorderWidth(10);
         iv.setDisplayShape(SImageView.TYPE_CIRCLE);
+        iv.setCloseNormalOnePicLoad(true);
         iv.setImages(bitmaps);
+
+
 
     }
 }

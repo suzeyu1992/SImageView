@@ -145,7 +145,7 @@ public class WeCharLayoutManager implements ILayoutManager {
     }
     /**对布局元素中的每个子元素添加空隙**/
     private void addSpacing(float dp, int side , ArrayList<LayoutInfoGroup> datas){
-        int addPixel = UIUtils.dip2px(context, dp);
+        int addPixel = (int) UIUtils.dip2px(context, dp);
 
         // 每个子元素的空隙不得超出子元素边长的三分之一
         addPixel = addPixel > side/3 ? side/3 : addPixel ;

@@ -35,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
 //        bitmaps.add(bitmap);
 //        bitmaps.add(bitmap);
 //        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
+        bitmaps.add(bitmap);
         bitmaps.add(bitmap);
         iv.setImages(bitmaps);
 

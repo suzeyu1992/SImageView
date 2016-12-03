@@ -103,7 +103,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         //GraphsTemplate.drawFivePointedStar(canvas, opeBitmap,layoutSquareSide/2, layoutOffsetX,layoutOffsetY,paint);
 
 
-        int flag = 1;
+        int flag = 2;
         if (flag == 1){
             // qq群组效果
             // 先处理成圆形头像
@@ -111,14 +111,17 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
 
 
         }else if (flag == 2){       // 原图头像
-            RectF rectF = new RectF(0 + layoutOffsetX, 0 + layoutOffsetY, layoutSquareSide + layoutOffsetX, layoutSquareSide + layoutOffsetY);
-            canvas.drawRect( rectF,paint);
-            rectF.bottom -= mBorderWidth/2;
-            rectF.top += mBorderWidth/2;
-            rectF.right -= mBorderWidth/2;
-            rectF.left += mBorderWidth/2;
-            canvas.drawRect(rectF, borderPaint);
-            canvas.drawBitmap(opeBitmap, layoutOffsetX, layoutOffsetY, paint);
+//            RectF rectF = new RectF(0 + layoutOffsetX, 0 + layoutOffsetY, layoutSquareSide + layoutOffsetX, layoutSquareSide + layoutOffsetY);
+//            canvas.drawRect( rectF,paint);
+//            rectF.bottom -= mBorderWidth/2;
+//            rectF.top += mBorderWidth/2;
+//            rectF.right -= mBorderWidth/2;
+//            rectF.left += mBorderWidth/2;
+//            canvas.drawRect(rectF, borderPaint);
+//            canvas.drawBitmap(opeBitmap, layoutOffsetX, layoutOffsetY, paint);
+            // 矩形图像
+            GraphsTemplate.drawRect(canvas, null, layoutSquareSide, layoutSquareSide, layoutOffsetX, layoutOffsetY, paint, mBorderWidth, borderPaint);
+
         }else if (flag == 3){
 
             // 椭圆头像

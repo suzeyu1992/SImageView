@@ -46,7 +46,7 @@ public class SImageView extends ImageView {
     /**
      *  默认单图片处理的开关标记
      */
-    private boolean mCloseNormalOnePicLoad = false;
+    private boolean mCloseNormalOnePicLoad = true;
 
     /**
      *  具体子元素图片显示样式策略, 默认下,对于一张图片会使用 mNormalOnePicStrategy 变量, 如果实现了自定义策略,

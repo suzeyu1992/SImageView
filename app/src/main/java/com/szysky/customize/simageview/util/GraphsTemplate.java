@@ -19,6 +19,33 @@ import android.graphics.RectF;
 public class GraphsTemplate {
 
 
+    public static void drawRect(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight,
+                                int offsetX, int offsetY, Paint paint, int borderWidth, Paint borderPaint ){
+        // 画矩形
+        RectF rectF = new RectF(0 + offsetX, 0 + offsetY, sideWidth + offsetX, sideHeight + offsetY);
+        canvas.drawRect( rectF,paint);
+
+        // 表明只需要要画出想要的图形即可, 可能实现合成方式是Shader着色器,而不是setXformode
+        if (null != bitmap) {
+            //设置混合的模式
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmap, offsetX, offsetY, paint);
+            paint.setXfermode(null);
+        }
+
+        // 设置描边
+        if (borderWidth > 0 && borderPaint != null){
+            // 位置修正
+            rectF.bottom -= borderWidth/2;
+            rectF.top += borderWidth/2;
+            rectF.right -= borderWidth/2;
+            rectF.left += borderWidth/2;
+            canvas.drawRect(rectF, borderPaint);
+        }
+    }
+
+
+
     /**
      *  合成一个圆角矩形图片
      * @param canvas  画布
@@ -63,6 +90,8 @@ public class GraphsTemplate {
      * @param centerX 圆心点的x坐标
      * @param centerY 圆心点的y坐标
      * @param radius  圆的半径
+     * @param borderWidth  描边宽度 , 不需要可以设置0
+     * @param borderPaint  描边画笔  不需要可以设置null
      */
     public static void drawCircle(Canvas canvas, Bitmap bitmap, float centerX, float centerY, float radius,
                                   Paint paint, int borderWidth, Paint borderPaint){

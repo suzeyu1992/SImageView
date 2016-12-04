@@ -97,7 +97,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         // 进行调整
         Matrix mShaderMatrix = new Matrix();
         mShaderMatrix.set(null);
-        mShaderMatrix.setScale(scale, scale);
+        mShaderMatrix.setScale(scale, scale );
         mShaderMatrix.postTranslate((int) (dx + 0.5f) + mBorderWidth + layoutOffsetX, (int) (dy + 0.5f) + mBorderWidth + layoutOffsetY);
         mBitmapShader.setLocalMatrix(mShaderMatrix);
 

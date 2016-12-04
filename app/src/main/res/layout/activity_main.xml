@@ -5,23 +5,18 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingTop="5dp"
     tools:context="com.szysky.customize.simageview.MainActivity"
     android:orientation="vertical">
 
-    <com.szysky.customize.siv.SImageView
-        android:id="@+id/iv_main"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:background="@color/colorAccent"
-        app:border_color="#33f0fa"
-        app:border_width="1px"
-        app:img="@mipmap/icon_test"
-        app:displayType="oval"
-        />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_main"
+        android:background="#efefef"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+    </android.support.v7.widget.RecyclerView>
 
 
 </LinearLayout>

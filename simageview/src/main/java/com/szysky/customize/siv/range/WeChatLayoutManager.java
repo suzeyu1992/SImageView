@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * ClassDescription :  微信 measure测量布局实现
  */
 
-public class WeCharLayoutManager implements ILayoutManager {
+public class WeChatLayoutManager implements ILayoutManager {
 
     private final Context context;
 
@@ -34,7 +34,7 @@ public class WeCharLayoutManager implements ILayoutManager {
      */
     private float mSpacing = 1f;
 
-    public WeCharLayoutManager(Context context) {
+    public WeChatLayoutManager(Context context) {
         this.context = context;
         // 创建子元素的布局对象集合, 用于后续使用
         mCacheList = new ArrayList<>();

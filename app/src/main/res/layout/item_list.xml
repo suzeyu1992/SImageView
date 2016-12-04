@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="300dp">
 
     <com.szysky.customize.siv.SImageView
         android:id="@+id/siv"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="@color/colorAccent"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_gravity="center"/>
 </LinearLayout>

@@ -80,12 +80,22 @@ public class GraphsTemplate {
         // 判断是否需要描边
         if (borderWidth >0 && borderPaint != null){
             Log.i("hahaha", "drawCornerRectBorder: " +sideWidth + " =====  "+sideHeight);
+            // 如果有bitmap, 描边应该以bitmap的宽高设置描边配置, 否则可能会出现描边缺失
+            if (null != bitmap){
+                float temp = borderWidth / 2.5f;
+                rectF.left += temp;
+                rectF.top += temp;
+                rectF.right = bitmap.getWidth() - temp;
+                rectF.bottom = bitmap.getHeight() - temp;
+                canvas.drawRoundRect(rectF,cornerX*0.8f,cornerY*0.8f , borderPaint);
 
-            rectF.bottom -= borderWidth/2;
-            rectF.top += borderWidth/2;
-            rectF.right -= borderWidth/2;
-            rectF.left += borderWidth/2;
-            canvas.drawRoundRect(rectF,cornerX*0.8f,cornerY*0.8f , borderPaint);
+            }else{
+                rectF.bottom -= borderWidth/2;
+                rectF.top += borderWidth/2;
+                rectF.right -= borderWidth/2;
+                rectF.left += borderWidth/2;
+                canvas.drawRoundRect(rectF,cornerX*0.8f,cornerY*0.8f , borderPaint);
+            }
 
         }
     }

@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.icu.util.Measure;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
@@ -46,6 +47,9 @@ public class SImageView extends ImageView {
 
     private Context mContext;
 
+    private int mDrawableWidth;
+    private int mDrawableHeight;
+
     /**
      *  对具体绘图抽象过程提供的一个可利用的画布.
      */
@@ -75,7 +79,10 @@ public class SImageView extends ImageView {
      *  具体的子图片绘制的策略对象
      */
     private IDrawingStrategy mDrawStrategy = new ConcreteQQCircleStrategy();
-
+    private int mPaddingLeft;
+    private int mPaddingRight;
+    private int mPaddingTop;
+    private int mPaddingBottom;
 
 
     /**
@@ -145,12 +152,119 @@ public class SImageView extends ImageView {
         mInfo.borderColor = typedArray.getColor(R.styleable.SImageView_border_color, Color.BLACK);
         mInfo.displayType = typedArray.getInt(R.styleable.SImageView_displayType, 0);
         Drawable drawable = typedArray.getDrawable(R.styleable.SImageView_img);
+
+
         if ( null != drawable ){
+            mDrawableHeight = drawable.getIntrinsicHeight();
+            mDrawableWidth = drawable.getIntrinsicWidth();
             mInfo.readyBmp.clear();
             mInfo.readyBmp.add(getBitmapFromDrawable(drawable));
         }
 
         typedArray.recycle();
+
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int w = 0;
+        int h = 0;
+
+        final int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+        final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+
+        final int pleft = mPaddingLeft;
+        final int pright = mPaddingRight;
+        final int ptop = mPaddingTop;
+        final int pbottom = mPaddingBottom;
+
+
+        // 宽度处理
+        if (widthSpecMode == MeasureSpec.UNSPECIFIED){
+            // 如果是UNSPECIFIED模式需要自定义大小 match_parent
+            if (mDrawableWidth > 0){
+                w = mDrawableWidth;
+            }else if (heightSize > 0){
+                w = heightSize;
+            }else{
+                w = (int) UIUtils.dip2px(mContext, 48f);
+            }
+
+            w += pleft + pright;    // 加上padding
+
+            w = Math.max(w, getSuggestedMinimumWidth());
+        }else if (widthSpecMode == MeasureSpec.AT_MOST){
+            // 如果是AT_MOST模式特殊处理  wrap_content
+            if (mDrawableWidth > 0){
+                w = mDrawableWidth + pleft + pright;
+                w = ( w > widthSize ? widthSize : w);
+            }
+
+            if (getSuggestedMinimumWidth() > 0){
+                if (getSuggestedMinimumWidth() >= widthSize){
+                    w = widthSize;
+                }else {
+                    w = (w > getSuggestedMinimumWidth() ? w : getSuggestedMinimumWidth());
+                }
+            }
+
+            // 如果既没有设置前景, 也没有背景, 设置一个像素占位
+            if ((mDrawableWidth <=0) && (getSuggestedMinimumWidth() <=0)){
+                w = 1 + pleft + pright;
+            }
+        }else if (widthSpecMode == MeasureSpec.EXACTLY){
+            w = widthSize;
+        }
+
+
+        // 高度测量
+        if (heightSpecMode == MeasureSpec.UNSPECIFIED){
+            // 如果是UNSPECIFIED模式需要自定义大小 match_parent
+            if (mDrawableHeight > 0){
+                h = mDrawableHeight;
+            }else if (widthSize > 0){
+                h = widthSize;
+            }else{
+                h = (int) UIUtils.dip2px(mContext, 48f);
+            }
+            h += ptop + pbottom; // 加上padding
+
+            h = Math.max(h, getSuggestedMinimumHeight());
+        }else if (heightSpecMode == MeasureSpec.AT_MOST){
+            // 如果是AT_MOST模式特殊处理  wrap_content
+            // 判断前景
+            if (mDrawableHeight > 0){
+                h = mDrawableHeight + ptop + pbottom;
+                h = ( h > heightSize ? heightSize : h);
+            }
+            // 判断背景
+            if (getSuggestedMinimumHeight() > 0){
+                if (getSuggestedMinimumHeight() >= heightSize){
+                    h = heightSize;
+                }else {
+                    h = (h > getSuggestedMinimumHeight() ? h : getSuggestedMinimumHeight());
+                }
+            }
+
+            // 如果既没有设置前景, 也没有背景, 设置一个像素占位
+            if ((mDrawableHeight <=0) && (getSuggestedMinimumHeight() <=0)){
+                h = 1 + ptop + pbottom;
+            }
+        }else if (heightSpecMode == MeasureSpec.EXACTLY){
+            h = heightSize;
+        }
+
+
+
+
+        widthSize = resolveSizeAndState(w, widthMeasureSpec, 0);
+        heightSize = resolveSizeAndState(h, heightMeasureSpec, 0);
+
+
+        setMeasuredDimension(widthSize, heightSize);
 
     }
 

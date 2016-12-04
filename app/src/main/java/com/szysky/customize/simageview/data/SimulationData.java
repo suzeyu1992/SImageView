@@ -52,11 +52,11 @@ public class SimulationData {
     public SimulationData(Context context, int loadNumPic){
 
         if (null == ic_1){
-            ic_1 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_5);
-            ic_2 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_1);
+            ic_1 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_1);
+            ic_2 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_2);
             ic_3 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_3);
             ic_4 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_4);
-            ic_5 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_2);
+            ic_5 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_5);
             ic_6 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_6);
             ic_7 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_7);
             ic_8 = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_8);

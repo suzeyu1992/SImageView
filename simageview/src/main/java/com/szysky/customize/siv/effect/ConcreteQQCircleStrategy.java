@@ -38,7 +38,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
     /**qq群组的不同数量时的对应旋转数组**/
     private static final float[][] rotations = { new float[] { 360.0f }, new float[] { 45.0f, 360.0f },
-            new float[] { 120.0f, 0.0f, -120.0f }, new float[] { 90.0f, 180.0f, -90.0f, 0.0f },
+            new float[] { 120.0f, 0.0f, -120.0f }, new float[] { 90.0f, 179.0f, -90.0f, 0.0f },
             new float[] { 144.0f, 72.0f, 0.0f, -72.0f, -144.0f }, };
 
 
@@ -98,63 +98,19 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
         int mBitmapWidth = opeBitmap.getWidth();   // 需要处理的bitmap宽度和高度
         int mBitmapHeight = opeBitmap.getHeight();
-////$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         // 布局调整
         float scaleX = maxWidth/(float)mBitmapWidth;
         float scaleY = maxHeight/(float)mBitmapHeight;
         float scaleResult = (scaleX > scaleY ? scaleX :scaleY);
 
-        // 获取 的位置调整的信息 和bitmap需要缩放的比值
 
-
-        // 容错控件非正方形场景处理
-//        int layoutOffsetX = 0;
-//        int layoutOffsetY = 0;
-//        int layoutSquareSide ;                  // 正方形边长
-//        if (maxHeight != maxWidth){
-//            int temp = (int) (maxHeight - maxWidth);
-//            if (temp > 0){
-//                layoutOffsetY += temp;
-//                layoutOffsetY >>= 1;
-//                layoutSquareSide = (int) maxWidth;
-//            }else{
-//                layoutOffsetX -= temp;
-//                layoutOffsetX >>= 1;
-//                layoutSquareSide = (int) maxHeight;
-//            }
-//        }else{
-//            layoutSquareSide = (int) maxHeight;
-//        }
-//
-//        int bodySquareSide = (int) (layoutSquareSide - mBorderWidth *2);
-
-
-//        float scale ;
-//        float dx = 0;
-//        float dy = 0;
-//        if (mBitmapWidth  >  mBitmapHeight) {
-//            scale = bodySquareSide / (float) mBitmapHeight;
-//            dx = (bodySquareSide - mBitmapWidth * scale) * 0.5f;
-//        } else {
-//            scale = bodySquareSide / (float) mBitmapWidth ;
-//            dy = (bodySquareSide - mBitmapHeight * scale) * 0.5f;
-//        }
 
         canvas.save();
 
 
-//        if (mBitmapWidth  >  mBitmapHeight) {
-//            scale = bodySquareSide / (float) mBitmapHeight;
-//            dx = (bodySquareSide - mBitmapWidth * scale) * 0.5f;
-//        } else {
-//            scale = bodySquareSide / (float) mBitmapWidth ;
-//            dy = (bodySquareSide - mBitmapHeight * scale) * 0.5f;
-//        }
 
         Matrix matrix = new Matrix();
-//        matrix.postScale(scale,scale);
         matrix.postScale(scaleResult,scaleResult);
-        //matrix.postTranslate((int) (dx + 0.5f) + mBorderWidth + layoutOffsetX, (int) (dy + 0.5f) + mBorderWidth + layoutOffsetY);
 
 
         // 缩放
@@ -189,8 +145,8 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
 
         if (SImageView.TYPE_CIRCLE == displayType){
             // qq群组效果
-            // 先处理成圆形头像
-            GraphsTemplate.drawCircle(canvas, bitmap, center, center,center,mPaint ,isRotate ? 0:mBorderWidth ,mBorderPaint );
+            // 先处理成圆形头像   如果没有旋转规则, 那么对半径进行0.95的缩小, 防止描边丢失
+            GraphsTemplate.drawCircle(canvas, bitmap, center, center, center*0.98f,mPaint ,isRotate ? 0:mBorderWidth ,mBorderPaint );
 
             if ( isRotate  &&   rotation != 360f  ) {
                 Matrix matrix = new Matrix();

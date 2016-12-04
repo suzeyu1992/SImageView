@@ -12,10 +12,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 
 
 import com.szysky.customize.simageview.data.SimulationData;
 import com.szysky.customize.siv.SImageView;
+import com.szysky.customize.siv.effect.ConcreteQQCircleStrategy;
+import com.szysky.customize.siv.range.QQLayoutManager;
 import com.szysky.customize.siv.range.WeChatLayoutManager;
 
 import java.util.ArrayList;
@@ -33,16 +36,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         RecyclerView rv_main = (RecyclerView) findViewById(R.id.rv_main);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 5);
+        DividerGridItemDecoration itemDivider = new DividerGridItemDecoration(getApplicationContext());
+        rv_main.addItemDecoration(itemDivider);
         rv_main.setLayoutManager(gridLayoutManager);
 
         ArrayList<SimulationData> datas = new ArrayList<>();
         new SimulationData(getApplicationContext(), datas);
-        SimulationData data = new SimulationData(getApplicationContext(), 2);
-        data.mMeasureManager = new WeChatLayoutManager(getApplicationContext());
-        data.borderColor = Color.BLACK;
-        data.borderWidth = 2;
-        //datas.add(data);
+
 
 
 
@@ -94,31 +95,35 @@ public class MainActivity extends AppCompatActivity {
 
             // 获取控件要展示的信息
             SimulationData data = datas.get(position);
-            com.szysky.customize.siv.SImageView sImageView = holder.siv_display;
+            ImageView sImageView = holder.siv_display;
 
 
-            // 设置是否关闭单张图片处理逻辑
-            sImageView.setCloseNormalOnePicLoad(data.mCloseNormalOnePicLoad);
-
-            // 设置描边颜色
-            if (data.borderColor <= 0){
-                sImageView.setBorderColor(data.borderColor);
-            }
-
-            // 设置描边宽度
-            sImageView.setBorderWidth(data.borderWidth);
-
-            // 设置显示类型
-            sImageView.setDisplayShape(data.displayType);
-
-            // 设置测量布局
-            if (null != data.mMeasureManager){
-                sImageView.setLayoutManager(data.mMeasureManager);
-
-            }
+//            // 设置是否关闭单张图片处理逻辑
+//            sImageView.setCloseNormalOnePicLoad(data.mCloseNormalOnePicLoad);
+//
+//            // 设置描边颜色
+//            if (data.borderColor <= 0){
+//                sImageView.setBorderColor(data.borderColor);
+//            }else{
+//                sImageView.setBorderColor(Color.BLACK);
+//            }
+//
+//            // 设置描边宽度
+//            sImageView.setBorderWidth(data.borderWidth);
+//
+//            // 设置显示类型
+//            sImageView.setDisplayShape(data.displayType);
+//
+//            // 设置测量布局
+//            if (null != data.mMeasureManager){
+//                sImageView.setLayoutManager(data.mMeasureManager);
+//            }else{
+//                sImageView.setLayoutManager(new QQLayoutManager());
+//            }
 
             // 最后设置图片展示
-            sImageView.setImages(data.readyBmp);
+            //sImageView.setImageBitmap(data.readyBmp.get(0));
+//            sImageView.setImageBitmap(data.readyBmp.get(0));
         }
 
 
@@ -129,11 +134,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         static class MyHolder extends RecyclerView.ViewHolder{
-            public SImageView siv_display;
+            public ImageView siv_display;
 
             public MyHolder(View itemView) {
                 super(itemView);
-                siv_display = (com.szysky.customize.siv.SImageView) itemView.findViewById(R.id.siv);
+                siv_display = (ImageView) itemView.findViewById(R.id.siv);
             }
         }
 

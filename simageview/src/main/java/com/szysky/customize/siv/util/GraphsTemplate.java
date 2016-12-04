@@ -55,9 +55,10 @@ public class GraphsTemplate {
                                   int offsetX, int offsetY, Paint paint , int flag){
 
         Matrix matrix = new Matrix();
-        float scale ;
+        float scale = 0;
         float dx = 0;
         float dy = 0;
+
 
         switch (flag){
 
@@ -86,14 +87,22 @@ public class GraphsTemplate {
 
             case SImageView.SCALE_TYPE_FIX_XY:
                 // 填充控件, 保证图片完整,  比例可能会变
-                matrix.postScale(sideWidth / bitmap.getWidth() , sideHeight / bitmap.getHeight());
+                float tempX = sideWidth / bitmap.getWidth();
+                float tempY = sideHeight / bitmap.getHeight();
+                matrix.postScale(tempX , tempY);
+                if (tempX ==1 && tempY ==1){
+                    scale = 1;
+                }
                 break;
 
             default:
                 return;
         }
-
-        canvas.drawBitmap(Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true),offsetX, offsetY, null);
+        if (scale == 1){
+            canvas.drawBitmap(bitmap, offsetX, offsetY, null);
+        }else{
+            canvas.drawBitmap(Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true),offsetX, offsetY, null);
+        }
     }
 
     /**

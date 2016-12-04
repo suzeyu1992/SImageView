@@ -15,6 +15,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 
@@ -152,14 +153,18 @@ public class SImageView extends ImageView {
         mInfo.borderColor = typedArray.getColor(R.styleable.SImageView_border_color, Color.BLACK);
         mInfo.displayType = typedArray.getInt(R.styleable.SImageView_displayType, 0);
         Drawable drawable = typedArray.getDrawable(R.styleable.SImageView_img);
-
-
         if ( null != drawable ){
             mDrawableHeight = drawable.getIntrinsicHeight();
             mDrawableWidth = drawable.getIntrinsicWidth();
             mInfo.readyBmp.clear();
             mInfo.readyBmp.add(getBitmapFromDrawable(drawable));
         }
+
+        // padding setting
+        mPaddingBottom = getPaddingBottom();
+        mPaddingTop = getPaddingTop();
+        mPaddingLeft = getPaddingLeft();
+        mPaddingRight = getPaddingRight();
 
         typedArray.recycle();
 
@@ -271,14 +276,17 @@ public class SImageView extends ImageView {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        mInfo.height = getHeight();
-        mInfo.width = getWidth();
+
+        mInfo.height = getHeight() - mPaddingBottom - mPaddingTop ;
+        mInfo.width = getWidth() - mPaddingLeft - mPaddingRight;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        // translate padding
+        canvas.translate(mPaddingLeft, mPaddingTop);
 
         long startCur = System.nanoTime();
 
@@ -290,7 +298,7 @@ public class SImageView extends ImageView {
 
         }else if (mInfo.readyBmp.size() > 0 ){
             // measure布局参数
-            mInfo.coordinates = mLayoutManager.calculate(getWidth(), getHeight(), mInfo.readyBmp.size());
+            mInfo.coordinates = mLayoutManager.calculate(mInfo.width, mInfo.height, mInfo.readyBmp.size());
 
             if (mInfo.coordinates == null) return;
             // layout 子元素布局
@@ -328,7 +336,8 @@ public class SImageView extends ImageView {
             Log.i(TAG, "多张图执行时间: "+ (System.nanoTime() - startCur)/1000000f +"毫秒");
         }
 
-
+        // translate padding
+        canvas.translate(-mPaddingLeft, -mPaddingTop);
 
     }
 

@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         RecyclerView rv_main = (RecyclerView) findViewById(R.id.rv_main);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 5);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
         rv_main.setLayoutManager(gridLayoutManager);
 
         ArrayList<SimulationData> datas = new ArrayList<>();

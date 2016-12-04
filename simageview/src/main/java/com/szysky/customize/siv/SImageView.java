@@ -267,6 +267,17 @@ public class SImageView extends ImageView {
     public void setLayoutManager(ILayoutManager mLayoutManager) {
         this.mLayoutManager = mLayoutManager;
 
+        // 兼容qq群组绘制的重叠场景问题
+        if (mLayoutManager instanceof QQLayoutManager){
+            if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
+                ((ConcreteQQCircleStrategy)mDrawStrategy).setIsPicRotate(true);
+            }
+        }else{
+            if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
+                ((ConcreteQQCircleStrategy)mDrawStrategy).setIsPicRotate(false);
+            }
+        }
+
     }
 
 

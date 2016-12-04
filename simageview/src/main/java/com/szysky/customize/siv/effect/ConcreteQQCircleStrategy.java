@@ -31,9 +31,9 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     private float mSpacing = 0.15f;
 
     /**
-     *  控制是开启qq群组图片去除两张图片重叠的效果
+     *  控制是开启qq群组图片两张图片重叠的效果
      */
-    private boolean mIsPicRotate = false;
+    private boolean mIsPicRotate = true;
     private static Paint  mPaint = new Paint();
 
     /**qq群组的不同数量时的对应旋转数组**/

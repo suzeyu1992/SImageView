@@ -6,7 +6,7 @@
 
     <com.szysky.customize.siv.SImageView
         android:id="@+id/siv"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_gravity="center"/>
 </LinearLayout>

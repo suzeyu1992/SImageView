@@ -77,14 +77,16 @@ public class GraphsTemplate {
             canvas.drawBitmap(bitmap, offsetX, offsetY, paint);
             paint.setXfermode(null);
         }
-
         // 判断是否需要描边
         if (borderWidth >0 && borderPaint != null){
+            Log.i("hahaha", "drawCornerRectBorder: " +sideWidth + " =====  "+sideHeight);
+
             rectF.bottom -= borderWidth/2;
             rectF.top += borderWidth/2;
             rectF.right -= borderWidth/2;
             rectF.left += borderWidth/2;
             canvas.drawRoundRect(rectF,cornerX*0.8f,cornerY*0.8f , borderPaint);
+
         }
     }
 
@@ -229,7 +231,7 @@ public class GraphsTemplate {
             matrix.postScale(scale , scale);
             // 缩放
             bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                    bitmap.getWidth(), matrix, true);
+                    bitmap.getHeight(), matrix, true);
 
         }
 

@@ -11,6 +11,7 @@ import android.graphics.Shader;
 import com.szysky.customize.siv.SImageView;
 import com.szysky.customize.siv.util.GraphsTemplate;
 
+
 /**
  * Author :  suzeyu
  * Time   :  2016-11-30  下午10:23
@@ -21,10 +22,12 @@ import com.szysky.customize.siv.util.GraphsTemplate;
 
 public class  NormalOnePicStrategy implements IDrawingStrategy {
 
+    private float mBorderWidth;
+
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
         // 描边宽度
-        float mBorderWidth = info.borderWidth;
+        mBorderWidth = info.borderWidth;
         int mBitmapWidth = opeBitmap.getWidth();   // 需要处理的bitmap宽度和高度
         int mBitmapHeight = opeBitmap.getHeight();
 
@@ -36,7 +39,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         // 容错控件非正方形场景处理
         int layoutOffsetX = 0;
         int layoutOffsetY = 0;
-        int layoutSquareSide ;                  // 正方形边长
+        int layoutSquareSide = 0;                  // 正方形边长
         if (viewWidth != viewHeight){
             int temp = viewHeight - viewWidth;
             if (temp > 0){
@@ -97,7 +100,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         // 进行调整
         Matrix mShaderMatrix = new Matrix();
         mShaderMatrix.set(null);
-        mShaderMatrix.setScale(scale, scale );
+        mShaderMatrix.setScale(scale, scale);
         mShaderMatrix.postTranslate((int) (dx + 0.5f) + mBorderWidth + layoutOffsetX, (int) (dy + 0.5f) + mBorderWidth + layoutOffsetY);
         mBitmapShader.setLocalMatrix(mShaderMatrix);
 
@@ -110,7 +113,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
 
         if (SImageView.TYPE_CIRCLE == display){
             // qq群组效果
-            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth /2),paint , mBorderWidth,borderPaint);
+            GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth/2),paint , mBorderWidth ,borderPaint);
 
         }else if (SImageView.TYPE_RECT == display){
 
@@ -120,17 +123,17 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         }else if (SImageView.TYPE_OVAL == display){
 
             // 椭圆头像
-            GraphsTemplate.drawOval(canvas, null, new RectF(layoutSquareSide*0.05f, layoutSquareSide*0.2f,layoutSquareSide*0.95f, layoutSquareSide*0.8f),layoutOffsetX,layoutOffsetY,paint , mBorderWidth,borderPaint);
+            GraphsTemplate.drawOval(canvas, null, new RectF(layoutSquareSide*0.05f, layoutSquareSide*0.2f,layoutSquareSide*0.95f, layoutSquareSide*0.8f),layoutOffsetX,layoutOffsetY,paint , mBorderWidth ,borderPaint);
 
         }else if (SImageView.TYPE_FIVE_POINTED_STAR == display){
 
             // 五角星头像
-            GraphsTemplate.drawFivePointedStar(canvas, opeBitmap, (int)(layoutSquareSide / 2f), layoutOffsetX,layoutOffsetY, null , mBorderWidth,borderPaint);
+            GraphsTemplate.drawFivePointedStar(canvas, opeBitmap, (int)(layoutSquareSide / 2f), layoutOffsetX,layoutOffsetY, null ,mBorderWidth ,borderPaint);
 
         }else if (SImageView.TYPE_ROUND_RECT == display){
 
             // 有圆角的头像
-            GraphsTemplate.drawCornerRectBorder(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/8, layoutSquareSide/8,layoutOffsetX,layoutOffsetY,paint, mBorderWidth,borderPaint);
+            GraphsTemplate.drawCornerRectBorder(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/8, layoutSquareSide/8,layoutOffsetX,layoutOffsetY,paint,mBorderWidth,borderPaint);
         }
 
     }

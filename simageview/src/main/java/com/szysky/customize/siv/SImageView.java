@@ -277,9 +277,13 @@ public class SImageView extends ImageView {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
+        adjustPadding(left, top, right, bottom);
+
         mInfo.height = getHeight() - mPaddingBottom - mPaddingTop ;
         mInfo.width = getWidth() - mPaddingLeft - mPaddingRight;
     }
+
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -351,6 +355,22 @@ public class SImageView extends ImageView {
     private void init(){
 
 
+    }
+
+    /**
+     *  对padding边界值处理
+     */
+    private void adjustPadding(int left, int top, int right, int bottom) {
+        // 对padding进行极限值处理
+        while ((mPaddingBottom + mPaddingTop) >= ( bottom - top )){
+            mPaddingBottom >>= 1;
+            mPaddingTop >>= 1;
+        }
+
+        while((mPaddingRight + mPaddingLeft) >= (right - left)){
+            mPaddingRight >>= 1;
+            mPaddingLeft >>= 1;
+        }
     }
 
     /**

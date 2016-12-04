@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         RecyclerView rv_main = (RecyclerView) findViewById(R.id.rv_main);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 5);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1);
         DividerGridItemDecoration itemDivider = new DividerGridItemDecoration(getApplicationContext());
         rv_main.addItemDecoration(itemDivider);
         rv_main.setLayoutManager(gridLayoutManager);
@@ -95,7 +95,11 @@ public class MainActivity extends AppCompatActivity {
 
             // 获取控件要展示的信息
             SimulationData data = datas.get(position);
-            ImageView sImageView = holder.siv_display;
+            SImageView sImageView = holder.siv_display;
+            sImageView.setScaleType(com.szysky.customize.siv.SImageView.SCALE_TYPE_CENTER_CROP);
+            sImageView.setDisplayShape(com.szysky.customize.siv.SImageView.TYPE_RECT);
+            sImageView.setBorderWidth(0);
+
 
 
 //            // 设置是否关闭单张图片处理逻辑
@@ -122,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
 
             // 最后设置图片展示
-            //sImageView.setImageBitmap(data.readyBmp.get(0));
+            sImageView.setIdRes(R.mipmap.ic_1);
 //            sImageView.setImageBitmap(data.readyBmp.get(0));
         }
 
@@ -134,11 +138,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         static class MyHolder extends RecyclerView.ViewHolder{
-            public ImageView siv_display;
+            public SImageView siv_display;
 
             public MyHolder(View itemView) {
                 super(itemView);
-                siv_display = (ImageView) itemView.findViewById(R.id.siv);
+                siv_display = (SImageView) itemView.findViewById(R.id.siv);
             }
         }
 

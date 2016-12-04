@@ -3,6 +3,7 @@ package com.szysky.customize.siv.effect;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -23,6 +24,20 @@ import com.szysky.customize.siv.util.GraphsTemplate;
 public class  NormalOnePicStrategy implements IDrawingStrategy {
 
     private float mBorderWidth;
+    private final Paint paint;
+    private final Paint borderPaint;
+
+    public NormalOnePicStrategy(){
+        // 创建内容画笔和描边画笔 并设置属性
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.FILL);
+
+        borderPaint = new Paint();
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setColor(Color.BLACK);
+        borderPaint.setAntiAlias(true);
+    }
 
     @Override
     public void algorithm(Canvas canvas, int childTotal, int curChild, Bitmap opeBitmap, SImageView.ConfigInfo info) {
@@ -34,6 +49,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         int viewWidth = info.width;                // 控件的宽高
         int viewHeight = info.height;
         int display = info.displayType;            // 显示的类型
+        int scaleType = info.scaleType;            // 矩形的缩放类型
 
 
         // 容错控件非正方形场景处理
@@ -64,13 +80,24 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         int bodySquareSide = (int) (layoutSquareSide - mBorderWidth *2);
 
 
-        // 创建内容画笔和描边画笔 并设置属性
-        Paint paint =  new Paint();
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.FILL);
+        // 首先处理是否是矩形, 如果是, 提高效率直接处理
+        if ((display == SImageView.TYPE_RECT) && (mBorderWidth<=0)){
+            switch (scaleType){
+                case SImageView.SCALE_TYPE_CENTER_INSIDE:
+                    GraphsTemplate.drawBitmap(canvas, opeBitmap, bodySquareSide,bodySquareSide, layoutOffsetX, layoutOffsetY,null, scaleType);
+                    return;
+                case SImageView.SCALE_TYPE_CENTER_CROP:
+                    GraphsTemplate.drawBitmap(canvas, opeBitmap, viewWidth,viewHeight, 0, 0,null , scaleType);
+                    return;
 
-        Paint borderPaint = new Paint();
-        borderPaint.setStyle(Paint.Style.STROKE);
+                case SImageView.SCALE_TYPE_FIX_XY:
+                    GraphsTemplate.drawBitmap(canvas, opeBitmap, viewWidth,viewHeight, 0, 0,null, scaleType);
+                    return;
+            }
+        }
+
+
+        // 描边画笔 并设置属性
         borderPaint.setStrokeWidth(mBorderWidth);
         borderPaint.setColor(info.borderColor);
         borderPaint.setAntiAlias(true);

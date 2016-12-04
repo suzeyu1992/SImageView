@@ -11,6 +11,8 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.util.Log;
 
+import com.szysky.customize.siv.SImageView;
+
 /**
  * Author :  suzeyu
  * Time   :  2016-12-01  上午2:24
@@ -49,7 +51,50 @@ public class GraphsTemplate {
         }
     }
 
+    public static void drawBitmap(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight,
+                                  int offsetX, int offsetY, Paint paint , int flag){
 
+        Matrix matrix = new Matrix();
+        float scale ;
+        float dx = 0;
+        float dy = 0;
+
+        switch (flag){
+
+            case SImageView.SCALE_TYPE_CENTER_INSIDE:
+                // 保持图片的完整 , 尽量缩小.  比例不变
+                if (bitmap.getWidth() > bitmap.getHeight()){
+                    scale = sideHeight / bitmap.getWidth();
+                    dy = (sideHeight - bitmap.getWidth() * scale) * 0.5f;
+                }else{
+                    scale = sideHeight / bitmap.getHeight();
+                    dx = (sideHeight - bitmap.getHeight() * scale) * 0.5f;
+                }
+                matrix.postScale(scale, scale);
+                matrix.postTranslate(dx, dy);
+                break;
+
+            case SImageView.SCALE_TYPE_CENTER_CROP:
+                // 尽量放大, 填充控件, 比例不变
+                float scaleY = sideHeight / bitmap.getHeight();
+                float scaleX = sideWidth / bitmap.getWidth();
+
+                scale = scaleY > scaleX ? scaleY : scaleX;
+                matrix.postScale(scale, scale);
+
+                break;
+
+            case SImageView.SCALE_TYPE_FIX_XY:
+                // 填充控件, 保证图片完整,  比例可能会变
+                matrix.postScale(sideWidth / bitmap.getWidth() , sideHeight / bitmap.getHeight());
+                break;
+
+            default:
+                return;
+        }
+
+        canvas.drawBitmap(Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true),offsetX, offsetY, null);
+    }
 
     /**
      *  合成一个圆角矩形图片
@@ -79,7 +124,6 @@ public class GraphsTemplate {
         }
         // 判断是否需要描边
         if (borderWidth >0 && borderPaint != null){
-            Log.i("hahaha", "drawCornerRectBorder: " +sideWidth + " =====  "+sideHeight);
             // 如果有bitmap, 描边应该以bitmap的宽高设置描边配置, 否则可能会出现描边缺失
             if (null != bitmap){
                 float temp = borderWidth / 2.5f;

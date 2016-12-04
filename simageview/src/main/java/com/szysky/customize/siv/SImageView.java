@@ -40,7 +40,7 @@ import java.util.List;
  * ClassDescription : 一个功能完备的ImageView
  */
 
-public class SImageView extends ImageView {
+public class SImageView extends View {
 
     private static final String TAG = SImageView.class.getName();
     private static final Bitmap.Config BITMAP_CONFIG = Bitmap.Config.ARGB_8888;
@@ -89,7 +89,7 @@ public class SImageView extends ImageView {
     /**
      *  控件属性类
      */
-    public static class ConfigInfo implements Cloneable{
+     public static class ConfigInfo implements Cloneable{
 
         public int height;                                      // 控件的高度
         public int width;                                       // 控件的宽度
@@ -98,6 +98,7 @@ public class SImageView extends ImageView {
         public int borderColor = Color.BLACK;                   // 描边颜色
         public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;  // 测量过程返回的每个元素的对应位置信息
         public int displayType ;                                 // 子元素的显示类型
+        public int scaleType = SCALE_TYPE_CENTER_INSIDE;         // 矩形的缩放类型
 
         @Override
         protected Object clone() {
@@ -132,6 +133,22 @@ public class SImageView extends ImageView {
     /**显示类型,默认为上面五种定义类型**/
     @ShapeDisplay private int mCurrentDisplayShape = TYPE_CIRCLE;
 
+
+    public static final int SCALE_TYPE_CENTER_INSIDE = 0;  // 图片比例不变, 以最大边的为标准缩放, 可能会有留白,显示全部图片
+    public static final int SCALE_TYPE_FIX_XY = 1;         // 图片比例改变, 已填充控件为主, 显示全部图片
+    public static final int SCALE_TYPE_CENTER_CROP = 2;    // 图片比例不变, 已填充控件为主, 图片可能显示不全
+
+    @IntDef({SCALE_TYPE_CENTER_INSIDE,SCALE_TYPE_FIX_XY ,SCALE_TYPE_CENTER_CROP})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ScaleType{}
+
+    /**
+     * 当显示类型为矩形的时候, 缩放类型才会生效. 并且当有描边时, 缩放类型失效,
+     * 并且使用{@link #mCloseNormalOnePicLoad}的初始值通过使用单张图片的绘制逻辑才有处理效果
+     * 默认为{@link #SCALE_TYPE_CENTER_INSIDE}
+     **/
+    @SImageView.ScaleType
+    private int mScaleType = SCALE_TYPE_CENTER_INSIDE;
 
 
     public SImageView(Context context) {
@@ -527,5 +544,20 @@ public class SImageView extends ImageView {
         } catch (OutOfMemoryError e) {
             return null;
         }
+    }
+
+    @ScaleType
+    public int getScaleType() {
+        return mScaleType;
+    }
+
+    /**
+     * 设置单张图片时, 图片的缩放类型, 只有在矩形图片和无描边的场景下有效,
+     * 并且使用{@link #mCloseNormalOnePicLoad}的初始值通过使用单张图片的绘制逻辑才有处理效果
+     * {@link #mScaleType}
+     */
+    public void setScaleType(@ScaleType int mScaleType) {
+        this.mScaleType = mScaleType;
+        mInfo.scaleType = mScaleType;
     }
 }

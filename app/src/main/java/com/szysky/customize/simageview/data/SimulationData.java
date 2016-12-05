@@ -384,10 +384,11 @@ public class SimulationData {
         siv_wechat_19.borderWidth = 1;
 
         // 再来一个凑数的
-        SimulationData siv_temp_2 = new SimulationData(context, 1);
+        SimulationData siv_temp_2 = new SimulationData(context, 9);
         siv_temp_2.borderColor = Color.BLACK;
         siv_temp_2.displayType = SImageView.TYPE_FIVE_POINTED_STAR;
         siv_temp_2.borderWidth = 5000;
         siv_temp_2.mMeasureManager = new WeChatLayoutManager(context);
+        datas.add(siv_temp_2);
     }
 }

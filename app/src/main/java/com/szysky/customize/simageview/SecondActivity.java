@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -33,9 +35,15 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
 
         mSImageView = (SImageView) findViewById(R.id.siv_main);
+        mSImageView.setRectRoundRadius(1.9f);
+        float rectRoundRadius = mSImageView.getRectRoundRadius();
+        mSImageView.invalidate();
 
         findViewById(R.id.btn_crop).setOnClickListener(this);
         findViewById(R.id.btn_fix_xy).setOnClickListener(this);
@@ -59,5 +67,16 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
                 break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

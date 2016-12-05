@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.util.Log;
 
 import com.szysky.customize.siv.SImageView;
 import com.szysky.customize.siv.util.GraphsTemplate;
@@ -23,9 +24,15 @@ import com.szysky.customize.siv.util.GraphsTemplate;
 
 public class  NormalOnePicStrategy implements IDrawingStrategy {
 
+    private static final String TAG = NormalOnePicStrategy.class.getName();
     private float mBorderWidth;
     private final Paint paint;
     private final Paint borderPaint;
+
+    /**
+     * 圆角矩形的圆角半径系数
+     */
+    private float mRectRoundRadius = 8;
 
     public NormalOnePicStrategy(){
         // 创建内容画笔和描边画笔 并设置属性
@@ -37,6 +44,39 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setColor(Color.BLACK);
         borderPaint.setAntiAlias(true);
+    }
+
+    /**
+     * 获得圆角矩形的圆角弧度系数, 范围0~2; 默认为1
+     */
+    public float getRectRoundRadius() {
+        if (mRectRoundRadius == 8){
+            return 1;
+        }else if (mRectRoundRadius < 8){  // 弧度大
+            return Math.round(((8 - mRectRoundRadius ) /4 + 1) *100)/100f;
+
+        }else {     // 弧度小
+            return Math.round((1 - (mRectRoundRadius - 8) / 4) * 100 )/100f ;
+
+        }
+    }
+
+    /**
+     *  设置圆角矩形的圆角弧度系数, 取值为0~2, 默认为1
+     *  此设置属性不会立即生效, 需下次圆角矩形加载时才会有效.
+     */
+    public void setRectRoundRadius(float mRectRoundRadius) {
+
+        mRectRoundRadius = mRectRoundRadius <= 0 ? 0.1f :  mRectRoundRadius;
+        mRectRoundRadius = mRectRoundRadius > 2 ? 2f :  mRectRoundRadius;
+
+        if (mRectRoundRadius < 1){
+            this.mRectRoundRadius += ((1 - mRectRoundRadius) * 4);
+        }else if (mRectRoundRadius > 1){
+            this.mRectRoundRadius -= ((mRectRoundRadius-1) * 4);
+        }else{
+            this.mRectRoundRadius = 8;
+        }
     }
 
     @Override
@@ -160,8 +200,10 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         }else if (SImageView.TYPE_ROUND_RECT == display){
 
             // 有圆角的头像
-            GraphsTemplate.drawCornerRectBorder(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/8, layoutSquareSide/8,layoutOffsetX,layoutOffsetY,paint,mBorderWidth,borderPaint);
+            GraphsTemplate.drawCornerRectBorder(canvas, null, layoutSquareSide, layoutSquareSide, layoutSquareSide/mRectRoundRadius, layoutSquareSide/mRectRoundRadius,layoutOffsetX,layoutOffsetY,paint,mBorderWidth,borderPaint);
         }
+
+
 
     }
 

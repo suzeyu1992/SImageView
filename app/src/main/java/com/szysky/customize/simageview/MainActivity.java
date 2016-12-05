@@ -1,6 +1,7 @@
 package com.szysky.customize.simageview;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -9,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -34,9 +38,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().setSubtitle("can do things");
+
 
         RecyclerView rv_main = (RecyclerView) findViewById(R.id.rv_main);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 5);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 3);
         DividerGridItemDecoration itemDivider = new DividerGridItemDecoration(getApplicationContext());
         rv_main.addItemDecoration(itemDivider);
         rv_main.setLayoutManager(gridLayoutManager);
@@ -55,22 +61,30 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-//        bitmaps.add(bitmap);
-       // bitmaps.add(bitmap);
-//        iv.setBorderWidth(10);
-//        iv.setDisplayShape(SImageView.TYPE_CIRCLE);
-      //  iv.setCloseNormalOnePicLoad(true);
-       // iv.setBorderColor(getResources().getColor(R.color.testColor));
 
 
 
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.first_pager, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_open:
+                // 跳转第二个展示页面
+                startActivity(new Intent(getApplicationContext(), SecondActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     static class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>{

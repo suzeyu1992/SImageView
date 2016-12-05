@@ -12,7 +12,7 @@
         app:scaleType="fix_XY"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:displayType="rect"
+        app:displayType="round_rect"
         app:img="@mipmap/ic_1"/>
 
     <View
@@ -32,7 +32,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:layout_margin="5dp"
-            android:textSize="12dp"
+            android:textSize="10dp"
             android:text="center_inside缩放"/>
 
         <Button
@@ -42,7 +42,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:layout_margin="5dp"
-            android:textSize="12dp"
+            android:textSize="10dp"
 
             android:text="center_crop缩放"/>
 
@@ -53,7 +53,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:layout_margin="5dp"
-            android:textSize="12dp"
+            android:textSize="10dp"
 
             android:text="fix_xy缩放"/>
 

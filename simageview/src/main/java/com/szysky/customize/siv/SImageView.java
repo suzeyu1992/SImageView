@@ -73,7 +73,7 @@ public class SImageView extends View {
      *  单个图片默认加载策略, 优先级高于多张图,
      *  可以通过{@link #setCloseNormalOnePicLoad(boolean)}设置为true强制关闭此策略
      */
-    private IDrawingStrategy mNormalOnePicStrategy = new NormalOnePicStrategy();
+    private NormalOnePicStrategy mNormalOnePicStrategy = new NormalOnePicStrategy();
 
 
     /**
@@ -564,5 +564,20 @@ public class SImageView extends View {
         this.mScaleType = mScaleType;
         mInfo.scaleType = mScaleType;
         updateForOne(null);
+    }
+
+    /**
+     * 获得单张图片时 圆角矩形 的圆角弧度系数, 范围0~2; 默认为1
+     */
+    public float getRectRoundRadius() {
+        return mNormalOnePicStrategy.getRectRoundRadius();
+    }
+
+    /**
+     *  设置单张图片时 圆角矩形 的圆角弧度系数, 取值为0~2, 默认为1
+     *  此设置属性不会立即生效, 需下次圆角矩形加载时才会有效.
+     */
+    public void setRectRoundRadius(float mRectRoundRadius) {
+        mNormalOnePicStrategy.setRectRoundRadius(mRectRoundRadius);
     }
 }

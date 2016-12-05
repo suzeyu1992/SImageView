@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         RecyclerView rv_main = (RecyclerView) findViewById(R.id.rv_main);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 5);
         DividerGridItemDecoration itemDivider = new DividerGridItemDecoration(getApplicationContext());
         rv_main.addItemDecoration(itemDivider);
         rv_main.setLayoutManager(gridLayoutManager);
@@ -96,38 +96,38 @@ public class MainActivity extends AppCompatActivity {
             // 获取控件要展示的信息
             SimulationData data = datas.get(position);
             SImageView sImageView = holder.siv_display;
-            sImageView.setScaleType(com.szysky.customize.siv.SImageView.SCALE_TYPE_CENTER_CROP);
-            sImageView.setDisplayShape(com.szysky.customize.siv.SImageView.TYPE_RECT);
-            sImageView.setBorderWidth(0);
+//            sImageView.setScaleType(com.szysky.customize.siv.SImageView.SCALE_TYPE_FIX_XY);
+//            sImageView.setDisplayShape(com.szysky.customize.siv.SImageView.TYPE_RECT);
+//            sImageView.setBorderWidth(0);
 
 
 
-//            // 设置是否关闭单张图片处理逻辑
-//            sImageView.setCloseNormalOnePicLoad(data.mCloseNormalOnePicLoad);
-//
-//            // 设置描边颜色
-//            if (data.borderColor <= 0){
-//                sImageView.setBorderColor(data.borderColor);
-//            }else{
-//                sImageView.setBorderColor(Color.BLACK);
-//            }
-//
-//            // 设置描边宽度
-//            sImageView.setBorderWidth(data.borderWidth);
-//
-//            // 设置显示类型
-//            sImageView.setDisplayShape(data.displayType);
-//
-//            // 设置测量布局
-//            if (null != data.mMeasureManager){
-//                sImageView.setLayoutManager(data.mMeasureManager);
-//            }else{
-//                sImageView.setLayoutManager(new QQLayoutManager());
-//            }
+            // 设置是否关闭单张图片处理逻辑
+            sImageView.setCloseNormalOnePicLoad(data.mCloseNormalOnePicLoad);
+
+            // 设置描边颜色
+            if (data.borderColor <= 0){
+                sImageView.setBorderColor(data.borderColor);
+            }else{
+                sImageView.setBorderColor(Color.BLACK);
+            }
+
+            // 设置描边宽度
+            sImageView.setBorderWidth(data.borderWidth);
+
+            // 设置显示类型
+            sImageView.setDisplayShape(data.displayType);
+
+            // 设置测量布局
+            if (null != data.mMeasureManager){
+                sImageView.setLayoutManager(data.mMeasureManager);
+            }else{
+                sImageView.setLayoutManager(new QQLayoutManager());
+            }
 
             // 最后设置图片展示
-            sImageView.setIdRes(R.mipmap.ic_1);
-//            sImageView.setImageBitmap(data.readyBmp.get(0));
+//            sImageView.setIdRes(R.mipmap.ic_1);
+            sImageView.setImages(data.readyBmp);
         }
 
 

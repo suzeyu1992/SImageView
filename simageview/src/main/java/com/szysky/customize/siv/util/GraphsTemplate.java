@@ -90,7 +90,7 @@ public class GraphsTemplate {
                 float tempX = sideWidth / bitmap.getWidth();
                 float tempY = sideHeight / bitmap.getHeight();
                 matrix.postScale(tempX , tempY);
-                if (tempX ==1 && tempY ==1){
+                if ((tempX <= 1) && (tempX >= 0.9f) && (tempY >= 0.9f) && (tempY <=1)){
                     scale = 1;
                 }
                 break;
@@ -98,7 +98,7 @@ public class GraphsTemplate {
             default:
                 return;
         }
-        if (scale == 1){
+        if ((scale <= 1) && (scale >= 0.9f)){
             canvas.drawBitmap(bitmap, offsetX, offsetY, null);
         }else{
             canvas.drawBitmap(Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true),offsetX, offsetY, null);

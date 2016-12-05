@@ -12,6 +12,11 @@
             <enum name="five_pointed_star" value="3" />
             <enum name="oval" value="4" />
         </attr>
+        <attr name="scaleType" format="enum">
+            <enum name="center_inside" value="0" />
+            <enum name="fix_XY" value="1" />
+            <enum name="center_crop" value="2" />
+        </attr>
 
     </declare-styleable>
 </resources>

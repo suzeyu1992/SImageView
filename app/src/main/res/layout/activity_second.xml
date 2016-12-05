@@ -1,13 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:paddingTop="5dp"
     android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/lv_main"
+    <com.szysky.customize.siv.SImageView
+        android:id="@+id/siv_main"
+        android:background="@color/colorAccent"
+        app:scaleType="fix_XY"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="200dp"
+        app:displayType="rect"
+        app:img="@mipmap/ic_1"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
-    </ListView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_inside"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:textSize="12dp"
+            android:text="center_inside缩放"/>
+
+        <Button
+            android:id="@+id/btn_crop"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:textSize="12dp"
+
+            android:text="center_crop缩放"/>
+
+        <Button
+            android:id="@+id/btn_fix_xy"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:textSize="12dp"
+
+            android:text="fix_xy缩放"/>
+
+    </LinearLayout>
 </LinearLayout>

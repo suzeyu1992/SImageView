@@ -139,7 +139,7 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
 
 
         if (SImageView.TYPE_CIRCLE == display){
-            // qq群组效果
+            // qq群组效果 包括圆形头像
             GraphsTemplate.drawCircle(canvas, null, centerX, centerY,(layoutSquareSide>>1) - (mBorderWidth/2),paint , mBorderWidth ,borderPaint);
 
         }else if (SImageView.TYPE_RECT == display){

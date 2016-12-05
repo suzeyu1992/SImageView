@@ -9,10 +9,9 @@
 
     <com.szysky.customize.siv.SImageView
         android:id="@+id/siv"
-        android:layout_margin="3dp"
+        android:padding="2dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:img="@mipmap/ic_2"
         android:layout_gravity="center"/>
 
 </LinearLayout>

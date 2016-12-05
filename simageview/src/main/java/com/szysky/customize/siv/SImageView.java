@@ -98,7 +98,7 @@ public class SImageView extends View {
         public int borderColor = Color.BLACK;                   // 描边颜色
         public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;  // 测量过程返回的每个元素的对应位置信息
         public int displayType ;                                 // 子元素的显示类型
-        public int scaleType = SCALE_TYPE_CENTER_INSIDE;         // 矩形的缩放类型
+        public int scaleType ;                                   // 矩形的缩放类型
 
         @Override
         protected Object clone() {
@@ -166,9 +166,11 @@ public class SImageView extends View {
         // 获得xml属性
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SImageView, defStyleAttr, 0);
 
-        mInfo.borderWidth = typedArray.getDimensionPixelSize(R.styleable.SImageView_border_width, 1);
+        mInfo.borderWidth = typedArray.getDimensionPixelSize(R.styleable.SImageView_border_width, 0);
         mInfo.borderColor = typedArray.getColor(R.styleable.SImageView_border_color, Color.BLACK);
         mInfo.displayType = typedArray.getInt(R.styleable.SImageView_displayType, 0);
+        mInfo.scaleType   = typedArray.getInt(R.styleable.SImageView_scaleType, 0);
+
         Drawable drawable = typedArray.getDrawable(R.styleable.SImageView_img);
         if ( null != drawable ){
             mDrawableHeight = drawable.getIntrinsicHeight();
@@ -504,6 +506,8 @@ public class SImageView extends View {
             mInfo.readyBmp.clear();
             mInfo.readyBmp.add(bitmap);
             invalidate();
+        }else {
+            invalidate();
         }
     }
 
@@ -559,5 +563,6 @@ public class SImageView extends View {
     public void setScaleType(@ScaleType int mScaleType) {
         this.mScaleType = mScaleType;
         mInfo.scaleType = mScaleType;
+        updateForOne(null);
     }
 }

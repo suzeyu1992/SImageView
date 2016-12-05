@@ -12,7 +12,7 @@
         app:scaleType="fix_XY"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:displayType="round_rect"
+        app:displayType="rect"
         app:img="@mipmap/ic_1"/>
 
     <View

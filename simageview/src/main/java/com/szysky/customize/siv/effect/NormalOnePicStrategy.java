@@ -34,6 +34,13 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
      */
     private float mRectRoundRadius = 8;
 
+
+    /**
+     * 椭圆的宽高比值
+     */
+    private float mOvalWidthRatio = 1f;
+    private float mOvalHeightRatio = 0.75f;
+
     public NormalOnePicStrategy(){
         // 创建内容画笔和描边画笔 并设置属性
         paint = new Paint();
@@ -190,7 +197,8 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         }else if (SImageView.TYPE_OVAL == display){
 
             // 椭圆头像
-            GraphsTemplate.drawOval(canvas, null, new RectF(layoutSquareSide*0.05f, layoutSquareSide*0.2f,layoutSquareSide*0.95f, layoutSquareSide*0.8f),layoutOffsetX,layoutOffsetY,paint , mBorderWidth ,borderPaint);
+//            GraphsTemplate.drawOval(canvas, null, new RectF(layoutSquareSide*0.05f, layoutSquareSide*0.2f,layoutSquareSide*0.95f, layoutSquareSide*0.8f),layoutOffsetX,layoutOffsetY,paint , mBorderWidth ,borderPaint);
+            GraphsTemplate.drawOval(canvas, null, new RectF(layoutSquareSide*(1-mOvalWidthRatio), layoutSquareSide*(1-mOvalHeightRatio),layoutSquareSide*mOvalWidthRatio, layoutSquareSide*mOvalHeightRatio),layoutOffsetX,layoutOffsetY,paint , mBorderWidth ,borderPaint);
 
         }else if (SImageView.TYPE_FIVE_POINTED_STAR == display){
 
@@ -204,8 +212,39 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
         }
 
 
-
     }
 
 
+
+    /**
+     * 设置单张图片 oval椭圆的宽高比.
+     * @param widthHeightRadio  宽高比.
+     */
+    public void setOvalWidthOrHeight(float widthHeightRadio){
+
+        if (widthHeightRadio < 0){
+            throw new IllegalArgumentException("传入的宽高比值不能是负值");
+        }
+        if (widthHeightRadio == 0){
+            throw new IllegalArgumentException("不能传入比值为0, 请重新确认");
+        }
+
+        if (widthHeightRadio > 1){
+            mOvalWidthRatio = 1;
+            mOvalHeightRatio = 0.5f * (1 + 1/widthHeightRadio);
+        }else if (widthHeightRadio < 1){
+            mOvalHeightRatio = 1;
+            mOvalWidthRatio = 0.5f * (1 + widthHeightRadio);
+
+        }else{
+            mOvalHeightRatio = mOvalWidthRatio = 1;
+        }
+    }
+
+    /**
+     * 获取当前椭圆的宽高比
+     */
+    public float getOvalWidthOrHeight(){
+        return Math.round(mOvalWidthRatio / mOvalHeightRatio * 100)/100f;
+    }
 }

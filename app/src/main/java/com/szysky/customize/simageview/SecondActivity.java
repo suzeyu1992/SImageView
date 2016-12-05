@@ -41,9 +41,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
 
         mSImageView = (SImageView) findViewById(R.id.siv_main);
-        mSImageView.setRectRoundRadius(1.9f);
-        float rectRoundRadius = mSImageView.getRectRoundRadius();
-        mSImageView.invalidate();
 
         findViewById(R.id.btn_crop).setOnClickListener(this);
         findViewById(R.id.btn_fix_xy).setOnClickListener(this);

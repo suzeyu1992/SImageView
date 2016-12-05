@@ -575,9 +575,25 @@ public class SImageView extends View {
 
     /**
      *  设置单张图片时 圆角矩形 的圆角弧度系数, 取值为0~2, 默认为1
-     *  此设置属性不会立即生效, 需下次圆角矩形加载时才会有效.
+     *  此设置属性不会立即生效, 需下次圆角矩形加载时才会有效.可手动invalidate刷新
      */
     public void setRectRoundRadius(float mRectRoundRadius) {
         mNormalOnePicStrategy.setRectRoundRadius(mRectRoundRadius);
+    }
+
+    /**
+     * 设置单张图片 oval椭圆的宽高比.
+     * 此设置属性同样不会立即生效, 需下次椭圆显示加载时才会生效, 可手动invalidate刷新
+     * @param widthHeightRadio  宽高比. 只能传入大于0, 默认值为宽高比为2/1  也就是2f
+     */
+    public  void setOvalRatio(float widthHeightRadio){
+        mNormalOnePicStrategy.setOvalWidthOrHeight(widthHeightRadio);
+    }
+
+    /**
+     * 获取当前椭圆的宽高比
+     */
+    public float getOvalRatio(){
+        return mNormalOnePicStrategy.getOvalWidthOrHeight();
     }
 }

@@ -10,7 +10,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_main"
-        android:background="#6f6f6f"
+        android:background="#cfcfcf"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

@@ -27,7 +27,6 @@ import com.szysky.customize.siv.range.WeChatLayoutManager;
 
 import java.util.ArrayList;
 
-import static com.szysky.customize.simageview.R.styleable.SImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         RecyclerView rv_main = (RecyclerView) findViewById(R.id.rv_main);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 6);
         DividerGridItemDecoration itemDivider = new DividerGridItemDecoration(getApplicationContext());
         rv_main.addItemDecoration(itemDivider);
         rv_main.setLayoutManager(gridLayoutManager);

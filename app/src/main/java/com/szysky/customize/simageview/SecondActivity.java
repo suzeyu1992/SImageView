@@ -24,7 +24,7 @@ import java.util.Random;
  * Time   :  2016-12-01  下午7:53
  * Blog   :  http://szysky.com
  * GitHub :  https://github.com/suzeyu1992
- * ClassDescription :
+ * ClassDescription : 展示scaleType缩放类型的界面
  */
 
 public class SecondActivity extends AppCompatActivity implements View.OnClickListener {
@@ -38,13 +38,13 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
 
         mSImageView = (SImageView) findViewById(R.id.siv_main);
 
         findViewById(R.id.btn_crop).setOnClickListener(this);
         findViewById(R.id.btn_fix_xy).setOnClickListener(this);
         findViewById(R.id.btn_inside).setOnClickListener(this);
+
     }
 
 
@@ -53,14 +53,17 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         switch (v.getId()){
             case R.id.btn_inside:
                 mSImageView.setScaleType(SImageView.SCALE_TYPE_CENTER_INSIDE);
+                mSImageView.invalidate();
                 break;
 
             case R.id.btn_crop:
                 mSImageView.setScaleType(SImageView.SCALE_TYPE_CENTER_CROP);
+                mSImageView.invalidate();
                 break;
 
             case R.id.btn_fix_xy:
                 mSImageView.setScaleType(SImageView.SCALE_TYPE_FIX_XY);
+                mSImageView.invalidate();
 
                 break;
         }

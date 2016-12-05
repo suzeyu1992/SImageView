@@ -24,7 +24,7 @@ public interface ILayoutManager {
      *
      * @param viewWidth 控件的宽
      * @param viewHeight 控件的高
-     * @param viewNum   控件需要在内部显示几张图片
+     * @param viewNum   控件图片的数量
      * @return  返回一个信息集合, 提供 {@link com.szysky.customize.siv.effect.IDrawingStrategy#algorithm(Canvas, int, int, Bitmap, SImageView.ConfigInfo)}使用
      */
     ArrayList<LayoutInfoGroup> calculate(int viewWidth, int viewHeight, int viewNum);

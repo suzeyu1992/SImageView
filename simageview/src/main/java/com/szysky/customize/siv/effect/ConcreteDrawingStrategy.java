@@ -23,7 +23,7 @@ import com.szysky.customize.siv.util.GraphsTemplate;
  *                      实现效果: 圆形头像.  当控件需要展示多张图片为QQ群组元素样式
  */
 
-public class ConcreteQQCircleStrategy implements IDrawingStrategy {
+public class ConcreteDrawingStrategy implements IDrawingStrategy {
 
     /**
      *  默认两张图片间隔距离系数
@@ -55,7 +55,7 @@ public class ConcreteQQCircleStrategy implements IDrawingStrategy {
     private final Paint bodyPaint;
 
 
-    public ConcreteQQCircleStrategy(){
+    public ConcreteDrawingStrategy(){
         // 创建内容画笔和描边画笔 并设置属性
         bodyPaint = new Paint();
         bodyPaint.setAntiAlias(true);

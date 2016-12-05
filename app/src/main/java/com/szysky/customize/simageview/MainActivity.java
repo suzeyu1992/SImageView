@@ -5,32 +5,26 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 
 
 import com.szysky.customize.simageview.data.SimulationData;
 import com.szysky.customize.siv.SImageView;
-import com.szysky.customize.siv.effect.ConcreteQQCircleStrategy;
 import com.szysky.customize.siv.range.QQLayoutManager;
-import com.szysky.customize.siv.range.WeChatLayoutManager;
 
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "sususu";
+    private static final String TAG = MainActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,29 +34,19 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setSubtitle("can do things");
 
 
+        // 设置RecyclerView.
         RecyclerView rv_main = (RecyclerView) findViewById(R.id.rv_main);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 6);
         DividerGridItemDecoration itemDivider = new DividerGridItemDecoration(getApplicationContext());
         rv_main.addItemDecoration(itemDivider);
         rv_main.setLayoutManager(gridLayoutManager);
 
+        // 创建模拟数据
         ArrayList<SimulationData> datas = new ArrayList<>();
         new SimulationData(getApplicationContext(), datas);
 
 
-
-
-
         rv_main.setAdapter(new MyAdapter(getApplicationContext(), datas));
-
-
-
-        ArrayList<Bitmap> bitmaps = new ArrayList<>();
-
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
-
-
-
 
     }
 
@@ -109,9 +93,6 @@ public class MainActivity extends AppCompatActivity {
             // 获取控件要展示的信息
             SimulationData data = datas.get(position);
             SImageView sImageView = holder.siv_display;
-//            sImageView.setScaleType(com.szysky.customize.siv.SImageView.SCALE_TYPE_FIX_XY);
-//            sImageView.setDisplayShape(com.szysky.customize.siv.SImageView.TYPE_RECT);
-//            sImageView.setBorderWidth(0);
 
 
 
@@ -139,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // 最后设置图片展示
-//            sImageView.setIdRes(R.mipmap.ic_1);
             sImageView.setImages(data.readyBmp);
         }
 

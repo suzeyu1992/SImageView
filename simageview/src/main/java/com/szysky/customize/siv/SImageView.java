@@ -9,17 +9,15 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.icu.util.Measure;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
 
-import com.szysky.customize.siv.effect.ConcreteQQCircleStrategy;
+import com.szysky.customize.siv.effect.ConcreteDrawingStrategy;
 import com.szysky.customize.siv.effect.IDrawingStrategy;
 import com.szysky.customize.siv.effect.NormalOnePicStrategy;
 import com.szysky.customize.siv.range.ILayoutManager;
@@ -79,7 +77,8 @@ public class SImageView extends View {
     /**
      *  具体的子图片绘制的策略对象
      */
-    private IDrawingStrategy mDrawStrategy = new ConcreteQQCircleStrategy();
+    private IDrawingStrategy mDrawStrategy = new ConcreteDrawingStrategy();
+
     private int mPaddingLeft;
     private int mPaddingRight;
     private int mPaddingTop;
@@ -366,15 +365,8 @@ public class SImageView extends View {
 
 
 
-    public void setImages(ArrayList<Bitmap> bitmaps){
-        mInfo.readyBmp = bitmaps ;
-        invalidate();
-    }
-
-    private void init(){
 
 
-    }
 
     /**
      *  对padding边界值处理
@@ -415,7 +407,7 @@ public class SImageView extends View {
      */
     public void setDrawStrategy(IDrawingStrategy mDrawStrategy) {
         this.mDrawStrategy = mDrawStrategy;
-        if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
+        if (mDrawStrategy instanceof ConcreteDrawingStrategy){
             mCloseNormalOnePicLoad = false;
         }else{
             mCloseNormalOnePicLoad = true;
@@ -431,12 +423,12 @@ public class SImageView extends View {
 
         // 兼容qq群组绘制的重叠场景问题
         if (mLayoutManager instanceof QQLayoutManager){
-            if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
-                ((ConcreteQQCircleStrategy)mDrawStrategy).setIsPicRotate(true);
+            if (mDrawStrategy instanceof ConcreteDrawingStrategy){
+                ((ConcreteDrawingStrategy)mDrawStrategy).setIsPicRotate(true);
             }
         }else{
-            if (mDrawStrategy instanceof ConcreteQQCircleStrategy){
-                ((ConcreteQQCircleStrategy)mDrawStrategy).setIsPicRotate(false);
+            if (mDrawStrategy instanceof ConcreteDrawingStrategy){
+                ((ConcreteDrawingStrategy)mDrawStrategy).setIsPicRotate(false);
             }
         }
 
@@ -485,6 +477,15 @@ public class SImageView extends View {
         return mInfo.borderColor;
     }
 
+
+    /**
+     * 设置展示图片的集合
+     * @param bitmaps 接收一个图片集合
+     */
+    public void setImages(List<Bitmap> bitmaps){
+        updateForList(bitmaps);
+    }
+
     /**
      * 传入drawable资源id
      */
@@ -497,6 +498,7 @@ public class SImageView extends View {
         }
     }
 
+
     public void setDrawable(Drawable drawable){
         updateForOne(getBitmapFromDrawable(drawable));
     }
@@ -506,21 +508,25 @@ public class SImageView extends View {
             mInfo.readyBmp.clear();
             mInfo.readyBmp.add(bitmap);
             invalidate();
-        }else {
-            invalidate();
         }
     }
 
     private void updateForList(List<Bitmap> bitmaps) {
 
-        if (null != bitmaps){
+        if ((null != bitmaps) && (bitmaps.size() >0)){
             mInfo.readyBmp.clear();
             for (Bitmap bitmap : bitmaps) {
                 mInfo.readyBmp.add(bitmap);
             }
             invalidate();
         }
+    }
 
+    /**
+     * 设置展示的图像的bitmap
+     */
+    public void setBitmap(Bitmap bitmap){
+        updateForOne(bitmap);
     }
 
     private Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -563,7 +569,7 @@ public class SImageView extends View {
     public void setScaleType(@ScaleType int mScaleType) {
         this.mScaleType = mScaleType;
         mInfo.scaleType = mScaleType;
-        updateForOne(null);
+
     }
 
     /**

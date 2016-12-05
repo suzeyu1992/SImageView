@@ -9,11 +9,13 @@
     <com.szysky.customize.siv.SImageView
         android:id="@+id/siv_main"
         android:background="@color/colorAccent"
-        app:scaleType="fix_XY"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         app:displayType="rect"
-        app:img="@mipmap/ic_1"/>
+        app:border_color="@color/colorPrimary"
+        app:border_width="0dp"
+        app:img="@mipmap/ic_1"
+        app:scaleType="center_inside"/>
 
     <View
         android:layout_width="match_parent"

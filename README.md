@@ -18,11 +18,12 @@
 
 ## 效果展示
 
+图片可能比较大, 如果不出现, 刷新页面试试或者多等一会.
+
 ![](imgs/sample_1.png)
 
 ![](imgs/sample_2.gif)
 
-[项目地址](https://github.com/suzeyu1992/SImageView) 看着还可以随手撒个星星, 鼓励鼓励新人的我吧.
 
 
 ## 使用说明
@@ -30,7 +31,7 @@
 ### xml声明方式
 
 
-```
+```xml
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -212,7 +213,7 @@ public interface IDrawingStrategy {
 ```
 
 
-[项目地址](https://github.com/suzeyu1992/SImageView)
+
 
 **未完待续... 后期实现支持图片链接的设置并添加内置图片缓存**
 

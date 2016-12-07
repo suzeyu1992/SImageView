@@ -1,4 +1,4 @@
-package com.szysky.customize.siv.imgload;
+package com.szysky.customize.siv.imgprocess;
 
 import android.graphics.Bitmap;
 

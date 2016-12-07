@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_photo_wall"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.szysky.note.androiddevseek_12.photowall.PhotoWallActivity">
+
+    <GridView
+        android:id="@+id/gv_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:horizontalSpacing="3dp"
+        android:verticalSpacing="3dp"
+        android:listSelector="@android:color/transparent"
+        android:numColumns="1"
+        android:stretchMode="columnWidth"
+        />
+
+
+</LinearLayout>

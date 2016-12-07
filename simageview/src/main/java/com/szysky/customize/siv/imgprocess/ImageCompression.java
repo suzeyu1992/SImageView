@@ -68,6 +68,11 @@ public class ImageCompression {
      *  一个计算工具类的方法, 传入图片的属性对象和 想要实现的目标大小. 通过计算得到采样值
      */
     private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+
+        if (reqHeight==0 || reqWidth ==0){
+            return 1;
+        }
+
         //Raw height and width of image
         //原始图片的宽高属性
         final int height = options.outHeight;

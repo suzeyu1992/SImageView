@@ -39,7 +39,7 @@ public class ImageLoader {
 
     private ImageLoader (Context context){
         mContext = context.getApplicationContext();
-        mImageCache = new DefaultImageCache(mContext);
+        mImageCache = new DefaultImageCache(mContext, this);
     }
 
     public static ImageLoader getInstance(Context context){
@@ -104,39 +104,26 @@ public class ImageLoader {
     }
 
 
-    public void setPicture(final String imaUrl, final SImageView sImageView, final int reqWidth, final int reqHeight){
+    public void setPicture(final String imaUrl, final ImageView sImageView, final int reqWidth, final int reqHeight){
 
-        Bitmap bitmap = mImageCache.get(imaUrl, reqWidth, reqHeight);
+        Bitmap bitmap = mImageCache.get(imaUrl, reqWidth, reqHeight,null, false);
         if (null != bitmap){
-            sImageView.setBitmap(bitmap);
+            sImageView.setImageBitmap(bitmap);
             return;
         }
 
+        mImageCache.get(imaUrl, reqWidth, reqHeight, sImageView, true);
+
 
         sImageView.setTag(imaUrl);
-        // 2. 创建一个Runable调用同步加载的方法去获取Bitmap
-        Runnable loadBitmapTask = new Runnable() {
-            @Override
-            public void run() {
-                Bitmap bitmap = downloadBitmapFromUrl(imaUrl, reqWidth, reqHeight);
-                if (bitmap != null) {
-                    LoaderResult loaderResult = new LoaderResult(sImageView, imaUrl, bitmap);
 
-                    mMainHandler.obtainMessage(MESSAGE_POST_RESULT, loaderResult).sendToTarget();
-                }
-            }
-        };
-
-
-        // 添加任务到线程池
-        THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
     }
 
 
     /**
      * 单纯的从一个地址下载并返回bitmap, 内部没有任何与缓存有关的操作了
      */
-    private Bitmap downloadBitmapFromUrl(String uriStr,final int reqWidth, final int reqHeight ) {
+    public Bitmap downloadBitmapFromUrl(String uriStr,final int reqWidth, final int reqHeight ) {
 
         Bitmap bitmap = null;
         HttpURLConnection urlConnection = null;
@@ -149,13 +136,12 @@ public class ImageLoader {
 
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
 
-            // 原图流的保存
-            mImageCache.putRawStream(uriStr, in);
+
 
             bitmap = BitmapFactory.decodeStream(in);
 
             // bitmap的缓存
-            mImageCache.put(uriStr , bitmap);
+            mImageCache.put(uriStr , bitmap, 0, 0);
 
         } catch (IOException e) {
             Log.e(TAG, "网络下载错误");
@@ -173,24 +159,49 @@ public class ImageLoader {
     /**
      * 发送Handler的标识
      */
-    private static final int MESSAGE_POST_RESULT = 0x99;
+    public static final int MESSAGE_POST_RESULT = 0x99;
+    public static final int MESSAGE_DISK_GET_ERR = 0x98;
+
     /**
      * 利用主线程个Loop来创建一个Handler用来给图片设置bitmap前景
      */
-    private Handler mMainHandler = new Handler(Looper.getMainLooper()) {
+    public Handler mMainHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
+                // 网络下载图片成功
                 case MESSAGE_POST_RESULT:
                     LoaderResult result = (LoaderResult) msg.obj;
-                    SImageView imageView = result.imageView;
+                    ImageView imageView = result.imageView;
                     String url = (String) imageView.getTag();
                     if (url.equals(result.url)) {
-                        imageView.setBitmap(result.bitmap);
+                        imageView.setImageBitmap(result.bitmap);
                     } else {
                         Log.w(TAG, "要设置的控件的url发生改变, so 取消设置图片");
                     }
+                    break;
+
+                // 从磁盘加载失败
+                case MESSAGE_DISK_GET_ERR:
+
+                    final LoaderResult errResult = (LoaderResult) msg.obj;
+
+                    // 2. 创建一个Runable调用同步加载的方法去获取Bitmap
+                    Runnable loadBitmapTask = new Runnable() {
+                        @Override
+                        public void run() {
+                            Bitmap bitmap = downloadBitmapFromUrl(errResult.url, errResult.reqWidth, errResult.reqHeight);
+                            if (bitmap != null) {
+                                LoaderResult loaderResult = new LoaderResult(errResult.imageView, errResult.url,errResult.bitmap, errResult.reqWidth, errResult.reqHeight);
+                                mMainHandler.obtainMessage(MESSAGE_POST_RESULT, loaderResult).sendToTarget();
+                            }
+                        }
+                    };
+
+
+                    // 添加任务到线程池
+                    THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
                     break;
 
                 default:
@@ -201,15 +212,20 @@ public class ImageLoader {
         }
     };
 
-    private static class LoaderResult {
-        public SImageView imageView;
+    static class LoaderResult {
+        public ImageView imageView;
         public String url;
         public Bitmap bitmap;
+        public int reqWidth;
+        public int reqHeight;
 
-        public LoaderResult(SImageView imageview, String urlStr, Bitmap bitmap) {
+        public LoaderResult(ImageView imageview, String urlStr, Bitmap bitmap, int reqWidth, int reqHeight) {
             imageView = imageview;
             url = urlStr;
             this.bitmap = bitmap;
+            this.reqWidth = reqWidth;
+            this.reqHeight = reqHeight;
+
         }
     }
 }

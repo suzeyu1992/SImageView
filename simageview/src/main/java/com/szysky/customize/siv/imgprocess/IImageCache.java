@@ -1,6 +1,9 @@
 package com.szysky.customize.siv.imgprocess;
 
 import android.graphics.Bitmap;
+import android.widget.ImageView;
+
+import com.szysky.customize.siv.SImageView;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -21,9 +24,10 @@ public interface IImageCache {
      * 通过图片地址获取bitmap对象
      *
      * @param url 图片的链接地址
+     * @param isDiskCacheGet
      * @return  对应的bitmap
      */
-    Bitmap get(String url,int reqWidth, int reqHeight);
+    Bitmap get(String url, int reqWidth, int reqHeight, ImageView imageView, boolean isDiskCacheGet);
 
     /**
      * 对图片的bitmap进行缓存
@@ -31,14 +35,9 @@ public interface IImageCache {
      * @param url 图片地址
      * @param bmp 地址对应的bmp对象
      */
-    void put(String url, Bitmap bmp);
+    void put(String url, Bitmap bmp, int reqWidth, int reqHeight);
 
 
-    /**
-     * 从网络下载图片后会调用, 按需选择是否进行原图片流的文件输出步骤
-     *   如果不需要可空实现
-     * @param url 图片的地址
-     */
-    void putRawStream(String url, BufferedInputStream in) throws IOException;
+
 
 }

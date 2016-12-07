@@ -3,12 +3,8 @@ package com.szysky.customize.siv.imgprocess;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.os.StatFs;
 import android.util.Log;
 import android.util.LruCache;
@@ -16,24 +12,14 @@ import android.widget.ImageView;
 
 import com.szysky.customize.siv.util.CloseUtil;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -60,15 +46,16 @@ public class DefaultImageCache implements IImageCache {
      * 设置字节流一次缓冲的数据流大小
      */
     private static final int IO_BUFFER_SIZE = 8 * 1024;
+    private final ImageLoader mImageLoader;
 
 
     private boolean mIsDiskLruCacheCreated;
     private DiskLruCache mDiskLruCache;
 
 
-
-    public DefaultImageCache(Context context){
+    public DefaultImageCache(Context context, ImageLoader imageLoader){
         mContext = context.getApplicationContext();
+        mImageLoader = imageLoader;
 
         // 获得当前进程最大可用内存
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
@@ -86,18 +73,22 @@ public class DefaultImageCache implements IImageCache {
 
         // 获得磁盘缓存的路径
         File diskCacheDir = getDiskCacheDir(mContext, "bitmap");
+        String path = Environment.getExternalStorageDirectory().getPath();
+
+        diskCacheDir = new File(path, "testing");
+
 
         if (!diskCacheDir.exists()) {
-            diskCacheDir.mkdirs();
+            diskCacheDir.mkdir();
         }
 
         // 判断磁盘路径下可用的空间 是否达到预期大小, 如果达到, 那就创建磁盘缓存对象
         if (getUsableSpace(diskCacheDir) > DISK_CACHE_SIZE) {
             // 利用open函数来构建磁盘缓存对象
             try {
-                Log.i(TAG, "设置磁盘缓存成功--> 路径为:"+diskCacheDir.getPath());
                 mDiskLruCache = DiskLruCache.open(diskCacheDir, 1, 1, DISK_CACHE_SIZE);
                 mIsDiskLruCacheCreated = true;
+                Log.i(TAG, "设置磁盘缓存成功--> 路径为:"+diskCacheDir.getPath());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -106,45 +97,71 @@ public class DefaultImageCache implements IImageCache {
 
 
     @Override
-    public Bitmap get(String url,int reqWidth, int reqHeight) {
-        long entry = System.currentTimeMillis();
-        // 1.从内存中读取
-        String key = keyFormUrl(url);
-        Bitmap bitmap = getBitmapFromMemoryCache(key);
-        if (bitmap != null) {
-            Log.d(TAG, "loadBitmap --> 图片从内存中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
-            return bitmap;
-        }
-
-        // 2.从磁盘缓存加载
-        try {
-            bitmap = loadBitmapFromDiskCache(url, reqWidth, reqHeight);
+    public Bitmap get(final String url, final int reqWidth, final int reqHeight, final ImageView imageView, boolean isDiskCacheGet) {
+        final long entry = System.currentTimeMillis();
+        Bitmap bitmap = null;
+        // 从内存缓存获取
+        if (!isDiskCacheGet) {
+            // 1.从内存中读取
+            String key = keyFormUrl(url);
+            bitmap = getBitmapFromMemoryCache(key);
             if (bitmap != null) {
-                Log.d(TAG, "loadBitmap --> 图片从磁盘中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
+                Log.d(TAG, "loadBitmap --> 图片从内存中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
                 return bitmap;
             }
+        }else{
+            // 2.从磁盘缓存加载
+            // 2. 创建一个Runable调用同步加载的方法去获取Bitmap
+            imageView.setTag(url);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            Runnable loadBitmapTask = new Runnable() {
+                @Override
+                public void run() {
+                    Bitmap tempBmp = null;
+                    try {
+                        ImageLoader.LoaderResult loaderResult;
+                        tempBmp  = loadBitmapFromDiskCache(url, reqWidth, reqHeight);
+                        if (tempBmp != null) {
+                            Log.d(TAG, "loadBitmap --> 图片从磁盘中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
+                            loaderResult = new ImageLoader.LoaderResult(imageView, url, tempBmp, reqWidth, reqHeight);
+                            mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_POST_RESULT, loaderResult).sendToTarget();
+                        }else{
+                            // 磁盘缓存获取失败
+                            loaderResult = new ImageLoader.LoaderResult(imageView, url, null, reqWidth, reqHeight);
+                            mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_DISK_GET_ERR, loaderResult).sendToTarget();
+                        }
+
+                    } catch (IOException e) {
+                        Log.e(TAG, "从磁盘获取IO失败", e);
+                    }
+
+                }
+            };
+
+            // 添加任务到线程池
+            ImageLoader.THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
         }
 
-
-
-        return bitmap;
+        return null;
     }
 
 
 
     @Override
-    public void put(String url, Bitmap bmp) {
-        addBitmapToMemoryCache(url, bmp);
+    public void put(String url, Bitmap bmp , int reqWidth, int reqHeight) {
+
+        if (reqHeight == 0 || reqWidth == 0){
+            // 存储原始图片
+            putRawStream(url, bmp);
+            addBitmapToMemoryCache(url, bmp);
+        }else{
+        }
     }
 
 
 
 
-    @Override
-    public void putRawStream(String url, BufferedInputStream inputStream) throws IOException {
+    public void putRawStream(String url, Bitmap bitmap) {
         // 因为本实例 是先下载先保存在磁盘, 然后从磁盘获取 所以如果磁盘无效那么就停止.
         if (mDiskLruCache == null) {
             return ;
@@ -158,31 +175,35 @@ public class DefaultImageCache implements IImageCache {
         try {
             // 开始对磁盘缓存的一个存储对象进行操作
             editor = mDiskLruCache.edit(key);
-            // 如果==null说明这个editor对象正在被使用
-            OutputStream outputStream = editor.newOutputStream(DISK_CACHE_IDEX);
+            if (editor != null){
+                // 如果==null说明这个editor对象正在被使用
+                OutputStream outputStream = editor.newOutputStream(DISK_CACHE_IDEX);
 
 
-            // 创建Buffer并指定要写入的磁盘缓存输出流
-            out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
+                // 创建Buffer并指定要写入的磁盘缓存输出流
+                out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
 
-            int b;
-            // 开始把输入流的数据写入到磁盘缓存输出流
-            while ((b = inputStream.read()) != -1) {
-                out.write(b);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+
+
+                //加载成功进行 提交操作
+                editor.commit();
+
+                mDiskLruCache.flush();
+
             }
 
 
-            //加载成功进行 提交操作
-            editor.commit();
-            Log.i(TAG, "putRawStream: ==> "+"原始图片流数据写入磁盘缓存成功");
+
+
+            Log.i(TAG, "putRawStream: ==> "+"原始图片数据写入磁盘缓存成功");
         } catch (IOException e) {
-            Log.w(TAG, "putRawStream: ==> "+"原始图片流数据写入磁盘缓存失败 ", e);
-            // 进行数据回滚
-            editor.abort();
+            Log.w(TAG, "putRawStream: ==> "+"原始图片数据写入磁盘缓存失败 ", e);
 
         }finally {
-            out.close();
-            mDiskLruCache.flush();
+            if (out != null){
+                CloseUtil.close(out);
+            }
 
         }
     }
@@ -190,10 +211,6 @@ public class DefaultImageCache implements IImageCache {
 
 
     private Bitmap loadBitmapFromDiskCache(String url, int reqWidth, int reqHeight) throws IOException {
-        // 因为从网络下载, 不允许操作线程不是主线程
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            throw new RuntimeException("不能再主线程中发起网络请求");
-        }
         if (mDiskLruCache == null) {
             return null;
         }
@@ -209,6 +226,7 @@ public class DefaultImageCache implements IImageCache {
 
             if (bitmap != null) {
                 addBitmapToMemoryCache(key, bitmap);
+
             }
             return bitmap;
         }

@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().setSubtitle("can do things");
 
-
+        
         // 设置RecyclerView.
         RecyclerView rv_main = (RecyclerView) findViewById(R.id.rv_main);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 6);

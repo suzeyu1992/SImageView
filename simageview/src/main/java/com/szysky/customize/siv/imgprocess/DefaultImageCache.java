@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -60,43 +61,11 @@ public class DefaultImageCache implements IImageCache {
      */
     private static final int IO_BUFFER_SIZE = 8 * 1024;
 
-    /**
-     * 获得系统的cpu核数
-     */
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
 
-    /**
-     * 分别对线程池中的核心线程数, 最大线程数, 最大最大存活定义常量
-     */
-    private static final int CORE_POOL_SIZE = CPU_COUNT + 1;
-    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
-    private static final long KEEP_ALIVE = 10L;
     private boolean mIsDiskLruCacheCreated;
     private DiskLruCache mDiskLruCache;
 
-    /**
-     * 创建线程工厂, 提供给ThreadPoolExecutor使用
-     */
-    private static final ThreadFactory sThreadFactory = new ThreadFactory() {
-        private final AtomicInteger mCount = new AtomicInteger(1);
 
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "ImageLoader#" + mCount.getAndIncrement());
-        }
-    };
-    /**
-     * 创建线程池, 用在异步加载图片时
-     */
-    public static final Executor THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(
-            CORE_POOL_SIZE,
-            MAXIMUM_POOL_SIZE,
-            KEEP_ALIVE,
-            TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(),
-            sThreadFactory
-
-    );
 
     public DefaultImageCache(Context context){
         mContext = context.getApplicationContext();
@@ -134,229 +103,91 @@ public class DefaultImageCache implements IImageCache {
             }
         }
     }
-    /**
-     * 发送Handler的标识
-     */
-    private static final int MESSAGE_POST_RESULT = 0x99;
-    /**
-     * 利用主线程个Loop来创建一个Handler用来给图片设置bitmap前景
-     */
-    private Handler mMianHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
 
-            switch (msg.what) {
-                case MESSAGE_POST_RESULT:
-                    LoaderResult result = (LoaderResult) msg.obj;
-                    ImageView imageView = result.imageView;
-                    String url = (String) imageView.getTag();
-                    if (url.equals(result.url)) {
-                        imageView.setImageBitmap(result.bitmap);
-                    } else {
-                        Log.w(TAG, "要设置的控件的url发生改变, so 取消设置图片");
-                    }
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-
-            }
-
-        }
-    };
 
     @Override
-    public Bitmap get(String url) {
-       return get(url, 0,0);
-    }
-
-    public Bitmap get(final String urlStr, final int reqWidth, final int reqHeight){
-        // 1. 首先从缓存中查找
-        Bitmap bitmap = getBitmapFromMemoryCache(urlStr);
-
-        if (null != bitmap){
-            return bitmap;
-        }
-
-        // 2. 创建一个Runable调用同步加载的方法去获取Bitmap
-        Runnable loadBitmapTask = new Runnable() {
-            @Override
-            public void run() {
-                Bitmap bitmap = loadBitmap(urlStr, reqWidth, reqHeight);
-                if (bitmap != null) {
-                    LoaderResult loaderResult = new LoaderResult(null, urlStr, bitmap);
-
-                    mMianHandler.obtainMessage(MESSAGE_POST_RESULT, loaderResult).sendToTarget();
-                }
-            }
-        };
-
-
-        // 添加任务到线程池
-        THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
-
-
-        return null;
-    }
-
-    @Override
-    public void put(String url, Bitmap bmp) {
-
-    }
-
-
-    /**
-     * 对外提供的同步加载图片方法
-     *
-     * @param uriStr    传入图片对应的网络路径
-     * @param reqWidth  需要目标的宽度
-     * @param reqHeight 需要目标的高度
-     * @return 返回Bitmap对象
-     */
-    public Bitmap loadBitmap(String uriStr, int reqWidth, int reqHeight) {
+    public Bitmap get(String url,int reqWidth, int reqHeight) {
         long entry = System.currentTimeMillis();
         // 1.从内存中读取
-        String key = keyFormUrl(uriStr);
+        String key = keyFormUrl(url);
         Bitmap bitmap = getBitmapFromMemoryCache(key);
         if (bitmap != null) {
-            Log.d(TAG, "loadBitmap --> 图片从内存中加载成功 uri=" + uriStr + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "s");
+            Log.d(TAG, "loadBitmap --> 图片从内存中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
             return bitmap;
         }
 
         // 2.从磁盘缓存加载
         try {
-            bitmap = loadBitmapFromDiskCache(uriStr, reqWidth, reqHeight);
+            bitmap = loadBitmapFromDiskCache(url, reqWidth, reqHeight);
             if (bitmap != null) {
-                Log.d(TAG, "loadBitmap --> 图片从磁盘中加载成功 uri=" + uriStr + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "s");
+                Log.d(TAG, "loadBitmap --> 图片从磁盘中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
                 return bitmap;
             }
-
-            // 3. 磁盘缓存也没有那么直接从网络下载
-            bitmap = loadBitmapFromHttp(uriStr, reqWidth, reqHeight);
-            Log.d(TAG, "loadBitmap --> 图片从网络中加载成功 uri=" + uriStr + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "s");
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if (bitmap == null && !mIsDiskLruCacheCreated) {
-            Log.w(TAG, " 磁盘缓存没有创建, 准备从网络下载");
-            bitmap = downloadBitmapFromUrl(uriStr);
-        }
-
-        return bitmap;
-    }
-
-    /**
-     * 单纯的从一个地址下载并返回bitmap, 内部没有任何与缓存有关的操作了
-     */
-    private Bitmap downloadBitmapFromUrl(String uriStr) {
-
-        Bitmap bitmap = null;
-        HttpURLConnection urlConnection = null;
-        BufferedInputStream in = null;
-
-        try {
-            URL url = new URL(uriStr);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
-            bitmap = BitmapFactory.decodeStream(in);
-
-        } catch (IOException e) {
-            Log.e(TAG, "网络下载错误");
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            CloseUtil.close(in);
-        }
 
 
         return bitmap;
     }
 
-    /**********************
-     * 给磁盘缓存添加操作方法
-     **********************/
-    private Bitmap loadBitmapFromHttp(String url, int reqWidth, int reqHeight) throws IOException {
-        // 因为从网络下载, 不允许操作线程是主线正
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            throw new RuntimeException("不能再主线程中发起网络请求");
-        }
 
+
+    @Override
+    public void put(String url, Bitmap bmp) {
+        addBitmapToMemoryCache(url, bmp);
+    }
+
+
+
+
+    @Override
+    public void putRawStream(String url, BufferedInputStream inputStream) throws IOException {
         // 因为本实例 是先下载先保存在磁盘, 然后从磁盘获取 所以如果磁盘无效那么就停止.
         if (mDiskLruCache == null) {
-            return null;
+            return ;
         }
 
         // 根据url算出md5值
         String key = keyFormUrl(url);
-
-        // 开始对磁盘缓存的一个存储对象进行操作
-        DiskLruCache.Editor editor = mDiskLruCache.edit(key);
-        // 如果==null说明这个editor对象正在被使用
-        if (null != editor) {
-            OutputStream outputStream = editor.newOutputStream(DISK_CACHE_IDEX);
-            if (downLoadUrlToStream(url, outputStream)) {
-                //加载成功进行 提交操作
-                editor.commit();
-            } else {
-                // 进行数据回滚
-                editor.abort();
-            }
-            mDiskLruCache.flush();
-        }
-
-        // 从磁盘缓存获取, 并在内部添加到内存中去.
-        return loadBitmapFromDiskCache(url, reqWidth, reqHeight);
-
-    }
-
-
-
-    /**
-     * 通过一个网络路径来下载文件
-     *
-     * @param urlStr       要下载的地址
-     * @param outputStream 需要把下载的流写入到传入的此流中
-     * @return 是写入成功
-     */
-    public boolean downLoadUrlToStream(String urlStr, OutputStream outputStream) {
-        HttpURLConnection urlConnection = null;
-        BufferedInputStream in = null;
         BufferedOutputStream out = null;
+        DiskLruCache.Editor editor = null;
 
         try {
-            URL url = new URL(urlStr);
-            urlConnection = (HttpURLConnection) url.openConnection();
+            // 开始对磁盘缓存的一个存储对象进行操作
+            editor = mDiskLruCache.edit(key);
+            // 如果==null说明这个editor对象正在被使用
+            OutputStream outputStream = editor.newOutputStream(DISK_CACHE_IDEX);
 
-            // 获得网络连接获得的输入流
-            in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
 
             // 创建Buffer并指定要写入的磁盘缓存输出流
             out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
 
             int b;
             // 开始把输入流的数据写入到磁盘缓存输出流
-            while ((b = in.read()) != -1) {
+            while ((b = inputStream.read()) != -1) {
                 out.write(b);
             }
 
-            return true;
 
+            //加载成功进行 提交操作
+            editor.commit();
+            Log.i(TAG, "putRawStream: ==> "+"原始图片流数据写入磁盘缓存成功");
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection == null) {
-                urlConnection.disconnect();
-            }
-            CloseUtil.close(in);
-            CloseUtil.close(out);
+            Log.w(TAG, "putRawStream: ==> "+"原始图片流数据写入磁盘缓存失败 ", e);
+            // 进行数据回滚
+            editor.abort();
+
+        }finally {
+            out.close();
+            mDiskLruCache.flush();
 
         }
-
-        return false;
     }
+
+
 
     private Bitmap loadBitmapFromDiskCache(String url, int reqWidth, int reqHeight) throws IOException {
         // 因为从网络下载, 不允许操作线程不是主线程
@@ -482,15 +313,5 @@ public class DefaultImageCache implements IImageCache {
         return stringBuilder.toString();
     }
 
-    private static class LoaderResult {
-        public ImageView imageView;
-        public String url;
-        public Bitmap bitmap;
 
-        public LoaderResult(ImageView imageview, String urlStr, Bitmap bitmap) {
-            imageView = imageview;
-            url = urlStr;
-            this.bitmap = bitmap;
-        }
-    }
 }

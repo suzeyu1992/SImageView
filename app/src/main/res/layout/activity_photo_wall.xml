@@ -7,14 +7,13 @@
     android:orientation="vertical"
     tools:context="com.szysky.note.androiddevseek_12.photowall.PhotoWallActivity">
 
-    <GridView
+    <ListView
         android:id="@+id/gv_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:horizontalSpacing="3dp"
         android:verticalSpacing="3dp"
         android:listSelector="@android:color/transparent"
-        android:numColumns="1"
         android:stretchMode="columnWidth"
         />
 

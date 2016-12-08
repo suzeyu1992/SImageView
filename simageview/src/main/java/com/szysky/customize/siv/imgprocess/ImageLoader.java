@@ -104,6 +104,14 @@ public class ImageLoader {
     }
 
 
+    /**
+     *  对外提供的下载图片方法.
+     *
+     * @param imaUrl 需要加载的图片
+     * @param sImageView  图片设置的控件
+     * @param reqWidth  需要大小, 可以为0
+     * @param reqHeight 需要大小, 可以为0
+     */
     public void setPicture(final String imaUrl, final ImageView sImageView, final int reqWidth, final int reqHeight){
 
         Bitmap bitmap = mImageCache.get(imaUrl, reqWidth, reqHeight,null, false);
@@ -112,6 +120,7 @@ public class ImageLoader {
             return;
         }
 
+        Log.e(TAG, imaUrl+" "+System.currentTimeMillis() );
         mImageCache.get(imaUrl, reqWidth, reqHeight, sImageView, true);
 
 
@@ -121,10 +130,9 @@ public class ImageLoader {
 
 
     /**
-     * 单纯的从一个地址下载并返回bitmap, 内部没有任何与缓存有关的操作了
+     * 从一个地址下载并图片并转换成bitmap,  并先对bitmap进行磁盘的写入. 然后再返回
      */
-    public Bitmap downloadBitmapFromUrl(String uriStr,final int reqWidth, final int reqHeight ) {
-
+    private Bitmap downloadBitmapFromUrl(String uriStr,final int reqWidth, final int reqHeight ) {
         Bitmap bitmap = null;
         HttpURLConnection urlConnection = null;
         BufferedInputStream in = null;
@@ -132,14 +140,8 @@ public class ImageLoader {
         try {
             URL url = new URL(uriStr);
             urlConnection = (HttpURLConnection) url.openConnection();
-
-
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
-
-
-
             bitmap = BitmapFactory.decodeStream(in);
-
             // bitmap的缓存
             mImageCache.put(uriStr , bitmap, 0, 0);
 
@@ -152,8 +154,37 @@ public class ImageLoader {
             CloseUtil.close(in);
         }
 
-
         return bitmap;
+    }
+
+    /**
+     * 从网络下载图片的流直接存入磁盘, 保证图片的原大小. 并在内部进行内存缓存添加.
+     *
+     */
+    private boolean downloadFirstDiskToCache(String uriStr) {
+
+        boolean result = false;
+        HttpURLConnection urlConnection = null;
+        BufferedInputStream in = null;
+        try {
+            URL url = new URL(uriStr);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
+
+
+            result =  mImageCache.putRawStream(uriStr, in);
+
+
+        } catch (IOException e) {
+            Log.e(TAG, ">>>>>>网络图片流直接存入磁盘失败");
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            CloseUtil.close(in);
+            return result;
+        }
+
     }
 
     /**
@@ -173,6 +204,7 @@ public class ImageLoader {
                 // 网络下载图片成功
                 case MESSAGE_POST_RESULT:
                     LoaderResult result = (LoaderResult) msg.obj;
+
                     ImageView imageView = result.imageView;
                     String url = (String) imageView.getTag();
                     if (url.equals(result.url)) {
@@ -191,11 +223,30 @@ public class ImageLoader {
                     Runnable loadBitmapTask = new Runnable() {
                         @Override
                         public void run() {
-                            Bitmap bitmap = downloadBitmapFromUrl(errResult.url, errResult.reqWidth, errResult.reqHeight);
-                            if (bitmap != null) {
-                                LoaderResult loaderResult = new LoaderResult(errResult.imageView, errResult.url,errResult.bitmap, errResult.reqWidth, errResult.reqHeight);
-                                mMainHandler.obtainMessage(MESSAGE_POST_RESULT, loaderResult).sendToTarget();
+                            Bitmap bitmap = null;
+                            // 根据默认缓存添加的分支, 网络下载的输入流直接存入磁盘, 先进行bitmap转换可能会影响到原图片的大小
+                            boolean result = downloadFirstDiskToCache(errResult.url);
+                            if (result){
+                                if (mImageCache instanceof DefaultImageCache){
+                                    try {
+                                         bitmap = ((DefaultImageCache) mImageCache).loadBitmapFromDiskCache(errResult.url, errResult.reqWidth, errResult.reqHeight);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }else{
+                                // 通用逻辑, 从网络下载之后, 先把bitmap存入硬盘然后返回bitmap
+                                // 一般情况下不会走此逻辑, 为了保险起见, 和后续扩展其他实现类可以保证bitmap会被添加到IImageView的put()回调中
+                                bitmap = downloadBitmapFromUrl(errResult.url, errResult.reqWidth, errResult.reqHeight);
                             }
+
+                            if (bitmap != null) {
+                                LoaderResult loaderResult = new LoaderResult(errResult.imageView, errResult.url,bitmap, errResult.reqWidth, errResult.reqHeight);
+                                mMainHandler.obtainMessage(MESSAGE_POST_RESULT, loaderResult).sendToTarget();
+                                return;
+                            }
+
+                            Log.e(TAG, "在磁盘获取缓存失败发送handler后, 无法从网络获取到bitmap对象!!! " );
                         }
                     };
 

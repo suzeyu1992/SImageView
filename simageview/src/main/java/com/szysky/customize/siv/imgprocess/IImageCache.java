@@ -38,6 +38,7 @@ public interface IImageCache {
     void put(String url, Bitmap bmp, int reqWidth, int reqHeight);
 
 
+    boolean putRawStream(String url, InputStream in);
 
 
 }

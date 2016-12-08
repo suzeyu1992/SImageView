@@ -12,11 +12,13 @@ import android.widget.ImageView;
 
 import com.szysky.customize.siv.util.CloseUtil;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -152,16 +154,72 @@ public class DefaultImageCache implements IImageCache {
 
         if (reqHeight == 0 || reqWidth == 0){
             // 存储原始图片
-            putRawStream(url, bmp);
+            long l = System.currentTimeMillis();
+            putBitmap(url, bmp);
+            Log.e(TAG, "磁盘存储的时间 "+(System.currentTimeMillis()-l) );
             addBitmapToMemoryCache(url, bmp);
+
         }else{
         }
     }
 
+    @Override
+    public boolean putRawStream(String url, InputStream in) {
+
+        boolean result = false;
+        // 因为本实例 是先下载先保存在磁盘, 然后从磁盘获取 所以如果磁盘无效那么就停止.
+        if (mDiskLruCache == null) {
+            return false;
+        }
+
+        // 根据url算出md5值
+        String key = keyFormUrl(url);
+        BufferedOutputStream out = null;
+        DiskLruCache.Editor editor = null;
+
+        try {
+            // 开始对磁盘缓存的一个存储对象进行操作
+            editor = mDiskLruCache.edit(key);
+            if (editor != null){
+                // 如果==null说明这个editor对象正在被使用
+                OutputStream outputStream = editor.newOutputStream(DISK_CACHE_IDEX);
 
 
+                // 创建Buffer并指定要写入的磁盘缓存输出流
+                out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
 
-    public void putRawStream(String url, Bitmap bitmap) {
+                BufferedInputStream ins = new BufferedInputStream(in, IO_BUFFER_SIZE);
+
+                byte[] b = new byte[1024 * 20];
+                int point;
+                while((point = ins.read(b)) != -1){
+                    out.write(b,0,point);
+                }
+
+                //加载成功进行 提交操作
+                editor.commit();
+
+                mDiskLruCache.flush();
+
+
+                result = true;
+            }
+
+            Log.i(TAG, "putRawStream: ==> "+"原始图片流写入磁盘缓存成功");
+        } catch (IOException e) {
+            Log.w(TAG, "putRawStream: ==> "+"原始图片流写入磁盘缓存失败 ", e);
+            result = false;
+        }finally {
+            if (out != null){
+                CloseUtil.close(out);
+            }
+            return result;
+
+        }
+    }
+
+
+    public void putBitmap(String url, Bitmap bitmap) {
         // 因为本实例 是先下载先保存在磁盘, 然后从磁盘获取 所以如果磁盘无效那么就停止.
         if (mDiskLruCache == null) {
             return ;
@@ -193,12 +251,9 @@ public class DefaultImageCache implements IImageCache {
 
             }
 
-
-
-
-            Log.i(TAG, "putRawStream: ==> "+"原始图片数据写入磁盘缓存成功");
+            Log.i(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存成功");
         } catch (IOException e) {
-            Log.w(TAG, "putRawStream: ==> "+"原始图片数据写入磁盘缓存失败 ", e);
+            Log.w(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存失败 ", e);
 
         }finally {
             if (out != null){
@@ -210,7 +265,7 @@ public class DefaultImageCache implements IImageCache {
 
 
 
-    private Bitmap loadBitmapFromDiskCache(String url, int reqWidth, int reqHeight) throws IOException {
+    public  Bitmap loadBitmapFromDiskCache(String url, int reqWidth, int reqHeight) throws IOException {
         if (mDiskLruCache == null) {
             return null;
         }

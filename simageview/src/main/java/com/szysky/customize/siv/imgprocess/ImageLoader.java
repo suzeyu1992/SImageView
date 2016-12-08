@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -70,7 +71,7 @@ public class ImageLoader {
         mImageCache = new DefaultImageCache(mContext, this);
 
         mLoadErrBmp = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.ic_menu_close_clear_cancel);
-        mLoadErrBmp = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.stat_notify_sync);
+        mLoadingBmp = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.stat_notify_sync);
     }
 
     public static ImageLoader getInstance(Context context){
@@ -154,6 +155,8 @@ public class ImageLoader {
             return;
         }
 
+
+
         Log.e(TAG, imaUrl+" "+System.currentTimeMillis() );
         mImageCache.get(imaUrl, reqWidth, reqHeight, sImageView, true, null);
 
@@ -168,10 +171,13 @@ public class ImageLoader {
      */
     public void setMulPicture(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight){
 
-        // 进行图片地址有效性匹配
-        matchUrlLink(urls);
+
 
         RequestBean requestBean = new RequestBean(urls, sImageView, reqWidth, reqHeight);
+
+        // 进行图片地址有效性匹配
+        matchUrlLink(requestBean);
+
         // 首先从内存中获取
         for (int i = 0; i < urls.size(); i++) {
             Bitmap bitmap = mImageCache.get(requestBean.urls.get(i), reqWidth, reqHeight, null, false, null);
@@ -187,6 +193,9 @@ public class ImageLoader {
             sImageView.setImages(requestBean.asListBitmap());
             return ;
         }
+
+        // 设置加载中图片
+        sImageView.setBitmap(mLoadingBmp);
 
         // 开始从磁盘缓存获取
         mImageCache.get(null, 0,0, null,true, requestBean);
@@ -212,7 +221,7 @@ public class ImageLoader {
             mImageCache.put(uriStr , bitmap, 0, 0);
 
         } catch (IOException e) {
-            Log.e(TAG, "网络下载错误");
+            Log.e(TAG, ">>>>>>downloadBitmapFromUrl()   再次进行网络下载也失败");
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -235,6 +244,7 @@ public class ImageLoader {
         try {
             URL url = new URL(uriStr);
             urlConnection = (HttpURLConnection) url.openConnection();
+
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
 
 
@@ -335,14 +345,14 @@ public class ImageLoader {
                                 }else{
                                     // 通用逻辑, 从网络下载之后, 先把bitmap存入硬盘然后返回bitmap
                                     // 一般情况下不会走此逻辑, 为了保险起见, 和后续扩展其他实现类可以保证bitmap会被添加到IImageView的put()回调中
-                                    bitmap = downloadBitmapFromUrl(noLoadUrl, diskGetErrRequest.reqWidth, diskGetErrRequest.reqHeight);
+                                    //bitmap = downloadBitmapFromUrl(noLoadUrl, diskGetErrRequest.reqWidth, diskGetErrRequest.reqHeight);
                                 }
 
                                 // 判断网络加载是否成功
                                 if (bitmap != null) {
                                     diskGetErrRequest.addBitmap(noLoadUrl, bitmap);
                                 }else{
-                                    diskGetErrRequest.addBitmap(noLoadUrl, null);
+                                    diskGetErrRequest.addBitmap(noLoadUrl, mLoadErrBmp);
                                     Log.e(TAG, "多张图片下载失败, >>>> 图片地址:"+noLoadUrl);
                                 }
 
@@ -402,23 +412,24 @@ public class ImageLoader {
         }
     }
 
-    private void matchUrlLink(List<String> list){
-        // 存储不匹配的规则地址
-        ArrayList<String> invalidateUrl = new ArrayList();
+    private void matchUrlLink( RequestBean req){
+        int errNum = 0;
+
+        if (req == null)
+            return;
 
         // 进行过滤
-        for (String url: list) {
+        for (String url: req.urls) {
             if (!SecurityUtil.matchUrlPicture(url, mPicUrlRegex)){
-                invalidateUrl.add(url);
+                // 添加默认错误图片
+                req.addBitmap(url, mLoadErrBmp);
+                errNum++;
             }
         }
 
         // 判断是否需要清除无效的url
-        if (invalidateUrl.size() > 0){
-            for (String url : invalidateUrl) {
-                list.remove(url);
-            }
-            Log.i(TAG, "清除了 "+ invalidateUrl.size() +" 个无效的地址");
+        if (errNum > 0){
+            Log.w(TAG, "发现了 "+ errNum +" 个无效的地址");
         }
 
     }

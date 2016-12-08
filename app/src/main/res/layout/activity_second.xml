@@ -19,6 +19,7 @@
 
     <com.szysky.customize.siv.SImageView
         android:id="@+id/siv_url"
+        android:background="@color/colorAccent"
         android:layout_width="100dp"
         android:layout_height="100dp" />
 

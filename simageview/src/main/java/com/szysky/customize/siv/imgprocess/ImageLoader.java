@@ -172,8 +172,7 @@ public class ImageLoader {
     public void setMulPicture(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight){
 
 
-
-        RequestBean requestBean = new RequestBean(urls, sImageView, reqWidth, reqHeight);
+        RequestBean requestBean = RequestBean.obtain(urls, sImageView, reqWidth, reqHeight);
 
         // 进行图片地址有效性匹配
         matchUrlLink(requestBean);
@@ -326,6 +325,7 @@ public class ImageLoader {
                     break;
 
 
+                // 多张图片在磁盘未获取到全部的bitmap
                 case MESSAGE_MULTI_DISK_GET_ERR:
 
                     final RequestBean diskGetErrRequest = (RequestBean) msg.obj;
@@ -384,6 +384,9 @@ public class ImageLoader {
                     }else{
                         Log.w(TAG, "多张图片>>>>控件的url发生改变, so取消设置图片");
                     }
+
+                    // recycle global pool
+                    requestOk.recycle();
 
                     break;
 

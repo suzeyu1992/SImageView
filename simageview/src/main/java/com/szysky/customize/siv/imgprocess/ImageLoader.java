@@ -12,11 +12,13 @@ import android.widget.ImageView;
 import com.szysky.customize.siv.SImageView;
 import com.szysky.customize.siv.imgprocess.db.RequestBean;
 import com.szysky.customize.siv.util.CloseUtil;
+import com.szysky.customize.siv.util.SecurityUtil;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -47,6 +49,11 @@ public class ImageLoader {
     private static volatile ImageLoader mInstance;
 
     private Context mContext;
+
+    /**
+     *  图片下载时的规则, 提供外部可自定义, 自定之后所有的图片地址匹配都会生效
+     */
+    private String mPicUrlRegex = "";
 
     private ImageLoader (Context context){
         mContext = context.getApplicationContext();
@@ -125,6 +132,9 @@ public class ImageLoader {
      */
     public void setPicture(final String imaUrl, final ImageView sImageView, final int reqWidth, final int reqHeight){
 
+        // 判断图片链接是否符合格式--> http(s)://..... .(jpg|png|bmp|jpeg|gif)
+
+
         Bitmap bitmap = mImageCache.get(imaUrl, reqWidth, reqHeight,null, false, null);
         if (null != bitmap){
             sImageView.setImageBitmap(bitmap);
@@ -144,6 +154,9 @@ public class ImageLoader {
      * 只针对SImageView控件场景使用
      */
     public void setMulPicture(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight){
+
+        // 进行图片地址有效性匹配
+        matchUrlLink(urls);
 
         RequestBean requestBean = new RequestBean(urls, sImageView, reqWidth, reqHeight);
         // 首先从内存中获取
@@ -374,5 +387,43 @@ public class ImageLoader {
             this.reqHeight = reqHeight;
 
         }
+    }
+
+    private void matchUrlLink(List<String> list){
+        // 存储不匹配的规则地址
+        ArrayList<String> invalidateUrl = new ArrayList();
+
+        // 进行过滤
+        for (String url: list) {
+            if (!SecurityUtil.matchUrlPicture(url, mPicUrlRegex)){
+                invalidateUrl.add(url);
+            }
+        }
+
+        // 判断是否需要清除无效的url
+        if (invalidateUrl.size() > 0){
+            for (String url : invalidateUrl) {
+                list.remove(url);
+            }
+            Log.i(TAG, "清除了 "+ invalidateUrl.size() +" 个无效的地址");
+        }
+
+    }
+
+    /**
+     * 获取用户定义的图片链接匹配正则,
+     * 如果为定义, 默认为空传
+     */
+    public String getPicUrlRegex() {
+        return mPicUrlRegex;
+    }
+
+    /**
+     * 可自定义匹配规则图片链接合法的正则, 设置之后将使用用户自定义的匹配规则
+     * 默认匹配正则为: https?://.*?.(jpg|png|bmp|jpeg|gif)
+     * @param mPicUrlRegex 正则匹配
+     */
+    public void setPicUrlRegex(String mPicUrlRegex) {
+        this.mPicUrlRegex = mPicUrlRegex;
     }
 }

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import com.szysky.customize.siv.SImageView;
+import com.szysky.customize.siv.imgprocess.db.RequestBean;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public interface IImageCache {
      * @param isDiskCacheGet
      * @return  对应的bitmap
      */
-    Bitmap get(String url, int reqWidth, int reqHeight, ImageView imageView, boolean isDiskCacheGet);
+    Bitmap get(String url, int reqWidth, int reqHeight, ImageView imageView, boolean isDiskCacheGet, RequestBean bean);
 
     /**
      * 对图片的bitmap进行缓存

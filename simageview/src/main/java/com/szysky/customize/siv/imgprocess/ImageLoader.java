@@ -10,12 +10,15 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.szysky.customize.siv.SImageView;
+import com.szysky.customize.siv.imgprocess.db.RequestBean;
 import com.szysky.customize.siv.util.CloseUtil;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -33,6 +36,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ImageLoader {
 
+    /**
+     *  多张图片从磁盘获取缓存, 没有完全成功
+     */
+    public static final int MESSAGE_MULTI_DISK_GET_ERR = 0x97;
+    /**
+     * 多张图片从磁盘获取缓存成功
+     */
+    public static final int MESSAGE_MULTI_DISK_GET_OK = 0x96;
     private static volatile ImageLoader mInstance;
 
     private Context mContext;
@@ -114,23 +125,51 @@ public class ImageLoader {
      */
     public void setPicture(final String imaUrl, final ImageView sImageView, final int reqWidth, final int reqHeight){
 
-        Bitmap bitmap = mImageCache.get(imaUrl, reqWidth, reqHeight,null, false);
+        Bitmap bitmap = mImageCache.get(imaUrl, reqWidth, reqHeight,null, false, null);
         if (null != bitmap){
             sImageView.setImageBitmap(bitmap);
             return;
         }
 
         Log.e(TAG, imaUrl+" "+System.currentTimeMillis() );
-        mImageCache.get(imaUrl, reqWidth, reqHeight, sImageView, true);
+        mImageCache.get(imaUrl, reqWidth, reqHeight, sImageView, true, null);
 
 
         sImageView.setTag(imaUrl);
 
     }
 
+    /**
+     * 下载多张图片的方法
+     * 只针对SImageView控件场景使用
+     */
+    public void setMulPicture(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight){
+
+        RequestBean requestBean = new RequestBean(urls, sImageView, reqWidth, reqHeight);
+        // 首先从内存中获取
+        for (int i = 0; i < urls.size(); i++) {
+            Bitmap bitmap = mImageCache.get(requestBean.urls.get(i), reqWidth, reqHeight, null, false, null);
+            if (null != bitmap){
+                requestBean.addBitmap(requestBean.urls.get(i), bitmap);
+            }
+        }
+
+
+        // 判断从内存获取是否全部加载完毕, 如果没有, 尝试从磁盘中获取
+        if (requestBean.isLoadSuccessful()){
+            sImageView.setImages(requestBean.asListBitmap());
+            return ;
+        }
+
+        // 开始从磁盘缓存获取
+        mImageCache.get(null, 0,0, null,true, requestBean);
+
+
+    }
+
 
     /**
-     * 从一个地址下载并图片并转换成bitmap,  并先对bitmap进行磁盘的写入. 然后再返回
+     * 从一个地址下载图片并转换成bitmap,  并先对bitmap进行磁盘的写入. 然后再返回
      */
     private Bitmap downloadBitmapFromUrl(String uriStr,final int reqWidth, final int reqHeight ) {
         Bitmap bitmap = null;
@@ -228,11 +267,7 @@ public class ImageLoader {
                             boolean result = downloadFirstDiskToCache(errResult.url);
                             if (result){
                                 if (mImageCache instanceof DefaultImageCache){
-                                    try {
-                                         bitmap = ((DefaultImageCache) mImageCache).loadBitmapFromDiskCache(errResult.url, errResult.reqWidth, errResult.reqHeight);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
+                                    bitmap = ((DefaultImageCache) mImageCache).loadBitmapFromDiskCache(errResult.url, errResult.reqWidth, errResult.reqHeight);
                                 }
                             }else{
                                 // 通用逻辑, 从网络下载之后, 先把bitmap存入硬盘然后返回bitmap
@@ -254,6 +289,8 @@ public class ImageLoader {
                     // 添加任务到线程池
                     THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
                     break;
+
+
 
                 default:
                     super.handleMessage(msg);

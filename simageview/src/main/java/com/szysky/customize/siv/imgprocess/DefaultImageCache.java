@@ -10,6 +10,7 @@ import android.util.Log;
 import android.util.LruCache;
 import android.widget.ImageView;
 
+import com.szysky.customize.siv.imgprocess.db.RequestBean;
 import com.szysky.customize.siv.util.CloseUtil;
 
 import java.io.BufferedInputStream;
@@ -99,7 +100,7 @@ public class DefaultImageCache implements IImageCache {
 
 
     @Override
-    public Bitmap get(final String url, final int reqWidth, final int reqHeight, final ImageView imageView, boolean isDiskCacheGet) {
+    public Bitmap get(final String url, final int reqWidth, final int reqHeight, final ImageView imageView, boolean isDiskCacheGet, final RequestBean bean) {
         final long entry = System.currentTimeMillis();
         Bitmap bitmap = null;
         // 从内存缓存获取
@@ -113,6 +114,41 @@ public class DefaultImageCache implements IImageCache {
             }
         }else{
             // 2.从磁盘缓存加载
+            // 首先判断是否是多张图片加载
+            if ((bean != null) &&(bean.loadTotal > 1)){
+
+                // 读取硬盘属于耗时操作, 使用子线程
+                Runnable loadBitmapTask = new Runnable(){
+                    @Override
+                    public void run() {
+                        // 对url对应value值为null的元素进行磁盘获取
+                        for (String url : bean.checkNoLoadUrl()) {
+                            Bitmap checkBitmap  = loadBitmapFromDiskCache(url, bean.reqWidth, bean.reqHeight);
+                            // 如果不等于空进行有效添加
+                            if (null != checkBitmap){
+                               bean.addBitmap(url, checkBitmap);
+                            }
+                        }
+
+                        // 判断磁盘获取结束后是否全部完毕
+                        if (!bean.isLoadSuccessful()){
+                            // 通知Handler多张图片从磁盘获取为完成
+                            mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_MULTI_DISK_GET_ERR, bean).sendToTarget();
+                        }else {
+                            // 通知成功并处理
+                            mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_MULTI_DISK_GET_OK, bean).sendToTarget();
+                        }
+
+                    }
+                };
+
+                // 添加任务到线程池
+                ImageLoader.THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
+                return null;
+            }
+
+
+
             // 2. 创建一个Runable调用同步加载的方法去获取Bitmap
             imageView.setTag(url);
 
@@ -120,22 +156,19 @@ public class DefaultImageCache implements IImageCache {
                 @Override
                 public void run() {
                     Bitmap tempBmp = null;
-                    try {
-                        ImageLoader.LoaderResult loaderResult;
-                        tempBmp  = loadBitmapFromDiskCache(url, reqWidth, reqHeight);
-                        if (tempBmp != null) {
-                            Log.d(TAG, "loadBitmap --> 图片从磁盘中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
-                            loaderResult = new ImageLoader.LoaderResult(imageView, url, tempBmp, reqWidth, reqHeight);
-                            mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_POST_RESULT, loaderResult).sendToTarget();
-                        }else{
-                            // 磁盘缓存获取失败
-                            loaderResult = new ImageLoader.LoaderResult(imageView, url, null, reqWidth, reqHeight);
-                            mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_DISK_GET_ERR, loaderResult).sendToTarget();
-                        }
 
-                    } catch (IOException e) {
-                        Log.e(TAG, "从磁盘获取IO失败", e);
+                    ImageLoader.LoaderResult loaderResult;
+                    tempBmp  = loadBitmapFromDiskCache(url, reqWidth, reqHeight);
+                    if (tempBmp != null) {
+                        Log.d(TAG, "loadBitmap --> 图片从磁盘中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
+                        loaderResult = new ImageLoader.LoaderResult(imageView, url, tempBmp, reqWidth, reqHeight);
+                        mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_POST_RESULT, loaderResult).sendToTarget();
+                    }else{
+                        // 磁盘缓存获取失败
+                        loaderResult = new ImageLoader.LoaderResult(imageView, url, null, reqWidth, reqHeight);
+                        mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_DISK_GET_ERR, loaderResult).sendToTarget();
                     }
+
 
                 }
             };
@@ -265,25 +298,31 @@ public class DefaultImageCache implements IImageCache {
 
 
 
-    public  Bitmap loadBitmapFromDiskCache(String url, int reqWidth, int reqHeight) throws IOException {
+    public  Bitmap loadBitmapFromDiskCache(String url, int reqWidth, int reqHeight)  {
         if (mDiskLruCache == null) {
             return null;
         }
 
         Bitmap bitmap = null;
         String key = keyFormUrl(url);
-        DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
-        if (null != snapshot) {
-            FileInputStream fileInputStream = (FileInputStream) snapshot.getInputStream(DISK_CACHE_IDEX);
-            // 由于文件流属于一种有序的文件流, 所以无法进行两次decode. 这里通过获得文件描述符的方法解决
-            FileDescriptor fd = fileInputStream.getFD();
-            bitmap = ImageCompression.decodeFixedSizeForFileDescription(fd, reqWidth, reqHeight);
 
-            if (bitmap != null) {
-                addBitmapToMemoryCache(key, bitmap);
+        DiskLruCache.Snapshot snapshot = null;
+        try {
+            snapshot = mDiskLruCache.get(key);
+            if (null != snapshot) {
+                FileInputStream fileInputStream = (FileInputStream) snapshot.getInputStream(DISK_CACHE_IDEX);
+                // 由于文件流属于一种有序的文件流, 所以无法进行两次decode. 这里通过获得文件描述符的方法解决
+                FileDescriptor fd = fileInputStream.getFD();
+                bitmap = ImageCompression.decodeFixedSizeForFileDescription(fd, reqWidth, reqHeight);
 
+                if (bitmap != null) {
+                    addBitmapToMemoryCache(key, bitmap);
+
+                }
+                return bitmap;
             }
-            return bitmap;
+        } catch (IOException e) {
+            Log.e(TAG, "从磁盘获取IO失败", e);
         }
 
 

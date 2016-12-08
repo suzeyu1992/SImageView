@@ -55,9 +55,22 @@ public class ImageLoader {
      */
     private String mPicUrlRegex = "";
 
+    /**
+     * 默认加载错误的图片
+     */
+    private Bitmap mLoadErrBmp;
+
+    /**
+     * 默认加载中的图片
+     */
+    private Bitmap mLoadingBmp;
+
     private ImageLoader (Context context){
         mContext = context.getApplicationContext();
         mImageCache = new DefaultImageCache(mContext, this);
+
+        mLoadErrBmp = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.ic_menu_close_clear_cancel);
+        mLoadErrBmp = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.stat_notify_sync);
     }
 
     public static ImageLoader getInstance(Context context){
@@ -425,5 +438,33 @@ public class ImageLoader {
      */
     public void setPicUrlRegex(String mPicUrlRegex) {
         this.mPicUrlRegex = mPicUrlRegex;
+    }
+
+    /**
+     * 获得默认图片加载失败,显示的图片
+     */
+    public Bitmap getLoadErrBmp() {
+        return mLoadErrBmp;
+    }
+
+    /**
+     * 设置默认图片加载失败显示的图片
+     */
+    public void setLoadErrBmp(Bitmap mLoadErrBmp) {
+        this.mLoadErrBmp = mLoadErrBmp;
+    }
+
+    /**
+     * 获得默认图片加载中,显示的图片
+     */
+    public Bitmap getLoadingBmp() {
+        return mLoadingBmp;
+    }
+
+    /**
+     * 设置默认图片加载中,显示的图片
+     */
+    public void setLoadingBmp(Bitmap mLoadingBmp) {
+        this.mLoadingBmp = mLoadingBmp;
     }
 }

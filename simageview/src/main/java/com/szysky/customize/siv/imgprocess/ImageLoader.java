@@ -284,13 +284,22 @@ public class ImageLoader {
                             Log.e(TAG, "在磁盘获取缓存失败发送handler后, 无法从网络获取到bitmap对象!!! " );
                         }
                     };
-
-
                     // 添加任务到线程池
                     THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
                     break;
 
+                // 多张图片从磁盘获取成功
+                case MESSAGE_MULTI_DISK_GET_OK:
 
+                    RequestBean requestOk = (RequestBean) msg.obj;
+                    // 进行控件是否需要有效的判断
+                    if (requestOk.sImageView.getTag().equals(requestOk.getTag())){
+                        requestOk.sImageView.setImages(requestOk.asListBitmap());
+                    }else{
+                        Log.w(TAG, "多张图片>>>>控件的url发生改变, so取消设置图片");
+                    }
+
+                    break;
 
                 default:
                     super.handleMessage(msg);

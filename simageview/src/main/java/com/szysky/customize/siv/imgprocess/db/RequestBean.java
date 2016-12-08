@@ -36,7 +36,7 @@ public class RequestBean {
     public long startTime = System.currentTimeMillis();
     public int loadTotal;       // 需要下载的总数
     public volatile int loadedNum;        // 已经完成的数量
-    private String mTag ;                 // 设置图片对应的控件的tag
+    private String mTag = "" ;                 // 设置图片对应的控件的tag
 
 
     public RequestBean(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight) {
@@ -50,10 +50,11 @@ public class RequestBean {
         getTag();
         sImageView.setTag(mTag);
 
+        noLoadUrls = new CopyOnWriteArrayList<>();
+        bitmaps = new ConcurrentHashMap<>();
 
         // 创建图片地址, 对应map
         for (String url:urls) {
-            bitmaps.put(url, null);
             noLoadUrls.add(url);
         }
 
@@ -63,7 +64,13 @@ public class RequestBean {
      * 检测对应的url, 是否已经存在bitmap
      */
     public String[] checkNoLoadUrl(){
-        return (String[]) noLoadUrls.toArray();
+
+        String [] strs = new String[noLoadUrls.size()];
+        for (int i = 0; i < strs.length;i++) {
+            strs[i] = noLoadUrls.get(i);
+        }
+
+        return strs ;
     }
 
     /**

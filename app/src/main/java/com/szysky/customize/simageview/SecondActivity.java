@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -49,6 +50,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
         // 测试网络
         SImageView sImageViewForHttp = (SImageView) findViewById(R.id.siv_url);
+
 
         List<String> urls = new ArrayList<>();
 

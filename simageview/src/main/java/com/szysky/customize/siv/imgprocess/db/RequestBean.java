@@ -1,6 +1,7 @@
 package com.szysky.customize.siv.imgprocess.db;
 
 import android.graphics.Bitmap;
+import android.os.Message;
 import android.widget.ImageView;
 
 import com.szysky.customize.siv.SImageView;
@@ -37,6 +38,18 @@ public class RequestBean {
     public int loadTotal;       // 需要下载的总数
     public volatile int loadedNum;        // 已经完成的数量
     private String mTag = "" ;                 // 设置图片对应的控件的tag
+
+
+
+    // sometimes we store linked lists of these things
+    /*package*/ RequestBean next;
+
+    private static final Object sPoolSync = new Object();
+    private static RequestBean sPool;
+    private static int sPoolSize = 0;
+    private static final int MAX_POOL_SIZE = 20;
+
+
 
 
     public RequestBean(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight) {
@@ -119,4 +132,62 @@ public class RequestBean {
         }
         return tempBitmaps;
     }
+
+    /**
+     * 缓存策略, 从全局缓存池中返回一个新的对象, 通常需要在调用了
+     */
+    public static RequestBean obtain(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight){
+        synchronized (sPoolSync){
+            if (sPool != null){
+                // 缓存链表的修正
+                RequestBean req = sPool;
+                sPool = req.next;
+                req.next = null;
+                sPoolSize--;
+
+                // 进行赋值初始化
+                req.startTime = System.currentTimeMillis();
+                req.urls = urls;
+                req.sImageView = sImageView;
+                req.reqHeight = reqHeight;
+                req.reqWidth = reqWidth;
+                req.getTag();
+                sImageView.setTag(req.mTag);
+                for (String url:urls) {
+                    req.noLoadUrls.add(url);
+                }
+                return req;
+            }
+        }
+
+        return new RequestBean( urls,  sImageView,  reqWidth,  reqHeight);
+    }
+
+    /**
+     * 返回一个干净的实例到全区缓冲池中
+     */
+    public void recycle() {
+        // 清除所有数据
+        reqWidth = 0;
+        reqHeight = 0;
+        startTime = 0;
+        loadedNum = 0;
+        loadTotal = 0;
+        mTag = "";
+        bitmaps.clear();
+        urls.clear();
+        noLoadUrls.clear();
+        sImageView = null;
+
+        // 填入缓冲池 并修正
+        synchronized (sPoolSync){
+            if (sPoolSize < MAX_POOL_SIZE){
+                next = sPool;
+                sPool = this;
+                sPoolSize--;
+            }
+        }
+    }
+
+
 }

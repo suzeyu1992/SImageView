@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.ImageView;
 
 import com.szysky.customize.siv.SImageView;
 import com.szysky.customize.siv.imgprocess.db.RequestBean;
@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -49,7 +47,7 @@ public class ImageLoader {
     public static final int MESSAGE_MULTI_DISK_GET_OK = 0x96;
     private static volatile ImageLoader mInstance;
 
-    private Context mContext;
+    private static Context mContext;
 
     /**
      *  图片下载时的规则, 提供外部可自定义, 自定之后所有的图片地址匹配都会生效
@@ -87,7 +85,8 @@ public class ImageLoader {
 
 
     private static final String TAG = ImageLoader.class.getName();
-    IImageCache mImageCache  ;
+
+    IImageCache mImageCache ;
 
     /**
      * 设置字节流一次缓冲的数据流大小
@@ -113,7 +112,7 @@ public class ImageLoader {
         private final AtomicInteger mCount = new AtomicInteger(1);
 
         @Override
-        public Thread newThread(Runnable r) {
+        public Thread newThread(@NonNull Runnable r) {
             return new Thread(r, "ImageLoader#" + mCount.getAndIncrement());
         }
     };
@@ -130,10 +129,7 @@ public class ImageLoader {
 
     );
 
-    // 暴露注入的缓存策略
-    public void setImageCache(IImageCache imageCache){
-        mImageCache = imageCache;
-    }
+
 
 
     /**
@@ -144,24 +140,12 @@ public class ImageLoader {
      * @param reqWidth  需要大小, 可以为0
      * @param reqHeight 需要大小, 可以为0
      */
-    public void setPicture(final String imaUrl, final ImageView sImageView, final int reqWidth, final int reqHeight){
+    public void setPicture(final String imaUrl, final SImageView sImageView, final int reqWidth, final int reqHeight){
 
         // 判断图片链接是否符合格式--> http(s)://..... .(jpg|png|bmp|jpeg|gif)
-
-
-        Bitmap bitmap = mImageCache.get(imaUrl, reqWidth, reqHeight,null, false, null);
-        if (null != bitmap){
-            sImageView.setImageBitmap(bitmap);
-            return;
-        }
-
-
-
-        Log.e(TAG, imaUrl+" "+System.currentTimeMillis() );
-        mImageCache.get(imaUrl, reqWidth, reqHeight, sImageView, true, null);
-
-
-        sImageView.setTag(imaUrl);
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add(imaUrl);
+        setMulPicture(strings, sImageView, reqWidth, reqHeight);
 
     }
 
@@ -262,11 +246,13 @@ public class ImageLoader {
 
     }
 
-    /**
-     * 发送Handler的标识
-     */
-    public static final int MESSAGE_POST_RESULT = 0x99;
-    public static final int MESSAGE_DISK_GET_ERR = 0x98;
+
+
+    // 暴露注入的缓存策略
+    public void setImageCache(IImageCache imageCache){
+        mImageCache = imageCache;
+    }
+
 
     /**
      * 利用主线程个Loop来创建一个Handler用来给图片设置bitmap前景
@@ -276,55 +262,6 @@ public class ImageLoader {
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
-                // 网络下载图片成功
-                case MESSAGE_POST_RESULT:
-                    LoaderResult result = (LoaderResult) msg.obj;
-
-                    ImageView imageView = result.imageView;
-                    String url = (String) imageView.getTag();
-                    if (url.equals(result.url)) {
-                        imageView.setImageBitmap(result.bitmap);
-                    } else {
-                        Log.w(TAG, "要设置的控件的url发生改变, so 取消设置图片");
-                    }
-                    break;
-
-                // 从磁盘加载失败
-                case MESSAGE_DISK_GET_ERR:
-
-                    final LoaderResult errResult = (LoaderResult) msg.obj;
-
-                    // 2. 创建一个Runable调用同步加载的方法去获取Bitmap
-                    Runnable loadBitmapTask = new Runnable() {
-                        @Override
-                        public void run() {
-                            Bitmap bitmap = null;
-                            // 根据默认缓存添加的分支, 网络下载的输入流直接存入磁盘, 先进行bitmap转换可能会影响到原图片的大小
-                            boolean result = downloadFirstDiskToCache(errResult.url);
-                            if (result){
-                                if (mImageCache instanceof DefaultImageCache){
-                                    bitmap = ((DefaultImageCache) mImageCache).loadBitmapFromDiskCache(errResult.url, errResult.reqWidth, errResult.reqHeight);
-                                }
-                            }else{
-                                // 通用逻辑, 从网络下载之后, 先把bitmap存入硬盘然后返回bitmap
-                                // 一般情况下不会走此逻辑, 为了保险起见, 和后续扩展其他实现类可以保证bitmap会被添加到IImageView的put()回调中
-                                bitmap = downloadBitmapFromUrl(errResult.url, errResult.reqWidth, errResult.reqHeight);
-                            }
-
-                            if (bitmap != null) {
-                                LoaderResult loaderResult = new LoaderResult(errResult.imageView, errResult.url,bitmap, errResult.reqWidth, errResult.reqHeight);
-                                mMainHandler.obtainMessage(MESSAGE_POST_RESULT, loaderResult).sendToTarget();
-                                return;
-                            }
-
-                            Log.e(TAG, "在磁盘获取缓存失败发送handler后, 无法从网络获取到bitmap对象!!! " );
-                        }
-                    };
-                    // 添加任务到线程池
-                    THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
-                    break;
-
-
                 // 多张图片在磁盘未获取到全部的bitmap
                 case MESSAGE_MULTI_DISK_GET_ERR:
 
@@ -345,7 +282,7 @@ public class ImageLoader {
                                 }else{
                                     // 通用逻辑, 从网络下载之后, 先把bitmap存入硬盘然后返回bitmap
                                     // 一般情况下不会走此逻辑, 为了保险起见, 和后续扩展其他实现类可以保证bitmap会被添加到IImageView的put()回调中
-                                    //bitmap = downloadBitmapFromUrl(noLoadUrl, diskGetErrRequest.reqWidth, diskGetErrRequest.reqHeight);
+                                    bitmap = downloadBitmapFromUrl(noLoadUrl, diskGetErrRequest.reqWidth, diskGetErrRequest.reqHeight);
                                 }
 
                                 // 判断网络加载是否成功
@@ -366,9 +303,6 @@ public class ImageLoader {
                         // 添加任务到线程池
                         THREAD_POOL_EXECUTOR.execute(loadMultiTask);
                     }
-
-
-
                     break;
 
                 // 多张图片从磁盘获取成功
@@ -394,26 +328,9 @@ public class ImageLoader {
                     super.handleMessage(msg);
 
             }
-
         }
     };
 
-    static class LoaderResult {
-        public ImageView imageView;
-        public String url;
-        public Bitmap bitmap;
-        public int reqWidth;
-        public int reqHeight;
-
-        public LoaderResult(ImageView imageview, String urlStr, Bitmap bitmap, int reqWidth, int reqHeight) {
-            imageView = imageview;
-            url = urlStr;
-            this.bitmap = bitmap;
-            this.reqWidth = reqWidth;
-            this.reqHeight = reqHeight;
-
-        }
-    }
 
     private void matchUrlLink( RequestBean req){
         int errNum = 0;

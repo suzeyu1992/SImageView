@@ -56,9 +56,9 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
         for (int i = 0; i < 1; i++) {
             urls.add("http://szysky.com/2016/12/05/%E5%B9%B4%E7%BB%88%E7%A6%8F%E5%88%A9-SImageView%E5%AE%9E%E7%94%A8%E7%9A%84%E5%9B%BE%E7%89%87%E6%8E%A7%E4%BB%B6/sample_2.gif");
-//            urls.add("http://img9.dzdwl.com/img/11543935W-1.jpg");
-//            urls.add("http://img02.tooopen.com/images/20160408/tooopen_sy_158723161481.jpg");
-//            urls.add("http://img02.tooopen.com/images/20160404/tooopen_sy_158262392146.jpg");
+            urls.add("http://img9.dzdwl.com/img/11543935W-1.jpg");
+            urls.add("http://img02.tooopen.com/images/20160408/tooopen_sy_158723161481.jpg");
+            urls.add("http://img02.tooopen.com/images/20160404/tooopen_sy_158262392146.jpg");
 //            urls.add("http://img02.tooopen.com/images/20160318/tooopen_sy_156339294124.jpg");
 //            urls.add("http://img06.tooopen.com/images/20160823/tooopen_sy_176393394325.jpg");
 //            urls.add("http://img06.tooopen.com/images/20160821/tooopen_sy_176144979595.jpg");
@@ -80,6 +80,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         ImageLoader.getInstance(getApplicationContext()).setMulPicture(urls, sImageViewForHttp, 0,0);
+//        ImageLoader.getInstance(getApplicationContext()).setPicture("http://img9.dzdwl.com/img/11543935W-1.jpg", sImageViewForHttp, 0,0);
 
     }
 

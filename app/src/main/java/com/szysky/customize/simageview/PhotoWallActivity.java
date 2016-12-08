@@ -153,7 +153,7 @@ public class PhotoWallActivity extends AppCompatActivity {
 //            if (mCanLoadForPhoneNet && mIsGridViewIdle){
                 // 加载图片
                // mImageLoader.setImageView(mImageView).url(mUrls.get(position));
-                mImageLoader.setPicture(mUrls.get(position), mImageView,0,0);
+               // mImageLoader.setPicture(mUrls.get(position), mImageView,0,0);
             }
 
 

@@ -102,12 +102,11 @@ public class DefaultImageCache implements IImageCache {
     @Override
     public Bitmap get(final String url, final int reqWidth, final int reqHeight, final ImageView imageView, boolean isDiskCacheGet, final RequestBean bean) {
         final long entry = System.currentTimeMillis();
-        Bitmap bitmap = null;
         // 从内存缓存获取
         if (!isDiskCacheGet) {
             // 1.从内存中读取
             String key = keyFormUrl(url);
-            bitmap = getBitmapFromMemoryCache(key);
+            Bitmap bitmap = getBitmapFromMemoryCache(key);
             if (bitmap != null) {
                 Log.d(TAG, "loadBitmap --> 图片从内存中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
                 return bitmap;
@@ -115,7 +114,7 @@ public class DefaultImageCache implements IImageCache {
         }else{
             // 2.从磁盘缓存加载
             // 首先判断是否是多张图片加载
-            if ((bean != null) &&(bean.loadTotal > 1)){
+            if ((bean != null) &&(bean.loadTotal > 0)){
 
                 // 读取硬盘属于耗时操作, 使用子线程
                 Runnable loadBitmapTask = new Runnable(){
@@ -152,35 +151,6 @@ public class DefaultImageCache implements IImageCache {
                 ImageLoader.THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
                 return null;
             }
-
-
-
-            // 2. 创建一个Runable调用同步加载的方法去获取Bitmap
-            imageView.setTag(url);
-
-            Runnable loadBitmapTask = new Runnable() {
-                @Override
-                public void run() {
-                    Bitmap tempBmp = null;
-
-                    ImageLoader.LoaderResult loaderResult;
-                    tempBmp  = loadBitmapFromDiskCache(url, reqWidth, reqHeight);
-                    if (tempBmp != null) {
-                        Log.d(TAG, "loadBitmap --> 图片从磁盘中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
-                        loaderResult = new ImageLoader.LoaderResult(imageView, url, tempBmp, reqWidth, reqHeight);
-                        mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_POST_RESULT, loaderResult).sendToTarget();
-                    }else{
-                        // 磁盘缓存获取失败
-                        loaderResult = new ImageLoader.LoaderResult(imageView, url, null, reqWidth, reqHeight);
-                        mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_DISK_GET_ERR, loaderResult).sendToTarget();
-                    }
-
-
-                }
-            };
-
-            // 添加任务到线程池
-            ImageLoader.THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
         }
 
         return null;
@@ -214,7 +184,7 @@ public class DefaultImageCache implements IImageCache {
         // 根据url算出md5值
         String key = keyFormUrl(url);
         BufferedOutputStream out = null;
-        DiskLruCache.Editor editor = null;
+        DiskLruCache.Editor editor = null ;
 
         try {
             // 开始对磁盘缓存的一个存储对象进行操作
@@ -238,8 +208,6 @@ public class DefaultImageCache implements IImageCache {
                 //加载成功进行 提交操作
                 editor.commit();
 
-                mDiskLruCache.flush();
-
 
                 result = true;
             }
@@ -247,14 +215,27 @@ public class DefaultImageCache implements IImageCache {
             Log.i(TAG, "putRawStream: ==> "+"原始图片流写入磁盘缓存成功");
         } catch (IOException e) {
             Log.w(TAG, "putRawStream: ==> "+"原始图片流写入磁盘缓存失败 ", e);
+            // 进行数据回滚
+            if (null != editor){
+                try {
+                    editor.abort();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
             result = false;
         }finally {
             if (out != null){
                 CloseUtil.close(out);
             }
-            return result;
-
+            try {
+                mDiskLruCache.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        return result;
     }
 
 
@@ -309,10 +290,10 @@ public class DefaultImageCache implements IImageCache {
             return null;
         }
 
-        Bitmap bitmap = null;
+        Bitmap bitmap ;
         String key = keyFormUrl(url);
 
-        DiskLruCache.Snapshot snapshot = null;
+        DiskLruCache.Snapshot snapshot ;
         try {
             snapshot = mDiskLruCache.get(key);
             if (null != snapshot) {

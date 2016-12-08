@@ -26,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RequestBean {
     public SImageView sImageView;
-    public List<String> urls;
+    public List<String> urls = new ArrayList<>();
     /**
      * 还未进行url处理的地址集合
      */
@@ -147,8 +147,9 @@ public class RequestBean {
 
                 // 进行赋值初始化
                 req.startTime = System.currentTimeMillis();
-                req.urls = urls;
+                req.urls.addAll(urls);
                 req.sImageView = sImageView;
+                req.loadTotal = req.urls.size();
                 req.reqHeight = reqHeight;
                 req.reqWidth = reqWidth;
                 req.getTag();

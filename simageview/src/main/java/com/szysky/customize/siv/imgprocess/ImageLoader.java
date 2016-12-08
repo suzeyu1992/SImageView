@@ -157,6 +157,7 @@ public class ImageLoader {
 
         // 判断从内存获取是否全部加载完毕, 如果没有, 尝试从磁盘中获取
         if (requestBean.isLoadSuccessful()){
+            Log.i(TAG, "多张图片的获取时间  >> 内存: "+(System.currentTimeMillis() - requestBean.startTime) + " ms");
             sImageView.setImages(requestBean.asListBitmap());
             return ;
         }
@@ -288,10 +289,59 @@ public class ImageLoader {
                     THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
                     break;
 
+
+                case MESSAGE_MULTI_DISK_GET_ERR:
+
+                    final RequestBean diskGetErrRequest = (RequestBean) msg.obj;
+
+                    for (final String noLoadUrl: diskGetErrRequest.checkNoLoadUrl()) {
+                        // 2. 创建一个Runable调用同步加载的方法去获取Bitmap
+                        Runnable loadMultiTask = new Runnable() {
+                            @Override
+                            public void run() {
+                                Bitmap bitmap = null;
+                                // 根据默认缓存添加的分支, 网络下载的输入流直接存入磁盘, 先进行bitmap转换可能会影响到原图片的大小
+                                boolean result = downloadFirstDiskToCache(noLoadUrl);
+                                if (result){
+                                    if (mImageCache instanceof DefaultImageCache){
+                                        bitmap = ((DefaultImageCache) mImageCache).loadBitmapFromDiskCache(noLoadUrl, diskGetErrRequest.reqWidth, diskGetErrRequest.reqHeight);
+                                    }
+                                }else{
+                                    // 通用逻辑, 从网络下载之后, 先把bitmap存入硬盘然后返回bitmap
+                                    // 一般情况下不会走此逻辑, 为了保险起见, 和后续扩展其他实现类可以保证bitmap会被添加到IImageView的put()回调中
+                                    bitmap = downloadBitmapFromUrl(noLoadUrl, diskGetErrRequest.reqWidth, diskGetErrRequest.reqHeight);
+                                }
+
+                                // 判断网络加载是否成功
+                                if (bitmap != null) {
+                                    diskGetErrRequest.addBitmap(noLoadUrl, bitmap);
+                                }else{
+                                    diskGetErrRequest.addBitmap(noLoadUrl, null);
+                                    Log.e(TAG, "多张图片下载失败, >>>> 图片地址:"+noLoadUrl);
+                                }
+
+                                // 判断是否全部加载完成, 如果全部加载完成, 那么发送通知到Handler
+                                if (diskGetErrRequest.isLoadSuccessful()){
+                                    mMainHandler.obtainMessage(ImageLoader.MESSAGE_MULTI_DISK_GET_OK, diskGetErrRequest).sendToTarget();
+                                }
+
+                            }
+                        };
+                        // 添加任务到线程池
+                        THREAD_POOL_EXECUTOR.execute(loadMultiTask);
+                    }
+
+
+
+                    break;
+
                 // 多张图片从磁盘获取成功
                 case MESSAGE_MULTI_DISK_GET_OK:
 
                     RequestBean requestOk = (RequestBean) msg.obj;
+                    // 打印多张图片的处理时间
+                    Log.i(TAG, "多张图片的获取时间  >> 磁盘或者网络: "+(System.currentTimeMillis() - requestOk.startTime) + " ms");
+
                     // 进行控件是否需要有效的判断
                     if (requestOk.sImageView.getTag().equals(requestOk.getTag())){
                         requestOk.sImageView.setImages(requestOk.asListBitmap());

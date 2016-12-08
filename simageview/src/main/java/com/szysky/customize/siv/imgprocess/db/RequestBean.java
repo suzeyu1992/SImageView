@@ -77,7 +77,9 @@ public class RequestBean {
      * 添加网址对应的bitmap
      */
     public  void addBitmap(String url, Bitmap bitmap){
-        bitmaps.put(url, bitmap);
+        if (bitmap != null){
+            bitmaps.put(url, bitmap);
+        }
         noLoadUrls.remove(url);
         synchronized (RequestBean.class){
             loadedNum++;

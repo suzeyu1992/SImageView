@@ -121,22 +121,28 @@ public class DefaultImageCache implements IImageCache {
                 Runnable loadBitmapTask = new Runnable(){
                     @Override
                     public void run() {
+                        int processNum = 0;
+
                         // 对url对应value值为null的元素进行磁盘获取
                         for (String url : bean.checkNoLoadUrl()) {
                             Bitmap checkBitmap  = loadBitmapFromDiskCache(url, bean.reqWidth, bean.reqHeight);
                             // 如果不等于空进行有效添加
                             if (null != checkBitmap){
                                bean.addBitmap(url, checkBitmap);
+                                processNum++;
                             }
                         }
 
                         // 判断磁盘获取结束后是否全部完毕
                         if (!bean.isLoadSuccessful()){
-                            // 通知Handler多张图片从磁盘获取为完成
+                            // 通知Handler多张图片从磁盘获取为完成, 但是还未全部完成
                             mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_MULTI_DISK_GET_ERR, bean).sendToTarget();
+                            Log.i(TAG, "info>>>>磁盘缓存获取的图片数量: "+processNum +" 张, 还剩 "+bean.checkNoLoadUrl().length+" 张图片需要网络下载");
                         }else {
                             // 通知成功并处理
                             mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_MULTI_DISK_GET_OK, bean).sendToTarget();
+                            Log.i(TAG, "info>>>>磁盘缓存获取的图片数量: "+processNum +"    图片全部处理完毕 ");
+
                         }
 
                     }

@@ -3,6 +3,7 @@ package com.szysky.customize.siv.imgprocess;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 
 import java.io.FileDescriptor;
 
@@ -55,12 +56,16 @@ public class ImageCompression {
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFileDescriptor(fd, null, options);
 
+
+
         //Calculate Size  计算要设置的采样率 并把值设置到option上
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+
         // 关闭只加载属性模式, 并重新加载的时候传入自定义的options对象
         options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFileDescriptor(fd, null, options);
+        return BitmapFactory.decodeFileDescriptor(fd, new Rect(50,50,50,50), options);
 
     }
 

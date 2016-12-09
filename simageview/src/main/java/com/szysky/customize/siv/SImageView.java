@@ -207,7 +207,7 @@ public class SImageView extends View {
 
         // 宽度处理
         if (widthSpecMode == MeasureSpec.UNSPECIFIED){
-            // 如果是UNSPECIFIED模式需要自定义大小 match_parent
+            // 如果是UNSPECIFIED模式需要自定义大小 内部控件match_parent 外部控件是warp_content
             if (mDrawableWidth > 0){
                 w = mDrawableWidth;
             }else if (heightSize > 0){

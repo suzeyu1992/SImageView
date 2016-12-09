@@ -1,17 +1,11 @@
 package com.szysky.customize.siv.imgprocess.db;
 
 import android.graphics.Bitmap;
-import android.os.Message;
-import android.widget.ImageView;
 
 import com.szysky.customize.siv.SImageView;
 import com.szysky.customize.siv.util.SecurityUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;

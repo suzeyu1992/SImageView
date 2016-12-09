@@ -139,6 +139,7 @@ public class ImageLoader {
      * @param sImageView  图片设置的控件
      * @param reqWidth  需要大小, 可以为0
      * @param reqHeight 需要大小, 可以为0
+     *
      */
     public void setPicture(final String imaUrl, final SImageView sImageView, final int reqWidth, final int reqHeight){
 
@@ -181,7 +182,7 @@ public class ImageLoader {
         sImageView.setBitmap(mLoadingBmp);
 
         // 开始从磁盘缓存获取
-        mImageCache.get(null, 0,0, null,true, requestBean);
+        mImageCache.get(null, requestBean.reqWidth, requestBean.reqHeight, null,true, requestBean);
 
 
     }

@@ -23,47 +23,47 @@
         android:layout_width="100dp"
         android:layout_height="100dp" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="0"/>-->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:orientation="horizontal">-->
 
-        <Button
-            android:id="@+id/btn_inside"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:layout_margin="5dp"
-            android:textSize="10dp"
-            android:text="center_inside缩放"/>
+        <!--<Button-->
+            <!--android:id="@+id/btn_inside"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center"-->
+            <!--android:layout_margin="5dp"-->
+            <!--android:textSize="10dp"-->
+            <!--android:text="center_inside缩放"/>-->
 
-        <Button
-            android:id="@+id/btn_crop"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:layout_margin="5dp"
-            android:textSize="10dp"
+        <!--<Button-->
+            <!--android:id="@+id/btn_crop"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center"-->
+            <!--android:layout_margin="5dp"-->
+            <!--android:textSize="10dp"-->
 
-            android:text="center_crop缩放"/>
+            <!--android:text="center_crop缩放"/>-->
 
-        <Button
-            android:id="@+id/btn_fix_xy"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:layout_margin="5dp"
-            android:textSize="10dp"
+        <!--<Button-->
+            <!--android:id="@+id/btn_fix_xy"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center"-->
+            <!--android:layout_margin="5dp"-->
+            <!--android:textSize="10dp"-->
 
-            android:text="fix_xy缩放"/>
+            <!--android:text="fix_xy缩放"/>-->
 
-    </LinearLayout>
+    <!--</LinearLayout>-->
 </LinearLayout>

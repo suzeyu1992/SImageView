@@ -156,8 +156,8 @@ public class ImageLoader {
      */
     public void setMulPicture(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight){
 
-
-        RequestBean requestBean = RequestBean.obtain(urls, sImageView, reqWidth, reqHeight);
+        ArrayList<String> strings = new ArrayList<>(urls);
+        RequestBean requestBean = RequestBean.obtain(strings, sImageView, reqWidth, reqHeight);
 
         // 进行图片地址有效性匹配
         matchUrlLink(requestBean);

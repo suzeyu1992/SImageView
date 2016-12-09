@@ -99,7 +99,7 @@ public class GraphsTemplate {
                 return;
         }
         if ((scale <= 1) && (scale >= 0.9f)){
-            canvas.drawBitmap(bitmap, offsetX, offsetY, null);
+            canvas.drawBitmap(bitmap, offsetX + dx, offsetY + dy, null);
         }else{
             canvas.drawBitmap(Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true),offsetX + dx, offsetY + dy, null);
         }

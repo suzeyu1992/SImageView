@@ -28,6 +28,7 @@ import com.szysky.customize.siv.util.UIUtils;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -494,7 +495,7 @@ public class SImageView extends View {
      * @param bitmaps 接收一个图片集合
      */
     public void setImages(List<Bitmap> bitmaps){
-        updateForList(bitmaps);
+        updateForList(bitmaps, null);
     }
 
     /**
@@ -555,7 +556,6 @@ public class SImageView extends View {
                 }
 
                 ImageLoader.getInstance(mContext).setPicture(url, this, reqWid, reqHeight);
-
             }
         }else{
             if (null != bitmap){
@@ -572,13 +572,34 @@ public class SImageView extends View {
 
     }
 
-    private void updateForList(List<Bitmap> bitmaps) {
+    private void updateForList(List<Bitmap> bitmaps, String[] urls) {
 
-        if ((null != bitmaps) && (bitmaps.size() >0)){
-            mInfo.readyBmp.clear();
+        if((urls == null) && (bitmaps == null)) return;
+
+        mInfo.readyBmp.clear();
+
+        // 分开网络加载 和 bitmap处理
+        if ((urls != null) && (urls.length>1)){
+
+
+           int temp = mInfo.height > mInfo.width ? mInfo.width : mInfo.height;
+
+            // 这里进行简单的处理判断,  不做细分, 过多的不同分辨率进行缓存的key不一定很适用, 因为图片从磁盘或者网络获取的时候,
+            // 是通过inJustDecodeBounds, 做一个笼统的2的次幂缩放. 适当的取一定情况下即可.
+            if (urls.length < 4){
+                temp /= 2;
+            }else{
+                temp /= 3;
+            }
+
+            ImageLoader.getInstance(mContext).setMulPicture(Arrays.asList(urls), this, temp, temp);
+
+        }else if ((null != bitmaps) && (bitmaps.size() >0)){
             for (Bitmap bitmap : bitmaps) {
                 mInfo.readyBmp.add(bitmap);
             }
+            // 布局信息测量获取
+            sizeMeasure();
             invalidate();
         }
     }
@@ -621,6 +642,8 @@ public class SImageView extends View {
     public void setImageUrls(String... imageUrls) {
         if (imageUrls.length == 1){
             updateForOne(null, imageUrls[0]);
+        }else if (imageUrls.length > 1){
+            updateForList(null, imageUrls);
         }
     }
 

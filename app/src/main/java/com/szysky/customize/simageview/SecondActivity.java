@@ -99,9 +99,14 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        String[] arrs = {"1","2"};
 //                        ImageLoader.getInstance(getApplicationContext()).setMulPicture(urls, sImageViewForHttp, sImageViewForHttp.getWidth(),sImageViewForHttp.getHeight());
-                       sImageViewForHttp.setImageUrls("http://img9.dzdwl.com/img/11543935W-1.jpg");//.setPicture("http://img9.dzdwl.com/img/11543935W-1.jpg", sImageViewForHttp, 0,0);
+                       sImageViewForHttp.setImageUrls("http://img9.dzdwl.com/img/11543935W-1.jpg",
+                               "http://img06.tooopen.com/images/20160821/tooopen_sy_176144979595.jpg",
+                               "http://img02.tooopen.com/images/20160408/tooopen_sy_158723161481.jpg",
+                               "http://img05.tooopen.com/images/20150417/tooopen_sy_119014046478.jpg",
+                               "http://img9.dzdwl.com/img/11543935W-1.jpg"
+                               //, "http://img05.tooopen.com/images/20150204/tooopen_sy_80359399983.jpg"
+                               );//.setPicture("http://img9.dzdwl.com/img/11543935W-1.jpg", sImageViewForHttp, 0,0);
 
                     }
                 });

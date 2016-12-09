@@ -66,10 +66,10 @@ public class GraphsTemplate {
                 // 保持图片的完整 , 尽量缩小.  比例不变
                 if (bitmap.getWidth() > bitmap.getHeight()){
                     scale = sideHeight / bitmap.getWidth();
-                    dy = (sideHeight - bitmap.getWidth() * scale) * 0.5f;
+                    dy = (sideHeight - bitmap.getHeight() * scale) * 0.5f;
                 }else{
                     scale = sideHeight / bitmap.getHeight();
-                    dx = (sideHeight - bitmap.getHeight() * scale) * 0.5f;
+                    dx = (sideHeight - bitmap.getWidth() * scale) * 0.5f;
                 }
                 matrix.postScale(scale, scale);
                 matrix.postTranslate(dx, dy);
@@ -101,7 +101,7 @@ public class GraphsTemplate {
         if ((scale <= 1) && (scale >= 0.9f)){
             canvas.drawBitmap(bitmap, offsetX, offsetY, null);
         }else{
-            canvas.drawBitmap(Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true),offsetX, offsetY, null);
+            canvas.drawBitmap(Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true),offsetX + dx, offsetY + dy, null);
         }
     }
 

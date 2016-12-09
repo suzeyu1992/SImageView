@@ -20,6 +20,7 @@ import android.view.View;
 import com.szysky.customize.siv.effect.ConcreteDrawingStrategy;
 import com.szysky.customize.siv.effect.IDrawingStrategy;
 import com.szysky.customize.siv.effect.NormalOnePicStrategy;
+import com.szysky.customize.siv.imgprocess.ImageLoader;
 import com.szysky.customize.siv.range.ILayoutManager;
 import com.szysky.customize.siv.range.QQLayoutManager;
 import com.szysky.customize.siv.util.UIUtils;
@@ -83,6 +84,8 @@ public class SImageView extends View {
     private int mPaddingRight;
     private int mPaddingTop;
     private int mPaddingBottom;
+    private static final String STR_EMPTY = "";
+
 
 
     /**
@@ -98,6 +101,8 @@ public class SImageView extends View {
         public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;  // 测量过程返回的每个元素的对应位置信息
         public int displayType ;                                 // 子元素的显示类型
         public int scaleType ;                                   // 矩形的缩放类型
+
+
 
         @Override
         protected Object clone() {
@@ -161,6 +166,7 @@ public class SImageView extends View {
 
     public SImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mContext = getContext();
 
         // 获得xml属性
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SImageView, defStyleAttr, 0);
@@ -319,8 +325,7 @@ public class SImageView extends View {
             Log.i(TAG, "一张图片执行时间: "+ (System.nanoTime() - l)/1000000f+"毫秒");
 
         }else if (mInfo.readyBmp.size() > 0 ){
-            // measure布局参数
-            mInfo.coordinates = mLayoutManager.calculate(mInfo.width, mInfo.height, mInfo.readyBmp.size());
+
 
             if (mInfo.coordinates == null) return;
             // layout 子元素布局
@@ -364,7 +369,13 @@ public class SImageView extends View {
     }
 
 
-
+    /**
+     * 对多张图片进行数据测量
+     */
+    private void sizeMeasure(){
+        // measure布局参数
+        mInfo.coordinates = mLayoutManager.calculate(mInfo.width, mInfo.height, mInfo.readyBmp.size());
+    }
 
 
 
@@ -493,22 +504,72 @@ public class SImageView extends View {
         if (id != 0) {
             Drawable drawable = getResources().getDrawable(id);
             if ( null != drawable){
-                updateForOne(getBitmapFromDrawable(drawable));
+                updateForOne(getBitmapFromDrawable(drawable) , STR_EMPTY);
             }
         }
     }
 
 
     public void setDrawable(Drawable drawable){
-        updateForOne(getBitmapFromDrawable(drawable));
+        updateForOne(getBitmapFromDrawable(drawable), STR_EMPTY );
     }
 
-    private void updateForOne(Bitmap bitmap){
-        if (null != bitmap){
+    private void updateForOne(Bitmap bitmap, String url){
+
+        // 本地加载, 和网络加载只能共存一个. 先判断rul
+
+        // 只有有一个url字符串和关闭了单张图片的开关才有计算的意义
+        if (!url.isEmpty()){
+            // 清空上一次的显示数据
             mInfo.readyBmp.clear();
-            mInfo.readyBmp.add(bitmap);
-            invalidate();
+
+            if (isCloseNormalOnePicLoad()){
+                mInfo.readyBmp.add(null);
+                sizeMeasure();
+                ImageLoader.getInstance(mContext).setPicture(url, this, mInfo.coordinates.get(0).innerWidth, mInfo.coordinates.get(0).innerHeight);
+            }else{
+                int reqWid = 0;
+                int reqHeight = 0;
+
+                int minSide = mInfo.height >=  mInfo.width ? mInfo.width : mInfo.height;
+
+                // 矩形比较特殊存在3中情况
+                if (mCurrentDisplayShape == TYPE_RECT){
+                    switch (mScaleType){
+                        case SCALE_TYPE_CENTER_INSIDE:
+                            reqHeight = reqWid = minSide;
+                            break;
+
+                        case SCALE_TYPE_CENTER_CROP:
+                        case SCALE_TYPE_FIX_XY:
+                            reqHeight = mInfo.height;
+                            reqWid = mInfo.width;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }else{
+                    // 其他图形基本都是在单张的时候, 基本都是控件的最小边
+                    reqHeight = reqWid = minSide;
+                }
+
+                ImageLoader.getInstance(mContext).setPicture(url, this, reqWid, reqHeight);
+
+            }
+        }else{
+            if (null != bitmap){
+                mInfo.readyBmp.clear();
+                mInfo.readyBmp.add(bitmap);
+                if (isCloseNormalOnePicLoad()){
+                    sizeMeasure();
+                }
+                // 测量图片大小
+                invalidate();
+            }
         }
+
+
     }
 
     private void updateForList(List<Bitmap> bitmaps) {
@@ -526,7 +587,7 @@ public class SImageView extends View {
      * 设置展示的图像的bitmap
      */
     public void setBitmap(Bitmap bitmap){
-        updateForOne(bitmap);
+        updateForOne(bitmap , STR_EMPTY);
     }
 
     private Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -553,6 +614,13 @@ public class SImageView extends View {
             return bitmap;
         } catch (OutOfMemoryError e) {
             return null;
+        }
+    }
+
+
+    public void setImageUrls(String... imageUrls) {
+        if (imageUrls.length == 1){
+            updateForOne(null, imageUrls[0]);
         }
     }
 

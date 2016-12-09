@@ -61,7 +61,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 //            urls.add("http://img9.dzdwl.com/img/11543935W-1.jpg");
 //            urls.add("http://img02.tooopen.com/images/20160408/tooopen_sy_158723161481.jpg");
 //            urls.add("http://img02.tooopen.com/images/20160404/tooopen_sy_158262392146.jpg");
-//            urls.add("http://img02.tooopen.com/images/20160404/tooopen_sy_158262392146.jpg");
 //            urls.add("http://img02.tooopen.com/images/20160318/tooopen_sy_156339294124.jpg");
             urls.add("http://img06.tooopen.com/images/20160823/tooopen_sy_176393394325.jpg");
 //            urls.add("http://img06.tooopen.com/images/20160821/tooopen_sy_176144979595.jpg");
@@ -83,7 +82,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         //ImageLoader.getInstance(getApplicationContext()).setPicture("http://img9.dzdwl.com/img/11543935W-1.jpg", sImageViewForHttp, 0,0);
-        ImageLoader.getInstance(getApplicationContext()).setMulPicture(urls, sImageViewForHttp, 150,150);
 
     }
 
@@ -94,7 +92,21 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         super.onAttachedToWindow();
         final SImageView sImageViewForHttp = (SImageView) findViewById(R.id.siv_url);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SystemClock.sleep(1000);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String[] arrs = {"1","2"};
+//                        ImageLoader.getInstance(getApplicationContext()).setMulPicture(urls, sImageViewForHttp, sImageViewForHttp.getWidth(),sImageViewForHttp.getHeight());
+                       sImageViewForHttp.setImageUrls("http://img9.dzdwl.com/img/11543935W-1.jpg");//.setPicture("http://img9.dzdwl.com/img/11543935W-1.jpg", sImageViewForHttp, 0,0);
 
+                    }
+                });
+            }
+        }).start();
 
     }
 

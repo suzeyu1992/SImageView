@@ -60,7 +60,7 @@ public class SImageView extends View {
     /**
      *  默认单图片处理策略的开关标记  true: 关闭   false: 开启
      */
-    private boolean mCloseNormalOnePicLoad = false;
+    private boolean mCloseNormalOnePicLoad = true;
 
     /**
      *  具体子元素的 measure布局 策略,

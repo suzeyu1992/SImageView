@@ -135,11 +135,11 @@ public class GraphsTemplate {
         if (borderWidth >0 && borderPaint != null){
             // 如果有bitmap, 描边应该以bitmap的宽高设置描边配置, 否则可能会出现描边缺失
             if (null != bitmap){
-                float temp = borderWidth / 2.5f;
+                float temp = borderWidth / 2.2f ;
                 rectF.left += temp;
                 rectF.top += temp;
-                rectF.right = bitmap.getWidth() - temp;
-                rectF.bottom = bitmap.getHeight() - temp;
+                rectF.right =canvas.getWidth() - temp;
+                rectF.bottom = canvas.getHeight() - temp;
                 canvas.drawRoundRect(rectF,cornerX*0.8f,cornerY*0.8f , borderPaint);
 
             }else{

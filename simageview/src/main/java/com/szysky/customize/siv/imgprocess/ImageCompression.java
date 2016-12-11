@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.util.Log;
 
 import java.io.FileDescriptor;
 
@@ -17,6 +18,8 @@ import java.io.FileDescriptor;
  */
 
 public class ImageCompression {
+
+    private static final String TAG = ImageCompression.class.getName();
 
     /**
      * 对一个Resources的资源文件进行指定长宽来加载进内存, 并把这个bitmap对象返回
@@ -61,7 +64,7 @@ public class ImageCompression {
         //Calculate Size  计算要设置的采样率 并把值设置到option上
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
+//        options.inPreferredConfig = Bitmap.Config.RGB_565;
 
         // 关闭只加载属性模式, 并重新加载的时候传入自定义的options对象
         options.inJustDecodeBounds = false;
@@ -71,6 +74,7 @@ public class ImageCompression {
 
     /**
      *  一个计算工具类的方法, 传入图片的属性对象和 想要实现的目标大小. 通过计算得到采样值
+     *  如果目标大于原图片那么是不进行处理的.
      */
     private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
 
@@ -94,7 +98,7 @@ public class ImageCompression {
                 inSampleSize *= 2;
             }
         }
-
+        Log.i(TAG, "进行图片的inSampleSize计算的值: "+inSampleSize);
         return inSampleSize;
 
     }

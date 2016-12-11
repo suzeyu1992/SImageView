@@ -128,7 +128,7 @@ public class ConcreteDrawingStrategy implements IDrawingStrategy {
 
 
 
-        int half = (int) (maxHeight > maxWidth ? maxWidth : maxHeight);
+        //int half = (int) (maxHeight > maxWidth ? maxWidth : maxHeight);
         adjustMaskBitmapDisplay(canvas,newBitmap, (int)maxWidth,
                 (int)maxHeight, childTotal > 5 ? 360:rotations[childTotal-1][curChild-1], mSpacing , mIsPicRotate , display);
 

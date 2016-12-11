@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 import com.szysky.customize.siv.imgprocess.db.RequestBean;
 import com.szysky.customize.siv.util.CloseUtil;
+import com.szysky.customize.siv.util.LogUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -105,7 +106,7 @@ public class DefaultImageCache implements IImageCache {
         // 从内存缓存获取
         if (!isDiskCacheGet) {
             // 1.从内存中读取
-            String key = keyFormUrl(url);
+            String key = keyFormUrlAndWH(url , reqWidth, reqHeight);
             Bitmap bitmap = getBitmapFromMemoryCache(key);
             if (bitmap != null) {
                 Log.d(TAG, "loadBitmap --> 图片从内存中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
@@ -161,15 +162,15 @@ public class DefaultImageCache implements IImageCache {
     @Override
     public void put(String url, Bitmap bmp , int reqWidth, int reqHeight) {
 
-        if (reqHeight == 0 || reqWidth == 0){
+
             // 存储原始图片
             long l = System.currentTimeMillis();
+            // 存储到磁盘
             putBitmap(url, bmp);
             Log.e(TAG, "磁盘存储的时间 "+(System.currentTimeMillis()-l) );
-            addBitmapToMemoryCache(url, bmp);
+            addBitmapToMemoryCache(url,reqWidth, reqHeight, bmp);
 
-        }else{
-        }
+
     }
 
     @Override
@@ -271,9 +272,9 @@ public class DefaultImageCache implements IImageCache {
 
             }
 
-            Log.i(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存成功");
+            Log.i(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存成功, 地址:"+url);
         } catch (IOException e) {
-            Log.w(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存失败 ", e);
+            Log.w(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存失败, 地址:"+url, e);
 
         }finally {
             if (out != null){
@@ -303,7 +304,11 @@ public class DefaultImageCache implements IImageCache {
                 bitmap = ImageCompression.decodeFixedSizeForFileDescription(fd, reqWidth, reqHeight);
 
                 if (bitmap != null) {
-                    addBitmapToMemoryCache(key, bitmap);
+
+                    LogUtil.print_i(TAG, "loadBitmapFromDiskCache(): ==> "+"从磁盘加载图片成功, \r\n   地址:"+url
+                            +"\r\n     加载到内存的图片大小  --> 宽:"+bitmap.getWidth() +"   高:"+bitmap.getHeight()
+                            +"\r\n     目标需要的大小图大小  --> 宽:"+reqWidth +"   高:"+reqHeight);
+                    addBitmapToMemoryCache(url, reqWidth, reqHeight, bitmap);
 
                 }
                 return bitmap;
@@ -320,15 +325,19 @@ public class DefaultImageCache implements IImageCache {
     /**
      * 添加bitmap对象到内存缓存中
      *
-     * @param key    根据图片的url生成的32md5值
+     * @param url    图片的url
      * @param bitmap 需要缓存的bitmap对象
      */
-    private void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+    private void addBitmapToMemoryCache(String url, int reqWidth, int reqHeight, Bitmap bitmap) {
+        String key = keyFormUrlAndWH(url, reqWidth, reqHeight);
         // 如果内存缓存中不存在, 那么才进行添加的动作
         if (null == getBitmapFromMemoryCache(key)) {
             mMemoryCache.put(key, bitmap);
-            Log.i(TAG, "loadBitmap --> 图片从内存中大小=" + bitmap.getRowBytes() * bitmap.getHeight() / 1024f /1024f + "mb");
 
+            LogUtil.print_i(TAG, "addBitmapToMemoryCache(): ==> "+"图片添加内存缓存成功, \r\n   地址:"+url
+                    +"\r\n     添加内存缓存的图片大小  --> 宽:"+bitmap.getWidth() +"   高:"+bitmap.getHeight()
+                    +"\r\n     目标需要的大小图大小    --> 宽:"+reqWidth +"   高:"+reqHeight
+                    +"\r\n     占用内存大小:"+(bitmap.getRowBytes() * bitmap.getHeight() / 1024f /1024f) + "MB");
         }
     }
 
@@ -391,6 +400,25 @@ public class DefaultImageCache implements IImageCache {
     public String keyFormUrl(String url) {
         String cacheKey;
         try {
+            MessageDigest mDigest = MessageDigest.getInstance("MD5");
+            mDigest.update(url.getBytes());
+            cacheKey = bytesToHexString(mDigest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            cacheKey = String.valueOf(url.hashCode());
+        }
+        return cacheKey;
+    }
+
+
+    /**
+     * 接收一个url地址,和宽高属性,  对其组合转换成md5值并返回, 使用与内存缓存中
+     * 转成一个32md5值
+     */
+    public String keyFormUrlAndWH(String url, int reqWidth, int reqHeight) {
+        String cacheKey;
+        try {
+            int marker = reqWidth * 17 + reqHeight * 31;
+            url += marker;
             MessageDigest mDigest = MessageDigest.getInstance("MD5");
             mDigest.update(url.getBytes());
             cacheKey = bytesToHexString(mDigest.digest());

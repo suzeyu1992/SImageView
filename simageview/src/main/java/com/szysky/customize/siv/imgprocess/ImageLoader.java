@@ -173,13 +173,13 @@ public class ImageLoader {
 
         // 判断从内存获取是否全部加载完毕, 如果没有, 尝试从磁盘中获取
         if (requestBean.isLoadSuccessful()){
-            Log.i(TAG, "多张图片的获取时间  >> 内存: "+(System.currentTimeMillis() - requestBean.startTime) + " ms");
+            Log.i(TAG, "多张图片的获取时间  >> 内存途径 : "+(System.currentTimeMillis() - requestBean.startTime) + " ms");
             sImageView.setImages(requestBean.asListBitmap());
             return ;
         }
 
-        // 设置加载中图片
-       // sImageView.setBitmap(mLoadingBmp);
+        // 设置加载中的过渡ma图片
+        sImageView.setBitmap(mLoadingBmp);
 
         // 开始从磁盘缓存获取
         mImageCache.get(null, requestBean.reqWidth, requestBean.reqHeight, null,true, requestBean);
@@ -202,7 +202,7 @@ public class ImageLoader {
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
             bitmap = BitmapFactory.decodeStream(in);
             // bitmap的缓存
-            mImageCache.put(uriStr , bitmap, 0, 0);
+            mImageCache.put(uriStr , bitmap, reqWidth, reqHeight);
 
         } catch (IOException e) {
             Log.e(TAG, ">>>>>>downloadBitmapFromUrl()   再次进行网络下载也失败");
@@ -220,7 +220,7 @@ public class ImageLoader {
      * 从网络下载图片的流直接存入磁盘, 保证图片的原大小. 并在内部进行内存缓存添加.
      *
      */
-    private boolean downloadFirstDiskToCache(String uriStr) {
+    private boolean downloadFirstDiskToCache(String uriStr)    {
 
         boolean result = false;
         HttpURLConnection urlConnection = null;

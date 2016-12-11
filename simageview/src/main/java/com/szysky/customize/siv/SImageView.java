@@ -555,16 +555,17 @@ public class SImageView extends View {
                     reqHeight = reqWid = minSide;
                 }
 
-                ImageLoader.getInstance(mContext).setPicture(url, this, reqWid, reqHeight);
+                ImageLoader.getInstance(mContext).setPicture(url, this, reqWid*4, reqHeight*4);
             }
         }else{
             if (null != bitmap){
                 mInfo.readyBmp.clear();
                 mInfo.readyBmp.add(bitmap);
                 if (isCloseNormalOnePicLoad()){
+                    // 测量图片大小
                     sizeMeasure();
                 }
-                // 测量图片大小
+
                 invalidate();
             }
         }

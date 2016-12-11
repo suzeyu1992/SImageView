@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.SystemClock;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
@@ -312,6 +313,7 @@ public class SImageView extends View {
 
         mInfo.height = getHeight() - mPaddingBottom - mPaddingTop ;
         mInfo.width = getWidth() - mPaddingLeft - mPaddingRight;
+
     }
 
 
@@ -647,10 +649,33 @@ public class SImageView extends View {
 
 
     /**
-     * 对外提供直接通过url来加载图片的方法
-     * @param imageUrls
+     * 针对某种情况下: 控件已经初始化还没有测量获得控件宽高时, 进行了url网址图片设置,
+     * 如果这个时候控件的宽高是0, 那么进行延迟发送的方式
      */
-    public void setImageUrls(String... imageUrls) {
+    private volatile int mSafetyCurrent = 0;
+    private final int MAX_SAFETY_NUM = 7;
+    private int mSleepTime = 5;
+
+    /**
+     * 对外提供直接通过url来加载图片的方法
+     * @param imageUrls 需要加载的图片地址数组
+     */
+    public void setImageUrls(final String... imageUrls) {
+
+        // 进行了控件未正确获得宽高属性的容错
+        if ((mInfo.width == 0 || mInfo.height == 0) && mSafetyCurrent < MAX_SAFETY_NUM ){
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e(TAG, "run: 进行了一次没有正确的控件宽高属性的容错"  );
+                    mSleepTime <<= 1;
+                    mSafetyCurrent++;
+                    setImageUrls(imageUrls);
+                }
+            }, mSleepTime);
+            return;
+        }
+
 
         // 对要加载的图片进行缓存
         if (imageUrls.length > 0){
@@ -659,7 +684,6 @@ public class SImageView extends View {
                 mUrlLoading.add(url);
             }
         }
-
         if (imageUrls.length == 1){
             updateForOne(null, imageUrls[0]);
         }else if (imageUrls.length > 1){

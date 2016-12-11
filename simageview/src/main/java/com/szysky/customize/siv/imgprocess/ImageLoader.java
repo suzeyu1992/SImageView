@@ -179,7 +179,7 @@ public class ImageLoader {
         }
 
         // 设置加载中图片
-        sImageView.setBitmap(mLoadingBmp);
+       // sImageView.setBitmap(mLoadingBmp);
 
         // 开始从磁盘缓存获取
         mImageCache.get(null, requestBean.reqWidth, requestBean.reqHeight, null,true, requestBean);

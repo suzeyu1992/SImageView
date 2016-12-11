@@ -99,10 +99,16 @@ public class ConcreteDrawingStrategy implements IDrawingStrategy {
         int mBitmapWidth = opeBitmap.getWidth();   // 需要处理的bitmap宽度和高度
         int mBitmapHeight = opeBitmap.getHeight();
         // 布局调整
-        float scaleX = maxWidth/(float)mBitmapWidth;
-        float scaleY = maxHeight/(float)mBitmapHeight;
-        float scaleResult = (scaleX > scaleY ? scaleX :scaleY);
-
+        int dx = 0;
+        int dy = 0;
+        float scale ;
+        if (mBitmapWidth  >  mBitmapHeight) {
+            scale = maxHeight / (float) mBitmapHeight;
+            dx = (int) ((maxWidth - mBitmapWidth * scale) /2);
+        } else {
+            scale = maxWidth / (float) mBitmapWidth ;
+            dy = (int) ((maxHeight - maxHeight * scale)  /2);
+        }
 
 
         canvas.save();
@@ -110,12 +116,12 @@ public class ConcreteDrawingStrategy implements IDrawingStrategy {
 
 
         Matrix matrix = new Matrix();
-        matrix.postScale(scaleResult,scaleResult);
+        matrix.postScale(scale,scale);
 
 
         // 缩放
-        Bitmap newBitmap = Bitmap.createBitmap(opeBitmap, 0, 0, mBitmapWidth,
-                mBitmapHeight, matrix, true);
+        Bitmap newBitmap = Bitmap.createBitmap(opeBitmap, dx < 0 ? -dx : dx, dy < 0 ? -dy : dy, opeBitmap.getWidth() + dx ,
+                opeBitmap.getHeight() + dy, matrix, true);
 
         int half = (int) (maxHeight > maxWidth ? maxWidth : maxHeight);
         adjustMaskBitmapDisplay(canvas,newBitmap, (int)maxWidth,
@@ -124,7 +130,6 @@ public class ConcreteDrawingStrategy implements IDrawingStrategy {
 
 
         canvas.restore();
-        matrix.reset();
 
     }
 

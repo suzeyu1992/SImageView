@@ -167,6 +167,12 @@ public class ImageLoader {
             Bitmap bitmap = mImageCache.get(requestBean.urls.get(i), reqWidth, reqHeight, null, false, null);
             if (null != bitmap){
                 requestBean.addBitmap(requestBean.urls.get(i), bitmap);
+            }else if (reqWidth != 0 && reqHeight != 0){
+                 bitmap = mImageCache.get(requestBean.urls.get(i), 0, 0, null, false, null);
+                if (null != bitmap){
+                    requestBean.addBitmap(requestBean.urls.get(i), bitmap);
+                }
+
             }
         }
 
@@ -267,6 +273,19 @@ public class ImageLoader {
                 case MESSAGE_MULTI_DISK_GET_ERR:
 
                     final RequestBean diskGetErrRequest = (RequestBean) msg.obj;
+
+                    // 判断在发起网络请求和进行内存, 磁盘缓存读取的之间 是否要加载的url发生了更改
+                    // 如果改变那么, 停止旧的url请求的发送, 避免资源浪费
+                    SImageView sImageView = diskGetErrRequest.sImageView;
+                    if (!diskGetErrRequest.urls.containsAll(sImageView.mUrlLoading)){
+                        // 发生了改变, 跳出发送请求的的步骤
+                        Log.w(TAG, ">>>>  控件要加载的url发生了改变\r\n"
+                                + "要加载的图片地址 --> "+diskGetErrRequest.urls.toString()
+                                + "\r\n控件当前需要加载的地址 -->  "+ sImageView.mUrlLoading.toString());
+                       return ;
+                    }
+
+
 
                     for (final String noLoadUrl: diskGetErrRequest.checkNoLoadUrl()) {
                         // 2. 创建一个Runable调用同步加载的方法去获取Bitmap

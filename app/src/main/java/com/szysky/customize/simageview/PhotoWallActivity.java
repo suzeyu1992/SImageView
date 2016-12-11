@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 
 import com.szysky.customize.simageview.util.NetWorkUtil;
+import com.szysky.customize.siv.SImageView;
 import com.szysky.customize.siv.imgprocess.ImageLoader;
 
 import java.util.ArrayList;
@@ -45,7 +46,6 @@ public class PhotoWallActivity extends AppCompatActivity {
             urls.add("http://img05.tooopen.com/images/20150417/tooopen_sy_119014046478.jpg");
             urls.add("http://img02.tooopen.com/images/20150318/tooopen_sy_82853534894.jpg");
             urls.add("http://img05.tooopen.com/images/20150204/tooopen_sy_80359399983.jpg");
-            urls.add("http://img01.tooopen.com/Downs/images/2010/4/9/sy_20100409135808693051.jpg");
             urls.add("http://pics.sc.chinaz.com/files/pic/pic9/201410/apic7065.jpg");
         }
 
@@ -137,22 +137,22 @@ public class PhotoWallActivity extends AppCompatActivity {
             if (convertView == null){
                 convertView = View.inflate(mContext, R.layout.item_photo_wall, null);
                 holder = new ViewHolder();
-                holder.mImageView = (ImageView) convertView.findViewById(R.id.iv_square);
+                holder.mImageView = (SImageView) convertView.findViewById(R.id.siv_main);
                 convertView.setTag(holder);
             }else{
                 holder = (ViewHolder) convertView.getTag();
             }
 
             // 设置默认图片
-            ImageView mImageView = holder.mImageView;
-            mImageView.setImageResource(android.R.drawable.screen_background_dark_transparent);
-
+            SImageView mImageView = holder.mImageView;
+            //mImageView.setIdRes(android.R.drawable.screen_background_dark_transparent);
+            mImageView.setImageUrls(mUrls.get(position));
 
             // 检测是否wifi 和 是否是滑动状态
             if (mCanLoadForPhoneNet){
 //            if (mCanLoadForPhoneNet && mIsGridViewIdle){
                 // 加载图片
-               // mImageLoader.setImageView(mImageView).url(mUrls.get(position));
+               //
                // mImageLoader.setPicture(mUrls.get(position), mImageView,0,0);
             }
 
@@ -161,7 +161,7 @@ public class PhotoWallActivity extends AppCompatActivity {
         }
 
         class ViewHolder{
-            private ImageView mImageView;
+            private SImageView mImageView;
         }
     }
 

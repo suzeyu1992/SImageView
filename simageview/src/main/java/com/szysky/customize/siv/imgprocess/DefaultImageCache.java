@@ -417,8 +417,10 @@ public class DefaultImageCache implements IImageCache {
     public String keyFormUrlAndWH(String url, int reqWidth, int reqHeight) {
         String cacheKey;
         try {
-            int marker = reqWidth * 17 + reqHeight * 31;
-            url += marker;
+            if (!(reqHeight == 0 || reqWidth ==0)){
+                int marker = reqWidth * 17 + reqHeight * 31;
+                url += marker;
+            }
             MessageDigest mDigest = MessageDigest.getInstance("MD5");
             mDigest.update(url.getBytes());
             cacheKey = bytesToHexString(mDigest.digest());

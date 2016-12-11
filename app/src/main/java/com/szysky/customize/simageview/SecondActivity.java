@@ -44,17 +44,16 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        //mSImageView = (SImageView) findViewById(R.id.siv_main);
+        mSImageView = (SImageView) findViewById(R.id.siv_main);
 
-//        findViewById(R.id.btn_crop).setOnClickListener(this);
-//        findViewById(R.id.btn_fix_xy).setOnClickListener(this);
-//        findViewById(R.id.btn_inside).setOnClickListener(this);
-
-        // 测试网络
-        SImageView sImageViewForHttp = (SImageView) findViewById(R.id.siv_url);
+        findViewById(R.id.btn_crop).setOnClickListener(this);
+        findViewById(R.id.btn_fix_xy).setOnClickListener(this);
+        findViewById(R.id.btn_inside).setOnClickListener(this);
 
 
-        urls = new ArrayList<>();
+
+
+       // urls = new ArrayList<>();
 
         for (int i = 0; i < 1; i++) {
 //            urls.add("http://szysky.com/2016/12/05/%E5%B9%B4%E7%BB%88%E7%A6%8F%E5%88%A9-SImageView%E5%AE%9E%E7%94%A8%E7%9A%84%E5%9B%BE%E7%89%87%E6%8E%A7%E4%BB%B6/sample_2.gif");
@@ -62,7 +61,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 //            urls.add("http://img02.tooopen.com/images/20160408/tooopen_sy_158723161481.jpg");
 //            urls.add("http://img02.tooopen.com/images/20160404/tooopen_sy_158262392146.jpg");
 //            urls.add("http://img02.tooopen.com/images/20160318/tooopen_sy_156339294124.jpg");
-            urls.add("http://img06.tooopen.com/images/20160823/tooopen_sy_176393394325.jpg");
+//            urls.add("http://img06.tooopen.com/images/20160823/tooopen_sy_176393394325.jpg");
 //            urls.add("http://img06.tooopen.com/images/20160821/tooopen_sy_176144979595.jpg");
 //            urls.add("http://img06.tooopen.com/images/20160723/tooopen_sy_171462742667.jpg");
 //            urls.add("http://img05.tooopen.com/images/20150417/tooopen_sy_119014046478.jpg");
@@ -87,54 +86,26 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
 
 
-    @Override
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        final SImageView sImageViewForHttp = (SImageView) findViewById(R.id.siv_url);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(1000);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                       sImageViewForHttp.setImageUrls("http://img9.dzdwl.com/img/11543935W-1.jpg"
-//                               ,
-//                               "http://img06.tooopen.com/images/20160821/tooopen_sy_176144979595.jpg",
-//                               "http://img02.tooopen.com/images/20160408/tooopen_sy_158723161481.jpg",
-//                               "http://img05.tooopen.com/images/20150417/tooopen_sy_119014046478.jpg",
-//                               "http://img9.dzdwl.com/img/11543935W-1.jpg"
-                               //, "http://img05.tooopen.com/images/20150204/tooopen_sy_80359399983.jpg"
-                               );//.setPicture("http://img9.dzdwl.com/img/11543935W-1.jpg", sImageViewForHttp, 0,0);
-
-//                        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.text_1);
-//                        sImageViewForHttp.setBitmap(bitmap);
-                    }
-                });
-            }
-        }).start();
-
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-//            case R.id.btn_inside:
-//                mSImageView.setScaleType(SImageView.SCALE_TYPE_CENTER_INSIDE);
-//                mSImageView.invalidate();
-//                break;
-//
-//            case R.id.btn_crop:
-//                mSImageView.setScaleType(SImageView.SCALE_TYPE_CENTER_CROP);
-//                mSImageView.invalidate();
-//                break;
-//
-//            case R.id.btn_fix_xy:
-//                mSImageView.setScaleType(SImageView.SCALE_TYPE_FIX_XY);
-//                mSImageView.invalidate();
+            case R.id.btn_inside:
+                mSImageView.setScaleType(SImageView.SCALE_TYPE_CENTER_INSIDE);
+                mSImageView.invalidate();
+                break;
 
-//                break;
+            case R.id.btn_crop:
+                mSImageView.setScaleType(SImageView.SCALE_TYPE_CENTER_CROP);
+                mSImageView.invalidate();
+                break;
+
+            case R.id.btn_fix_xy:
+                mSImageView.setScaleType(SImageView.SCALE_TYPE_FIX_XY);
+                mSImageView.invalidate();
+
+                break;
         }
     }
 

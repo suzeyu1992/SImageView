@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Author :  suzeyu
@@ -86,6 +87,11 @@ public class SImageView extends View {
     private int mPaddingTop;
     private int mPaddingBottom;
     private static final String STR_EMPTY = "";
+
+    /**
+     *  正在处理的url图片集合
+     */
+    public Vector<String> mUrlLoading = new Vector();
 
 
 
@@ -555,7 +561,7 @@ public class SImageView extends View {
                     reqHeight = reqWid = minSide;
                 }
 
-                ImageLoader.getInstance(mContext).setPicture(url, this, reqWid*4, reqHeight*4);
+                ImageLoader.getInstance(mContext).setPicture(url, this, reqWid, reqHeight);
             }
         }else{
             if (null != bitmap){
@@ -640,7 +646,20 @@ public class SImageView extends View {
     }
 
 
+    /**
+     * 对外提供直接通过url来加载图片的方法
+     * @param imageUrls
+     */
     public void setImageUrls(String... imageUrls) {
+
+        // 对要加载的图片进行缓存
+        if (imageUrls.length > 0){
+            mUrlLoading.clear();
+            for (String url : imageUrls) {
+                mUrlLoading.add(url);
+            }
+        }
+
         if (imageUrls.length == 1){
             updateForOne(null, imageUrls[0]);
         }else if (imageUrls.length > 1){

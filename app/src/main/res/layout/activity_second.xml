@@ -6,68 +6,60 @@
     android:paddingTop="5dp"
     android:layout_height="match_parent">
 
-    <!--<com.szysky.customize.siv.SImageView-->
-        <!--android:id="@+id/siv_main"-->
-        <!--android:background="@color/colorAccent"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="200dp"-->
-        <!--app:displayType="rect"-->
-        <!--app:border_color="@color/colorPrimary"-->
-        <!--app:border_width="0dp"-->
-        <!--app:img="@mipmap/ic_1"-->
-        <!--app:scaleType="center_inside"/>-->
-
     <com.szysky.customize.siv.SImageView
-        android:id="@+id/siv_url"
+        android:id="@+id/siv_main"
         android:background="@color/colorAccent"
-        app:displayType="circle"
-        android:padding="0dp"
-        app:border_width="1dp"
-        app:scaleType="fix_XY"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="200dp"
+        app:displayType="rect"
+        app:border_color="@color/colorPrimary"
+        app:border_width="0dp"
+        app:img="@mipmap/ic_1"
+        app:scaleType="center_inside"/>
 
-    <!--<View-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:layout_weight="0"/>-->
 
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="50dp"-->
-        <!--android:orientation="horizontal">-->
 
-        <!--<Button-->
-            <!--android:id="@+id/btn_inside"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center"-->
-            <!--android:layout_margin="5dp"-->
-            <!--android:textSize="10dp"-->
-            <!--android:text="center_inside缩放"/>-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0"/>
 
-        <!--<Button-->
-            <!--android:id="@+id/btn_crop"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center"-->
-            <!--android:layout_margin="5dp"-->
-            <!--android:textSize="10dp"-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
 
-            <!--android:text="center_crop缩放"/>-->
+        <Button
+            android:id="@+id/btn_inside"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:textSize="10dp"
+            android:text="center_inside缩放"/>
 
-        <!--<Button-->
-            <!--android:id="@+id/btn_fix_xy"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center"-->
-            <!--android:layout_margin="5dp"-->
-            <!--android:textSize="10dp"-->
+        <Button
+            android:id="@+id/btn_crop"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:textSize="10dp"
 
-            <!--android:text="fix_xy缩放"/>-->
+            android:text="center_crop缩放"/>
 
-    <!--</LinearLayout>-->
+        <Button
+            android:id="@+id/btn_fix_xy"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:textSize="10dp"
+
+            android:text="fix_xy缩放"/>
+
+    </LinearLayout>
 </LinearLayout>

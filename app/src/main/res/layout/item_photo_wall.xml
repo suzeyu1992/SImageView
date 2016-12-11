@@ -2,12 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="50dp">
 
-    <com.szysky.customize.simageview.SquareImageView
-        android:id="@+id/iv_square"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="centerCrop"/>
+    <com.szysky.customize.siv.SImageView
+        android:id="@+id/siv_main"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
 
 </LinearLayout>

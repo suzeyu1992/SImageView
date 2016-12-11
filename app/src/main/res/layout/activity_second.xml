@@ -20,9 +20,9 @@
     <com.szysky.customize.siv.SImageView
         android:id="@+id/siv_url"
         android:background="@color/colorAccent"
-        app:displayType="round_rect"
+        app:displayType="five_pointed_star"
         android:padding="0dp"
-        app:border_width="5dp"
+        app:border_width="1dp"
         app:scaleType="fix_XY"
         android:layout_width="100dp"
         android:layout_height="100dp" />

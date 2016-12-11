@@ -83,7 +83,24 @@ public class GraphsTemplate {
                 scale = scaleY > scaleX ? scaleY : scaleX;
                 matrix.postScale(scale, scale);
 
-                break;
+
+
+                if (bitmap.getHeight() < bitmap.getWidth()){
+                    scale = sideHeight/ bitmap.getHeight();
+                    dx = (sideWidth - bitmap.getWidth() * scale) / (2 * scale);
+                }else if (bitmap.getWidth() < bitmap.getHeight()){
+                    scale = sideHeight/ bitmap.getWidth();
+                    dy = (sideWidth - bitmap.getHeight() * scale) / (2 * scale);
+                }else {
+                    scale = sideHeight/ bitmap.getHeight();
+                    dy = dx = (sideWidth - bitmap.getWidth() * scale) / (2 * scale);
+
+                }
+                canvas.drawBitmap(Bitmap.createBitmap(bitmap,  (int) (dx < 0 ? -dx : dx),  (int) (dy < 0 ? -dy : dy),  (int)  (bitmap.getWidth() + (dx < 0 ? dx : -dx)) ,
+                        (int) (bitmap.getHeight() + (dy < 0 ? dy : -dy)), matrix, true),offsetX , offsetY , null);
+
+
+                return ;
 
             case SImageView.SCALE_TYPE_FIX_XY:
                 // 填充控件, 保证图片完整,  比例可能会变

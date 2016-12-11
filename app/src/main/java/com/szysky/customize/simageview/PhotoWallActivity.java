@@ -46,7 +46,7 @@ public class PhotoWallActivity extends AppCompatActivity {
             urls.add("http://img05.tooopen.com/images/20150417/tooopen_sy_119014046478.jpg");
             urls.add("http://img02.tooopen.com/images/20150318/tooopen_sy_82853534894.jpg");
             urls.add("http://img05.tooopen.com/images/20150204/tooopen_sy_80359399983.jpg");
-            urls.add("http://pics.sc.chinaz.com/files/pic/pic9/201410/apic7065.jpg");
+//            urls.add("http://pics.sc.chinaz.com/files/pic/pic9/201410/apic7065.jpg");
         }
 
         // 根据连接网络的情况判断是否加载图片

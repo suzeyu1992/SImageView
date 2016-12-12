@@ -18,6 +18,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -26,6 +28,13 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Author :  suzeyu
@@ -233,7 +242,15 @@ public class ImageLoader {
         BufferedInputStream in = null;
         try {
             URL url = new URL(uriStr);
-            urlConnection = (HttpURLConnection) url.openConnection();
+
+            if (url.getProtocol().toLowerCase().equals("https")){
+                // trust all hosts
+
+            }else{
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+            }
+
 
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
 
@@ -252,6 +269,7 @@ public class ImageLoader {
         }
 
     }
+
 
 
 

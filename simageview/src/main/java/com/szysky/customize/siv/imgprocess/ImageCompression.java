@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.util.Log;
 
+import com.szysky.customize.siv.util.LogUtil;
+
 import java.io.FileDescriptor;
 
 /**
@@ -98,7 +100,7 @@ public class ImageCompression {
                 inSampleSize *= 2;
             }
         }
-        Log.i(TAG, "进行图片的inSampleSize计算的值: "+inSampleSize);
+        LogUtil._i(TAG, "进行图片的inSampleSize计算的值: "+inSampleSize);
         return inSampleSize;
 
     }

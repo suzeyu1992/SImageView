@@ -204,7 +204,7 @@ public class ImageLoader {
 
         // 判断从内存获取是否全部加载完毕, 如果没有, 尝试从磁盘中获取
         if (requestBean.isLoadSuccessful()){
-            Log.i(TAG, "多张图片的获取时间  >> 内存途径 : "+(System.currentTimeMillis() - requestBean.startTime) + " ms");
+            LogUtil._i(TAG, "多张图片的获取时间  >> 内存途径 : "+(System.currentTimeMillis() - requestBean.startTime) + " ms");
             sImageView.setImages(requestBean.asListBitmap());
             return ;
         }
@@ -236,7 +236,7 @@ public class ImageLoader {
             mImageCache.put(uriStr , bitmap, reqWidth, reqHeight);
 
         } catch (IOException e) {
-            Log.e(TAG, ">>>>>>downloadBitmapFromUrl()   再次进行网络下载也失败");
+            LogUtil._e(TAG, ">>>>>>downloadBitmapFromUrl()   再次进行网络下载也失败");
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -272,7 +272,7 @@ public class ImageLoader {
 
 
         } catch (IOException e) {
-            Log.e(TAG, ">>>>>>网络图片流直接存入磁盘失败");
+            LogUtil._e(TAG, ">>>>>>网络图片流直接存入磁盘失败");
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -339,7 +339,7 @@ public class ImageLoader {
                     SImageView sImageView = diskGetErrRequest.sImageView;
                     if (!diskGetErrRequest.urls.containsAll(sImageView.mUrlLoading)){
                         // 发生了改变, 跳出发送请求的的步骤
-                        Log.w(TAG, ">>>>  控件要加载的url发生了改变\r\n"
+                        LogUtil._w(TAG, ">>>>  控件要加载的url发生了改变\r\n"
                                 + "要加载的图片地址 --> "+diskGetErrRequest.urls.toString()
                                 + "\r\n控件当前需要加载的地址 -->  "+ sImageView.mUrlLoading.toString());
                        return ;
@@ -370,7 +370,7 @@ public class ImageLoader {
                                     diskGetErrRequest.addBitmap(noLoadUrl, bitmap);
                                 }else{
                                     diskGetErrRequest.addBitmap(noLoadUrl, mLoadErrBmp);
-                                    Log.e(TAG, "多张图片下载失败, >>>> 图片地址:"+noLoadUrl);
+                                    LogUtil._e(TAG, "多张图片下载失败, >>>> 图片地址:"+noLoadUrl);
                                 }
 
                                 // 判断是否全部加载完成, 如果全部加载完成, 那么发送通知到Handler
@@ -390,13 +390,13 @@ public class ImageLoader {
 
                     RequestBean requestOk = (RequestBean) msg.obj;
                     // 打印多张图片的处理时间
-                    Log.i(TAG, "多张图片的获取时间  >> 磁盘或者网络: "+(System.currentTimeMillis() - requestOk.startTime) + " ms");
+                    LogUtil._i(TAG, "多张图片的获取时间  >> 磁盘或者网络: "+(System.currentTimeMillis() - requestOk.startTime) + " ms");
 
                     // 进行控件是否需要有效的判断
                     if (requestOk.sImageView.getTag().equals(requestOk.getTag())){
                         requestOk.sImageView.setImages(requestOk.asListBitmap());
                     }else{
-                        Log.w(TAG, "多张图片>>>>控件的url发生改变, so取消设置图片");
+                        LogUtil._w(TAG, "多张图片>>>>控件的url发生改变, so取消设置图片");
                     }
 
                     // recycle global pool
@@ -429,7 +429,7 @@ public class ImageLoader {
 
         // 判断是否需要清除无效的url
         if (errNum > 0){
-            Log.w(TAG, "发现了 "+ errNum +" 个无效的地址");
+            LogUtil._w(TAG, "发现了 "+ errNum +" 个无效的地址");
         }
 
     }

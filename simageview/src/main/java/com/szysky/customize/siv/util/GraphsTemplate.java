@@ -283,7 +283,7 @@ public class GraphsTemplate {
 
         if (Build.VERSION.SDK_INT < 21){
             isSupportBorder = false;
-            Log.w(TAG, "此操作版本不支持五角星的描边绘制");
+            LogUtil._w(TAG, "此操作版本不支持五角星的描边绘制");
         }
 
         // 开始画描边

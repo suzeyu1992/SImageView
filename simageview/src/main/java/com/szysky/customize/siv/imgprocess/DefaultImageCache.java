@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-import android.util.Log;
 import android.util.LruCache;
 import android.widget.ImageView;
 
@@ -73,7 +72,7 @@ public class DefaultImageCache implements IImageCache {
                 return value.getRowBytes() * value.getHeight() / 1024;
             }
         };
-        Log.i(TAG, "设置内存缓存成功--> 大小为:"+cacheSize/1024+"MB");
+        LogUtil._i(TAG, "设置内存缓存成功--> 大小为:"+cacheSize/1024+"MB");
 
         // 获得磁盘缓存的路径
         File diskCacheDir = getDiskCacheDir(mContext, "bitmap");
@@ -92,7 +91,7 @@ public class DefaultImageCache implements IImageCache {
             try {
                 mDiskLruCache = DiskLruCache.open(diskCacheDir, 1, 1, DISK_CACHE_SIZE);
                 mIsDiskLruCacheCreated = true;
-                Log.i(TAG, "设置磁盘缓存成功--> 路径为:"+diskCacheDir.getPath());
+                LogUtil._i(TAG, "设置磁盘缓存成功--> 路径为:"+diskCacheDir.getPath());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -109,7 +108,7 @@ public class DefaultImageCache implements IImageCache {
             String key = keyFormUrlAndWH(url , reqWidth, reqHeight);
             Bitmap bitmap = getBitmapFromMemoryCache(key);
             if (bitmap != null) {
-                Log.d(TAG, "loadBitmap --> 图片从内存中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
+                LogUtil._d(TAG, "loadBitmap --> 图片从内存中加载成功 uri=" + url + "\r\n消耗时间=" + (System.currentTimeMillis() - entry) + "ms");
                 return bitmap;
             }
         }else{
@@ -137,12 +136,11 @@ public class DefaultImageCache implements IImageCache {
                         if (!bean.isLoadSuccessful()){
                             // 通知Handler多张图片从磁盘获取为完成, 但是还未全部完成
                             mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_MULTI_DISK_GET_ERR, bean).sendToTarget();
-                            Log.i(TAG, "info>>>>磁盘缓存获取的图片数量: "+processNum +" 张, 还剩 "+bean.checkNoLoadUrl().length+" 张图片需要网络下载");
+                            LogUtil._i(TAG, "info>>>>磁盘缓存获取的图片数量: "+processNum +" 张, 还剩 "+bean.checkNoLoadUrl().length+" 张图片需要网络下载");
                         }else {
                             // 通知成功并处理
                             mImageLoader.mMainHandler.obtainMessage(ImageLoader.MESSAGE_MULTI_DISK_GET_OK, bean).sendToTarget();
-                            Log.i(TAG, "info>>>>磁盘缓存获取的图片数量: "+processNum +"    图片全部处理完毕 ");
-
+                            LogUtil._i(TAG, "info>>>>磁盘缓存获取的图片数量: "+processNum +"    图片全部处理完毕 ");
                         }
 
                     }
@@ -167,7 +165,7 @@ public class DefaultImageCache implements IImageCache {
             long l = System.currentTimeMillis();
             // 存储到磁盘
             putBitmap(url, bmp);
-            Log.e(TAG, "磁盘存储的时间 "+(System.currentTimeMillis()-l) );
+            LogUtil._i(TAG, "磁盘存储的时间 "+(System.currentTimeMillis()-l));
             addBitmapToMemoryCache(url,reqWidth, reqHeight, bmp);
 
 
@@ -213,9 +211,9 @@ public class DefaultImageCache implements IImageCache {
                 result = true;
             }
 
-            Log.i(TAG, "putRawStream: ==> "+"原始图片流写入磁盘缓存成功");
+            LogUtil._i(TAG, "putRawStream: ==> "+"原始图片流写入磁盘缓存成功");
         } catch (IOException e) {
-            Log.w(TAG, "putRawStream: ==> "+"原始图片流写入磁盘缓存失败 ", e);
+            LogUtil._w(TAG, "putRawStream: ==> "+"原始图片流写入磁盘缓存失败 ", e);
             // 进行数据回滚
             if (null != editor){
                 try {
@@ -272,9 +270,9 @@ public class DefaultImageCache implements IImageCache {
 
             }
 
-            Log.i(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存成功, 地址:"+url);
+            LogUtil._i(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存成功, 地址:"+url);
         } catch (IOException e) {
-            Log.w(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存失败, 地址:"+url, e);
+            LogUtil._w(TAG, "putRawStream: ==> "+"原始图片bitmap写入磁盘缓存失败, 地址:"+url, e);
 
         }finally {
             if (out != null){
@@ -314,7 +312,7 @@ public class DefaultImageCache implements IImageCache {
                 return bitmap;
             }
         } catch (IOException e) {
-            Log.e(TAG, "从磁盘获取IO失败", e);
+            LogUtil._e(TAG, "从磁盘获取IO失败", e);
         }
 
 

@@ -9,14 +9,11 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.SystemClock;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-
 
 import com.szysky.customize.siv.effect.ConcreteDrawingStrategy;
 import com.szysky.customize.siv.effect.IDrawingStrategy;
@@ -123,7 +120,7 @@ public class SImageView extends View {
                 }
                 clone.readyBmp = (ArrayList<Bitmap>) readyBmp.clone();
             } catch (CloneNotSupportedException e) {
-                Log.w(TAG, "图片信息 clone is error" );
+                LogUtil._w(TAG, "图片信息 clone is error" );
                 e.printStackTrace();
                 return this;
             }
@@ -324,7 +321,6 @@ public class SImageView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Log.e("wocao", this+" "+mInfo.readyBmp.size());
 
 
         // translate padding
@@ -336,8 +332,8 @@ public class SImageView extends View {
         if ( mInfo.readyBmp.size() == 1 && !mCloseNormalOnePicLoad){
             long l = System.nanoTime();
             mNormalOnePicStrategy.algorithm(canvas,1,1,mInfo.readyBmp.get(0), (ConfigInfo) mInfo.clone());
-            Log.i(TAG, "一张图片执行时间: "+ (System.nanoTime() - l)/1000000f+"毫秒");
-            mInfo.coordinates = null;
+            LogUtil._i(TAG, "一张图片执行时间: "+ (System.nanoTime() - l)/1000000f+"毫秒");
+
         }else if (mInfo.readyBmp.size() > 0 ){
 
             sizeMeasure();
@@ -374,7 +370,7 @@ public class SImageView extends View {
             // 清除布局消息
             mInfo.coordinates = null;
 
-            Log.i(TAG, "多张图执行时间: "+ (System.nanoTime() - startCur)/1000000f +"毫秒");
+            LogUtil._i(TAG, "多张图执行时间: "+ (System.nanoTime() - startCur)/1000000f +"毫秒");
         }
 
         // translate padding
@@ -615,7 +611,6 @@ public class SImageView extends View {
             for (Bitmap bitmap : bitmaps) {
                 mInfo.readyBmp.add(bitmap);
             }
-
             invalidate();
         }
     }
@@ -674,7 +669,7 @@ public class SImageView extends View {
             postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.e(TAG, "run: 进行了一次没有正确的控件宽高属性的容错"  );
+                    LogUtil._e(TAG, "run: 进行了一次没有正确的控件宽高属性的容错"  );
                     mSleepTime <<= 1;
                     mSafetyCurrent++;
                     setImageUrls(imageUrls);

@@ -8,7 +8,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.util.Log;
 
 import com.szysky.customize.siv.SImageView;
 import com.szysky.customize.siv.util.GraphsTemplate;

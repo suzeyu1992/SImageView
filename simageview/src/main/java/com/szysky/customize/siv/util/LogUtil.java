@@ -15,4 +15,13 @@ public class LogUtil {
     public static void print_i(String tag, String body){
         Log.i(tag, "\r\nStart-----------------------------------------------------------------\r\n"+body+"\r\nEnd-----------------------------------------------------------------\r\n");
     }
+
+
+    public static void _i(String tag, String body){
+        Log.i(tag, body);
+    }
+
+    public static void _w(String tag, String body){
+        Log.w(tag, body );
+    }
 }

@@ -4,18 +4,70 @@
     android:id="@+id/activity_photo_wall"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.szysky.note.androiddevseek_12.photowall.PhotoWallActivity">
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/gv_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:horizontalSpacing="3dp"
         android:verticalSpacing="3dp"
         android:listSelector="@android:color/transparent"
-        android:stretchMode="columnWidth"
-        />
+        android:stretchMode="columnWidth" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#8f8f8f"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_circle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="原型头像"/>
+
+        <Button
+            android:id="@+id/btn_oval"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="椭圆头像"/>
+
+        <Button
+            android:id="@+id/btn_rect"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="矩形头像"/>
+
+        <Button
+            android:id="@+id/btn_round"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="圆角头像"/>
+
+        <Button
+            android:id="@+id/btn_mul_display"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="切换群组显示"/>
+
+        <Button
+            android:id="@+id/btn_border"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="添加描边"/>
+
+    </LinearLayout>
 
 
 </LinearLayout>

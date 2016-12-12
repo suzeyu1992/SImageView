@@ -24,6 +24,7 @@ import com.szysky.customize.siv.effect.NormalOnePicStrategy;
 import com.szysky.customize.siv.imgprocess.ImageLoader;
 import com.szysky.customize.siv.range.ILayoutManager;
 import com.szysky.customize.siv.range.QQLayoutManager;
+import com.szysky.customize.siv.util.LogUtil;
 import com.szysky.customize.siv.util.UIUtils;
 
 import java.lang.annotation.Retention;
@@ -200,6 +201,7 @@ public class SImageView extends View {
 
         typedArray.recycle();
 
+
     }
 
     @Override
@@ -322,6 +324,9 @@ public class SImageView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        Log.e("wocao", this+" "+mInfo.readyBmp.size());
+
+
         // translate padding
         canvas.translate(mPaddingLeft, mPaddingTop);
 
@@ -332,7 +337,7 @@ public class SImageView extends View {
             long l = System.nanoTime();
             mNormalOnePicStrategy.algorithm(canvas,1,1,mInfo.readyBmp.get(0), (ConfigInfo) mInfo.clone());
             Log.i(TAG, "一张图片执行时间: "+ (System.nanoTime() - l)/1000000f+"毫秒");
-
+            mInfo.coordinates = null;
         }else if (mInfo.readyBmp.size() > 0 ){
 
 
@@ -452,6 +457,13 @@ public class SImageView extends View {
             }
         }
 
+    }
+
+    /**
+     *  获得当前的测量布局规则
+     */
+    public ILayoutManager getLayoutManager(){
+        return mLayoutManager;
     }
 
 

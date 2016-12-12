@@ -12,12 +12,14 @@ import android.util.Log;
 import com.szysky.customize.siv.SImageView;
 import com.szysky.customize.siv.imgprocess.db.RequestBean;
 import com.szysky.customize.siv.util.CloseUtil;
+import com.szysky.customize.siv.util.LogUtil;
 import com.szysky.customize.siv.util.SecurityUtil;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -79,6 +81,20 @@ public class ImageLoader {
 
         mLoadErrBmp = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.ic_menu_close_clear_cancel);
         mLoadingBmp = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.stat_notify_sync);
+
+
+        // 忽略证书配置
+        try{
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[] { new MyTrustManager() },
+                    new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new MyHostnameVerifier());
+
+        }catch(Exception e){
+            LogUtil._w(TAG, "配置无视证书失败");
+        }
+
     }
 
     public static ImageLoader getInstance(Context context){
@@ -243,13 +259,10 @@ public class ImageLoader {
         try {
             URL url = new URL(uriStr);
 
-            if (url.getProtocol().toLowerCase().equals("https")){
-                // trust all hosts
 
-            }else{
-                urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection = (HttpURLConnection) url.openConnection();
 
-            }
+
 
 
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
@@ -270,7 +283,36 @@ public class ImageLoader {
 
     }
 
+    private class MyHostnameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+            // TODO Auto-generated method stub
+            return true;
+        }
 
+    }
+
+    private class MyTrustManager implements X509TrustManager {
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType)
+
+                throws CertificateException {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+    }
 
 
     // 暴露注入的缓存策略

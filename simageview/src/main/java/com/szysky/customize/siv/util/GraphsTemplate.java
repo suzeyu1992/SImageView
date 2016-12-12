@@ -77,30 +77,51 @@ public class GraphsTemplate {
 
             case SImageView.SCALE_TYPE_CENTER_CROP:
                 // 尽量放大, 填充控件, 比例不变
-                float scaleY = sideHeight / bitmap.getHeight();
-                float scaleX = sideWidth / bitmap.getWidth();
+                if (sideHeight == sideWidth){
+                    // 画布是一个正方形
+                    if (bitmap.getHeight() < bitmap.getWidth()){
+                        scale = sideHeight/ bitmap.getHeight();
+                        dx = (sideWidth - bitmap.getWidth() * scale) / (2 * scale);
+                    }else if (bitmap.getWidth() < bitmap.getHeight()){
+                        scale = sideHeight/ bitmap.getWidth();
+                        dy = (sideWidth - bitmap.getHeight() * scale) / (2 * scale);
+                    }else {
+                        scale = sideHeight/ bitmap.getHeight();
+                        dy = dx = (sideWidth - bitmap.getWidth() * scale) / (2 * scale);
 
-                scale = scaleY > scaleX ? scaleY : scaleX;
-                matrix.postScale(scale, scale);
+                    }
+                    matrix.postScale(scale, scale);
+                    canvas.drawBitmap(Bitmap.createBitmap(bitmap,  (int) (dx < 0 ? -dx : dx),  (int) (dy < 0 ? -dy : dy),  (int)  (bitmap.getWidth() + 2 * (dx < 0 ? dx : -dx)) ,
+                            (int) (bitmap.getHeight() + 2 * (dy < 0 ? dy : -dy)), matrix, true),offsetX , offsetY , null);
 
+                    return;
+                }else{
+                    // 画布不是一个正方形
+                    float scaleY = sideHeight / bitmap.getHeight();
+                    float scaleX = sideWidth / bitmap.getWidth();
 
+                    if (scaleY > scaleX){
+                        scale = scaleY;
+                        dx = (sideWidth - bitmap.getWidth() * scale) / (2 * scale);
+                    }else if(scaleY < scaleX){
+                        scale = scaleX;
+                        dy = (sideHeight - bitmap.getHeight() * scale) / (2 * scale);
+                    }else {
+                        scale = scaleX;
+                        dy = dx = (sideWidth - bitmap.getWidth() * scale) / (2 * scale);
 
-                if (bitmap.getHeight() < bitmap.getWidth()){
-                    scale = sideHeight/ bitmap.getHeight();
-                    dx = (sideWidth - bitmap.getWidth() * scale) / (2 * scale);
-                }else if (bitmap.getWidth() < bitmap.getHeight()){
-                    scale = sideHeight/ bitmap.getWidth();
-                    dy = (sideWidth - bitmap.getHeight() * scale) / (2 * scale);
-                }else {
-                    scale = sideHeight/ bitmap.getHeight();
-                    dy = dx = (sideWidth - bitmap.getWidth() * scale) / (2 * scale);
+                    }
+
+                    matrix.postScale(scale, scale);
+                    canvas.drawBitmap(Bitmap.createBitmap(bitmap,  (int) (dx < 0 ? -dx : dx),  (int) (dy < 0 ? -dy : dy),  (int)  (bitmap.getWidth() + 2 * (dx < 0 ? dx : -dx)) ,
+                            (int) (bitmap.getHeight() + 2*(dy < 0 ? dy : -dy)),matrix, true),offsetX , offsetY , null);
+
+                    return;
 
                 }
-                canvas.drawBitmap(Bitmap.createBitmap(bitmap,  (int) (dx < 0 ? -dx : dx),  (int) (dy < 0 ? -dy : dy),  (int)  (bitmap.getWidth() + (dx < 0 ? dx : -dx)) ,
-                        (int) (bitmap.getHeight() + (dy < 0 ? dy : -dy)), matrix, true),offsetX , offsetY , null);
 
 
-                return ;
+
 
             case SImageView.SCALE_TYPE_FIX_XY:
                 // 填充控件, 保证图片完整,  比例可能会变

@@ -340,7 +340,7 @@ public class SImageView extends View {
             mInfo.coordinates = null;
         }else if (mInfo.readyBmp.size() > 0 ){
 
-
+            sizeMeasure();
             if (mInfo.coordinates == null) return;
             // layout 子元素布局
             Iterator<ILayoutManager.LayoutInfoGroup> iterator = mInfo.coordinates.iterator();
@@ -581,10 +581,6 @@ public class SImageView extends View {
             if (null != bitmap){
                 mInfo.readyBmp.clear();
                 mInfo.readyBmp.add(bitmap);
-                if (isCloseNormalOnePicLoad()){
-                    // 测量图片大小
-                    sizeMeasure();
-                }
 
                 invalidate();
             }
@@ -619,8 +615,7 @@ public class SImageView extends View {
             for (Bitmap bitmap : bitmaps) {
                 mInfo.readyBmp.add(bitmap);
             }
-            // 布局信息测量获取
-            sizeMeasure();
+
             invalidate();
         }
     }

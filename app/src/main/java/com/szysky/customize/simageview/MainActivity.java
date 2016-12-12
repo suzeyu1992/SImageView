@@ -66,6 +66,12 @@ public class MainActivity extends AppCompatActivity {
                 // 跳转第二个展示页面
                 startActivity(new Intent(getApplicationContext(), SecondActivity.class));
                 return true;
+
+            case R.id.menu_list:
+                // 跳转网络展示列表
+                startActivity(new Intent(getApplicationContext(), PhotoWallActivity.class));
+
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

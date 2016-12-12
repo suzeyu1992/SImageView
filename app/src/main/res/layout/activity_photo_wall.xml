@@ -19,7 +19,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="#8f8f8f"
+        android:background="#efefef"
         android:orientation="horizontal">
 
         <Button
@@ -27,7 +27,12 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="原型头像"/>
+            android:layout_margin="3dp"
+            android:textSize="11dp"
+            android:background="@color/colorAccent"
+            android:textColor="#fff"
+
+            android:text="圆形头像"/>
 
         <Button
             android:id="@+id/btn_oval"
@@ -35,6 +40,12 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:textSize="11dp"
+            android:background="@color/colorAccent"
+            android:textColor="#fff"
+
+
             android:text="椭圆头像"/>
 
         <Button
@@ -43,6 +54,11 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:textSize="11dp"
+            android:background="@color/colorAccent"
+            android:textColor="#fff"
+
             android:text="矩形头像"/>
 
         <Button
@@ -51,6 +67,11 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:textSize="11dp"
+            android:background="@color/colorAccent"
+            android:textColor="#fff"
+
             android:text="圆角头像"/>
 
         <Button
@@ -58,13 +79,24 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="切换群组显示"/>
+            android:layout_margin="3dp"
+            android:textSize="11dp"
+            android:textColor="#fff"
+            android:background="@color/colorAccent"
+
+
+            android:text="切换群组"/>
 
         <Button
             android:id="@+id/btn_border"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:textSize="11dp"
+            android:background="@color/colorAccent"
+            android:textColor="#fff"
+
             android:text="添加描边"/>
 
     </LinearLayout>

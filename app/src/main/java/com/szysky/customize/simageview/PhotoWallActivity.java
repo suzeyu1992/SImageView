@@ -2,12 +2,15 @@ package com.szysky.customize.simageview;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -30,32 +33,18 @@ import java.util.ArrayList;
 
 public class PhotoWallActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static boolean mCanLoadForPhoneNet;
     private ImageAdapter imageAdapter;
-    private static boolean mIsGridViewIdle;
     private Button btn_border;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN); // 隐藏android系统的状态栏
         setContentView(R.layout.activity_photo_wall);
         MANAGER_WECHAT = new WeChatLayoutManager(getApplicationContext());
 
-//        ArrayList<String> urls = new ArrayList<>();
-//        for (int i = 0; i < 100; i++) {
-//            urls.add("http://szysky.com/2016/12/05/%E5%B9%B4%E7%BB%88%E7%A6%8F%E5%88%A9-SImageView%E5%AE%9E%E7%94%A8%E7%9A%84%E5%9B%BE%E7%89%87%E6%8E%A7%E4%BB%B6/sample_2.gif");
-//            urls.add("http://img9.dzdwl.com/img/11543935W-1.jpg");
-//            urls.add("http://img02.tooopen.com/images/20160408/tooopen_sy_158723161481.jpg");
-//            urls.add("http://img02.tooopen.com/images/20160404/tooopen_sy_158262392146.jpg");
-//            urls.add("http://img02.tooopen.com/images/20160318/tooopen_sy_156339294124.jpg");
-//            urls.add("http://img06.tooopen.com/images/20160823/tooopen_sy_176393394325.jpg");
-//            urls.add("http://img06.tooopen.com/images/20160821/tooopen_sy_176144979595.jpg");
-//            urls.add("http://img06.tooopen.com/images/20160723/tooopen_sy_171462742667.jpg");
-//            urls.add("http://img05.tooopen.com/images/20150417/tooopen_sy_119014046478.jpg");
-//            urls.add("http://img02.tooopen.com/images/20150318/tooopen_sy_82853534894.jpg");
-//            urls.add("http://img05.tooopen.com/images/20150204/tooopen_sy_80359399983.jpg");
-//            urls.add("http://pics.sc.chinaz.com/files/pic/pic9/201410/apic7065.jpg");
-//        }
+
 
         // 查找按钮并设置点击事件
         findViewById(R.id.btn_circle).setOnClickListener(this);
@@ -123,8 +112,11 @@ public class PhotoWallActivity extends AppCompatActivity implements View.OnClick
             case R.id.btn_mul_display:
                 if (mDisplayLayoutManager == MANAGER_QQ){
                     mDisplayLayoutManager = MANAGER_WECHAT;
+                    Toast.makeText(getApplicationContext(), "切换为微信群组样式.",Toast.LENGTH_SHORT).show();
+
                 }else{
                     mDisplayLayoutManager = MANAGER_QQ;
+                    Toast.makeText(getApplicationContext(), "切换为QQ群组样式.",Toast.LENGTH_SHORT).show();
                 }
                 imageAdapter.notifyDataSetChanged();
                 break;
@@ -196,6 +188,14 @@ public class PhotoWallActivity extends AppCompatActivity implements View.OnClick
                 holder.mImageView.setLayoutManager(new WeChatLayoutManager(mContext));
             }else if((holder.mImageView.getLayoutManager() instanceof WeChatLayoutManager) && (mDisplayLayoutManager instanceof QQLayoutManager)){
                 holder.mImageView.setLayoutManager(new QQLayoutManager());
+            }
+
+            // 为了让圆角矩形好看, 如果是圆角矩形那么就去掉背景
+            if (mDisplayType == SImageView.TYPE_ROUND_RECT){
+                holder.mImageView.setBackgroundColor(Color.WHITE);
+            }else{
+                holder.mImageView.setBackgroundColor(Color.GRAY);
+
             }
 
 

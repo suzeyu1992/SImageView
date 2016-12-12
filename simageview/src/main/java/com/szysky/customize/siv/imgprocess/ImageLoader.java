@@ -233,7 +233,7 @@ public class ImageLoader {
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
             bitmap = BitmapFactory.decodeStream(in);
             // bitmap的缓存
-            mImageCache.put(uriStr , bitmap, reqWidth, reqHeight);
+            mImageCache.put(uriStr , bitmap, 0, 0);
 
         } catch (IOException e) {
             LogUtil._e(TAG, ">>>>>>downloadBitmapFromUrl()   再次进行网络下载也失败");

@@ -1,11 +1,14 @@
 package com.szysky.customize.siv.imgprocess;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import android.util.Log;
 import android.util.LruCache;
 import android.widget.ImageView;
 
@@ -74,11 +77,43 @@ public class DefaultImageCache implements IImageCache {
         };
         LogUtil._i(TAG, "设置内存缓存成功--> 大小为:"+cacheSize/1024+"MB");
 
+
+        boolean writeOrReadPermission = checkWriteOrReadPermission();
+
+        if (!writeOrReadPermission){
+            Log.w(TAG, "DefaultImageCache: \r\n\r\n     没有写外部存储的权限, 请先授权\r\n\r\n    否则将只有内存缓存会生效 ");
+        }else{
+            initDiskCache();
+        }
+
+
+    }
+
+    /**
+     * 检测是否有写权限
+     */
+    private boolean checkWriteOrReadPermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            int checkCallPhonePermission = mContext.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (checkCallPhonePermission == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * 初始化磁盘缓存, 这是很重要, 在默认实现中, 如果没有磁盘缓存将导致无法内存缓存.
+     */
+    private void initDiskCache(){
+
         // 获得磁盘缓存的路径
         File diskCacheDir = getDiskCacheDir(mContext, "bitmap");
         String path = Environment.getExternalStorageDirectory().getPath();
-
-        diskCacheDir = new File(path, "testing");
+        diskCacheDir = new File(path, "SImageViewCache");
 
 
         if (!diskCacheDir.exists()) {
@@ -383,7 +418,7 @@ public class DefaultImageCache implements IImageCache {
     private long getUsableSpace(File path) {
         // 大于等于android版本9
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            return path.getUsableSpace();
+            return path.getFreeSpace();
         }
 
         StatFs statFs = new StatFs(path.getPath());

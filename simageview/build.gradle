@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
 
 
     }
@@ -21,33 +21,7 @@ android {
     }
 }
 
-//// 常量定义
-//ext {
-//    bintrayRepo = 'maven'
-//    bintrayName = 'simageviewlibrary'
-//
-//    publishedGroupId = 'com.szysky.customize.siv'  // 函数库的Maven Group Id
-//    libraryName = 'SImageViewLibrary'      // 函数库名字
-//    artifact = 'simageviewlibrary'         // 构建的名字
-//
-//    libraryDescription = 'This is a better control than ImageView';
-//
-//    siteUrl = 'https://github.com/suzeyu1992/SImageViewLib' // 定义函数库的主页
-//    gitUrl = 'https://github.com/suzeyu1992/SImageViewLib.git'  // 函数库的GitHub仓库
-//
-//    libraryVersion = '1.0.0' // 函数库的版本号
-//
-//    developerId = 'szyskys'
-//    developerName = 'szyskys'
-//    developerEmail = 'suzeyu_1992@163.com'
-//
-//    licenseName = 'The Apache Software License, Version 2.0'
-//    licenseUrl  = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//    allLicenses = [ "Apache-2.0" ]
-//
-//
-//
-//}
+
 apply from: "bintrayUpload.gradle"
 
 dependencies {

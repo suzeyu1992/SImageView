@@ -32,24 +32,13 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
 
         mSImageView = (SImageView) findViewById(R.id.siv_main);
-
-//        ImageLoader.getInstance(getApplicationContext()).setLoadingResId(R.mipmap.ic_launcher);
-//        ImageLoader.getInstance(getApplicationContext()).setLoadErrResId(R.mipmap.icon_test);
-
-        mSImageView.setLoadingResID(R.mipmap.ic_4);
-        //mSImageView.setErrPicResID(R.mipmap.ic_1);
-
-
-        mSImageView.setImageUrls("http://img02.tooopen.com/images/20160318/tooopen_sy_1563392941241.jpg");
-
+        
         findViewById(R.id.btn_crop).setOnClickListener(this);
         findViewById(R.id.btn_fix_xy).setOnClickListener(this);
         findViewById(R.id.btn_inside).setOnClickListener(this);
 
 
     }
-
-
 
 
 

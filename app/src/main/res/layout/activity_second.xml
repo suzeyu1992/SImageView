@@ -14,7 +14,7 @@
         app:displayType="rect"
         app:border_color="@color/colorPrimary"
         app:border_width="0dp"
-
+        app:img="@mipmap/ic_1"
         app:scaleType="center_inside"/>
 
 

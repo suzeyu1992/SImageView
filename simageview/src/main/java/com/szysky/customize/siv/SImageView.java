@@ -3,6 +3,7 @@ package com.szysky.customize.siv;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -12,12 +13,15 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
+import android.support.annotation.IntegerRes;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.szysky.customize.siv.effect.ConcreteDrawingStrategy;
 import com.szysky.customize.siv.effect.IDrawingStrategy;
 import com.szysky.customize.siv.effect.NormalOnePicStrategy;
+import com.szysky.customize.siv.imgprocess.ImageCompression;
 import com.szysky.customize.siv.range.ILayoutManager;
 import com.szysky.customize.siv.range.QQLayoutManager;
 import com.szysky.customize.siv.util.LogUtil;
@@ -90,6 +94,19 @@ public class SImageView extends View {
      *  正在处理的url图片集合
      */
     public Vector<String> mUrlLoading = new Vector();
+
+
+    /**
+     * 控件加载图片错误的资源id
+     */
+    @IntegerRes private int mErrPicResID = 0;
+    Bitmap mErrPicBitmap ;
+
+    /**
+     * 控件加载中的图片资源id
+     */
+    @IntegerRes private int mLoadingResID = 0;
+    Bitmap mLoadingPicBitmap;
 
 
 
@@ -753,4 +770,60 @@ public class SImageView extends View {
     public float getOvalRatio(){
         return mNormalOnePicStrategy.getOvalWidthOrHeight();
     }
+
+
+
+    public int getErrPicResID() {
+        return mErrPicResID;
+    }
+
+    /**
+     * 设置控件网络加载错误时候的图片
+     */
+    public void setErrPicResID(@DrawableRes int mErrPicResID) {
+        if (mInfo.width > 0 && mInfo.height > 0){
+            // 解析为和控件一样大的
+            mErrPicBitmap = ImageCompression.decodeFixedSizeForResources(getResources(), mErrPicResID, mInfo.width, mInfo.height);
+        }else{
+            // 无法获取控件宽高, 直接解析为图片的大小
+            mErrPicBitmap = BitmapFactory.decodeResource(mContext.getResources(), mErrPicResID);
+        }
+
+        if (mErrPicBitmap != null){
+            this.mErrPicResID = mErrPicResID;
+            LogUtil._i(TAG, "控件的默认加载错误图片设置成功 图片宽高   "+ mErrPicBitmap.getWidth() + "  "+mErrPicBitmap.getHeight() );
+        }else{
+            Log.w(TAG, "控件的默认加载错误图片设置失败, 请检测填入的是否是图片资源ID ");
+        }
+    }
+
+
+
+    public int getLoadingResID() {
+        return mLoadingResID;
+    }
+
+    /**
+     * 设置网络加载中的图片资源id
+     */
+    public void setLoadingResID(@DrawableRes int mLoadingResID) {
+        if (mInfo.width > 0 && mInfo.height > 0){
+            // 解析为和控件一样大的
+            mLoadingPicBitmap = ImageCompression.decodeFixedSizeForResources(getResources(), mLoadingResID, mInfo.width, mInfo.height);
+            LogUtil._i(TAG, "设置控件的网络加载错误的图片成功, 加载的宽高到内存的宽高: "+mInfo.width+ "    "+mInfo.height );
+        }else{
+            // 无法获取控件宽高, 直接解析为图片的大小
+            mLoadingPicBitmap = BitmapFactory.decodeResource(mContext.getResources(), mLoadingResID);
+            LogUtil._i(TAG, "设置控件的网络加载错误的图片成功, 加载的宽高到内存的宽高为源资源图片大小: "+mLoadingPicBitmap.getWidth()+ "    "+mLoadingPicBitmap.getHeight() );
+        }
+
+        if (mLoadingPicBitmap != null){
+            this.mLoadingResID = mLoadingResID;
+            LogUtil._i(TAG, "控件的默认加载中时图片设置成功 图片宽高   "+ mLoadingPicBitmap.getWidth() + "  "+mLoadingPicBitmap.getHeight() );
+        }else{
+            Log.w(TAG, "控件的默认加载中时图片设置失败, 请检测填入的是否是图片资源ID ");
+        }
+    }
+
+
 }

@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 
 import com.szysky.customize.siv.imgprocess.DefaultImageCache;
@@ -222,8 +224,14 @@ public class ImageLoader {
             return ;
         }
 
-        // 设置加载中的过渡ma图片
-        sImageView.setBitmap(mLoadingBmp);
+        // 设置控件加载中的图片
+        if (sImageView.mLoadingPicBitmap != null){
+            // 如果控件设置了默认加载中的图片, 优先使用
+            sImageView.setBitmap(sImageView.mLoadingPicBitmap);
+        }else{
+            // 否则使用全局默认图片
+            sImageView.setBitmap(mLoadingBmp);
+        }
 
         // 开始从磁盘缓存获取
         mImageCache.get(null, requestBean.reqWidth, requestBean.reqHeight, null,true, requestBean);
@@ -403,7 +411,7 @@ public class ImageLoader {
 
                     // 判断在发起网络请求和进行内存, 磁盘缓存读取的之间 是否要加载的url发生了更改
                     // 如果改变那么, 停止旧的url请求的发送, 避免资源浪费
-                    SImageView sImageView = diskGetErrRequest.sImageView;
+                    final SImageView sImageView = diskGetErrRequest.sImageView;
                     if (!diskGetErrRequest.urls.containsAll(sImageView.mUrlLoading)){
                         // 发生了改变, 跳出发送请求的的步骤
                         LogUtil._w(TAG, ">>>>  控件要加载的url发生了改变\r\n"
@@ -436,7 +444,11 @@ public class ImageLoader {
                                 if (bitmap != null) {
                                     diskGetErrRequest.addBitmap(noLoadUrl, bitmap);
                                 }else{
-                                    diskGetErrRequest.addBitmap(noLoadUrl, mLoadErrBmp);
+                                    if (sImageView.mErrPicBitmap != null){
+                                        diskGetErrRequest.addBitmap(noLoadUrl, sImageView.mErrPicBitmap);
+                                    }else{
+                                        diskGetErrRequest.addBitmap(noLoadUrl, mLoadErrBmp);
+                                    }
                                     LogUtil._e(TAG, "图片下载失败, >>>> 图片地址:"+noLoadUrl);
                                 }
 
@@ -526,10 +538,15 @@ public class ImageLoader {
     }
 
     /**
-     * 设置默认图片加载失败显示的图片
+     * 设置默认图片加载失败显示的图片id
      */
-    public void setLoadErrBmp(Bitmap mLoadErrBmp) {
-        this.mLoadErrBmp = mLoadErrBmp;
+    public void setLoadErrResId(@DrawableRes int resID) {
+
+        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resID);
+        if (null != bitmap){
+            // 可能传入的是color资源id同样可能接收, 所以对处理后的Bitmap进行判断
+            mLoadErrBmp = bitmap;
+        }
     }
 
     /**
@@ -542,7 +559,11 @@ public class ImageLoader {
     /**
      * 设置默认图片加载中,显示的图片
      */
-    public void setLoadingBmp(Bitmap mLoadingBmp) {
-        this.mLoadingBmp = mLoadingBmp;
+    public void setLoadingResId(@DrawableRes int resID) {
+        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resID);;
+        if (null != bitmap){
+            // 可能传入的是color资源id同样可能接收, 所以对处理后的Bitmap进行判断
+            mLoadingBmp = bitmap;
+        }
     }
 }

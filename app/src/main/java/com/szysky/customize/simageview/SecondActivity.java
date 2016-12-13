@@ -1,27 +1,13 @@
 package com.szysky.customize.simageview;
 
-import android.app.Activity;
-import android.app.ListActivity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Message;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 
 import com.szysky.customize.siv.SImageView;
-import com.szysky.customize.siv.imgprocess.ImageLoader;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Author :  suzeyu

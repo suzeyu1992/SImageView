@@ -12,6 +12,7 @@ import android.util.Log;
 import android.util.LruCache;
 import android.widget.ImageView;
 
+import com.szysky.customize.siv.ImageLoader;
 import com.szysky.customize.siv.imgprocess.db.RequestBean;
 import com.szysky.customize.siv.util.CloseUtil;
 import com.szysky.customize.siv.util.LogUtil;
@@ -193,15 +194,23 @@ public class DefaultImageCache implements IImageCache {
 
 
     @Override
-    public void put(String url, Bitmap bmp , int reqWidth, int reqHeight) {
+    public void put(String url, Bitmap bmp , int reqWidth, int reqHeight, boolean isNeedDoubleCache) {
+
+            if (isNeedDoubleCache){
+                // 双缓存
+                // 存储原始图片
+                long l = System.currentTimeMillis();
+                // 存储到磁盘
+                putBitmap(url, bmp);
+                LogUtil._i(TAG, "磁盘存储的时间 "+(System.currentTimeMillis()-l));
+                addBitmapToMemoryCache(url,reqWidth, reqHeight, bmp);
+            }else{
+                // 只进行内存缓存
+                addBitmapToMemoryCache(url,reqWidth, reqHeight, bmp);
+
+            }
 
 
-            // 存储原始图片
-            long l = System.currentTimeMillis();
-            // 存储到磁盘
-            putBitmap(url, bmp);
-            LogUtil._i(TAG, "磁盘存储的时间 "+(System.currentTimeMillis()-l));
-            addBitmapToMemoryCache(url,reqWidth, reqHeight, bmp);
 
 
     }

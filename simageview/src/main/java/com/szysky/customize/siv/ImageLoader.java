@@ -1,4 +1,4 @@
-package com.szysky.customize.siv.imgprocess;
+package com.szysky.customize.siv;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,13 +7,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.szysky.customize.siv.SImageView;
+import com.szysky.customize.siv.imgprocess.DefaultImageCache;
+import com.szysky.customize.siv.imgprocess.IImageCache;
 import com.szysky.customize.siv.imgprocess.db.RequestBean;
 import com.szysky.customize.siv.util.CloseUtil;
 import com.szysky.customize.siv.util.LogUtil;
 import com.szysky.customize.siv.util.SecurityUtil;
+import com.szysky.customize.siv.util.UIUtils;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -187,7 +188,19 @@ public class ImageLoader {
         // 进行图片地址有效性匹配
         matchUrlLink(requestBean);
 
-        // 首先从内存中获取
+
+        // 首先对单张矩形和圆形的控件类型, 尝试获取曾经剪切好的bitmap
+        if (urls.size() == 1 ){
+            Bitmap commonlyUsedBitmap = getCommonlyUsedBitmap(urls.get(0), sImageView.getDisplayShape(), sImageView.getScaleType(), reqWidth, reqHeight);
+            if (null != commonlyUsedBitmap){
+                LogUtil._i(TAG, "单张矩形类型的特殊缓存获取成功  >> 内存途径 : "+(System.currentTimeMillis() - requestBean.startTime) + " ms");
+                requestBean.addBitmap(requestBean.urls.get(0), commonlyUsedBitmap);
+                sImageView.setImages(requestBean.asListBitmap(), requestBean.urls);
+                return ;
+            }
+        }
+
+        // 常规从内存中获取
         for (int i = 0; i < urls.size(); i++) {
             Bitmap bitmap = mImageCache.get(requestBean.urls.get(i), reqWidth, reqHeight, null, false, null);
             if (null != bitmap){
@@ -205,7 +218,7 @@ public class ImageLoader {
         // 判断从内存获取是否全部加载完毕, 如果没有, 尝试从磁盘中获取
         if (requestBean.isLoadSuccessful()){
             LogUtil._i(TAG, "多张图片的获取时间  >> 内存途径 : "+(System.currentTimeMillis() - requestBean.startTime) + " ms");
-            sImageView.setImages(requestBean.asListBitmap());
+            sImageView.setImages(requestBean.asListBitmap(), requestBean.urls);
             return ;
         }
 
@@ -233,7 +246,7 @@ public class ImageLoader {
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
             bitmap = BitmapFactory.decodeStream(in);
             // bitmap的缓存
-            mImageCache.put(uriStr , bitmap, 0, 0);
+            mImageCache.put(uriStr , bitmap, 0, 0, true);
 
         } catch (IOException e) {
             LogUtil._e(TAG, ">>>>>>downloadBitmapFromUrl()   再次进行网络下载也失败");
@@ -246,6 +259,60 @@ public class ImageLoader {
 
         return bitmap;
     }
+
+    /**
+     * 控制常用类型的bitmap, 在大小为多少的情况下进行额外缓存
+     */
+    private int CommonlyUsedSizeDp = 100;
+
+    /**
+     * 对特别常用的进行, 多一层的存储, 如圆形头像, 和矩形头像的center_crop两种类型.
+     * 当处理后的图片大小不超过100dp那么就增加到内存存储.
+     *
+     */
+    public void saveCommonlyUsedBitmap(String url, int type, Bitmap bmp, int reqWidth, int reqHeight){
+
+        if((reqHeight <= UIUtils.dip2px(mContext, CommonlyUsedSizeDp)) && (reqWidth <= UIUtils.dip2px(mContext, CommonlyUsedSizeDp))){
+            switch (type){
+                case SImageView.TYPE_CIRCLE:
+                    url = url+COMM_CIRCLE;
+                    break;
+
+                case SImageView.TYPE_RECT:
+                    url = url+COMM_RECT;
+                    break;
+
+                default:
+                    return;
+            }
+            LogUtil._i(TAG, "准备对 "+url+" 进行额外常用矩形类型内存存储!!!!!!!!");
+            mImageCache.put(url, bmp, reqWidth, reqHeight, false);
+        }
+
+    }
+
+
+    private Bitmap getCommonlyUsedBitmap(String url, int type, int scaleType,  int reqWidth, int reqHeight){
+        if ((reqHeight <= UIUtils.dip2px(mContext, CommonlyUsedSizeDp)) && (reqWidth <= UIUtils.dip2px(mContext, CommonlyUsedSizeDp))){
+            Bitmap bitmap = null;
+            // 只对两种类型进行内存查询
+            if (type == SImageView.TYPE_CIRCLE){
+
+                // TODO: 2016/12/13  单张圆形图片时内存抖动比较恒定, 暂时先不需要缓存
+
+            }else if (type == SImageView.TYPE_RECT  && scaleType == SImageView.SCALE_TYPE_CENTER_CROP){
+
+                bitmap = mImageCache.get(url+COMM_RECT, reqWidth, reqHeight, null, false, null);
+            }
+
+            return bitmap;
+
+        }
+        return null;
+    }
+
+    private final String COMM_RECT = "_rect_";
+    private final String COMM_CIRCLE = "_circle_";
 
     /**
      * 从网络下载图片的流直接存入磁盘, 保证图片的原大小. 并在内部进行内存缓存添加.
@@ -370,7 +437,7 @@ public class ImageLoader {
                                     diskGetErrRequest.addBitmap(noLoadUrl, bitmap);
                                 }else{
                                     diskGetErrRequest.addBitmap(noLoadUrl, mLoadErrBmp);
-                                    LogUtil._e(TAG, "多张图片下载失败, >>>> 图片地址:"+noLoadUrl);
+                                    LogUtil._e(TAG, "图片下载失败, >>>> 图片地址:"+noLoadUrl);
                                 }
 
                                 // 判断是否全部加载完成, 如果全部加载完成, 那么发送通知到Handler
@@ -390,13 +457,13 @@ public class ImageLoader {
 
                     RequestBean requestOk = (RequestBean) msg.obj;
                     // 打印多张图片的处理时间
-                    LogUtil._i(TAG, "多张图片的获取时间  >> 磁盘或者网络: "+(System.currentTimeMillis() - requestOk.startTime) + " ms");
+                    LogUtil._i(TAG, "图片的获取时间  >> 磁盘或者网络: "+(System.currentTimeMillis() - requestOk.startTime) + " ms");
 
                     // 进行控件是否需要有效的判断
                     if (requestOk.sImageView.getTag().equals(requestOk.getTag())){
-                        requestOk.sImageView.setImages(requestOk.asListBitmap());
+                        requestOk.sImageView.setImages(requestOk.asListBitmap(), requestOk.urls);
                     }else{
-                        LogUtil._w(TAG, "多张图片>>>>控件的url发生改变, so取消设置图片");
+                        LogUtil._w(TAG, ">>>>控件的url发生改变, so取消设置图片");
                     }
 
                     // recycle global pool

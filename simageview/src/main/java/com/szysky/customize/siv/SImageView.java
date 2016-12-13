@@ -18,7 +18,6 @@ import android.view.View;
 import com.szysky.customize.siv.effect.ConcreteDrawingStrategy;
 import com.szysky.customize.siv.effect.IDrawingStrategy;
 import com.szysky.customize.siv.effect.NormalOnePicStrategy;
-import com.szysky.customize.siv.imgprocess.ImageLoader;
 import com.szysky.customize.siv.range.ILayoutManager;
 import com.szysky.customize.siv.range.QQLayoutManager;
 import com.szysky.customize.siv.util.LogUtil;
@@ -107,6 +106,7 @@ public class SImageView extends View {
         public ArrayList<ILayoutManager.LayoutInfoGroup> coordinates ;  // 测量过程返回的每个元素的对应位置信息
         public int displayType ;                                 // 子元素的显示类型
         public int scaleType ;                                   // 矩形的缩放类型
+        public ArrayList<String> urls = new ArrayList<>();
 
 
 
@@ -119,6 +119,8 @@ public class SImageView extends View {
                     clone.coordinates = (ArrayList<ILayoutManager.LayoutInfoGroup>) coordinates.clone();
                 }
                 clone.readyBmp = (ArrayList<Bitmap>) readyBmp.clone();
+
+                clone.urls = (ArrayList<String>) urls.clone();
             } catch (CloneNotSupportedException e) {
                 LogUtil._w(TAG, "图片信息 clone is error" );
                 e.printStackTrace();
@@ -141,7 +143,7 @@ public class SImageView extends View {
     public @interface ShapeDisplay{}
 
     /**显示类型,默认为上面五种定义类型**/
-    @ShapeDisplay private int mCurrentDisplayShape = TYPE_CIRCLE;
+    private int mCurrentDisplayShape = TYPE_CIRCLE;
 
 
     public static final int SCALE_TYPE_CENTER_INSIDE = 0;  // 图片比例不变, 以最大边的为标准缩放, 可能会有留白,显示全部图片
@@ -157,7 +159,6 @@ public class SImageView extends View {
      * 并且使用{@link #mCloseNormalOnePicLoad}的初始值通过使用单张图片的绘制逻辑才有处理效果
      * 默认为{@link #SCALE_TYPE_CENTER_INSIDE}
      **/
-    @SImageView.ScaleType
     private int mScaleType = SCALE_TYPE_CENTER_INSIDE;
 
 
@@ -179,8 +180,8 @@ public class SImageView extends View {
 
         mInfo.borderWidth = typedArray.getDimensionPixelSize(R.styleable.SImageView_border_width, 0);
         mInfo.borderColor = typedArray.getColor(R.styleable.SImageView_border_color, Color.BLACK);
-        mInfo.displayType = typedArray.getInt(R.styleable.SImageView_displayType, 0);
-        mInfo.scaleType   = typedArray.getInt(R.styleable.SImageView_scaleType, 0);
+        mCurrentDisplayShape = mInfo.displayType = typedArray.getInt(R.styleable.SImageView_displayType, 0);
+        mScaleType = mInfo.scaleType   = typedArray.getInt(R.styleable.SImageView_scaleType, 0);
 
         Drawable drawable = typedArray.getDrawable(R.styleable.SImageView_img);
         if ( null != drawable ){
@@ -511,6 +512,16 @@ public class SImageView extends View {
      * @param bitmaps 接收一个图片集合
      */
     public void setImages(List<Bitmap> bitmaps){
+        mInfo.urls.clear();
+        updateForList(bitmaps, null);
+    }
+
+    void setImages(List<Bitmap> bitmaps, List<String> urls){
+        // 对地址进行赋值
+        mInfo.urls.clear();
+        for (String url : urls) {
+            mInfo.urls.add(url);
+        }
         updateForList(bitmaps, null);
     }
 
@@ -520,6 +531,7 @@ public class SImageView extends View {
     public void setIdRes(@DrawableRes int id){
         if (id != 0) {
             Drawable drawable = getResources().getDrawable(id);
+            mInfo.urls.clear();
             if ( null != drawable){
                 updateForOne(getBitmapFromDrawable(drawable) , STR_EMPTY);
             }
@@ -528,6 +540,7 @@ public class SImageView extends View {
 
 
     public void setDrawable(Drawable drawable){
+        mInfo.urls.clear();
         updateForOne(getBitmapFromDrawable(drawable), STR_EMPTY );
     }
 
@@ -619,6 +632,7 @@ public class SImageView extends View {
      * 设置展示的图像的bitmap
      */
     public void setBitmap(Bitmap bitmap){
+        mInfo.urls.clear();
         updateForOne(bitmap , STR_EMPTY);
     }
 

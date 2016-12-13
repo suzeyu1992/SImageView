@@ -1,30 +1,21 @@
 package com.szysky.customize.simageview;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.szysky.customize.simageview.data.ListDisplayData;
-import com.szysky.customize.simageview.util.NetWorkUtil;
 import com.szysky.customize.siv.SImageView;
-import com.szysky.customize.siv.imgprocess.ImageLoader;
 import com.szysky.customize.siv.range.ILayoutManager;
 import com.szysky.customize.siv.range.QQLayoutManager;
 import com.szysky.customize.siv.range.WeChatLayoutManager;

@@ -16,7 +16,7 @@ public class LogUtil {
      * SImageView 相关的log信息开关
      * true 为开启, false为关闭(默认)
      */
-    public static boolean GlobalLogPrint = false;
+    public static boolean GlobalLogPrint = true;
 
     public static void print_i(String tag, String body){
         if (GlobalLogPrint){

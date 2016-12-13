@@ -35,8 +35,9 @@ public interface IImageCache {
      *
      * @param url 图片地址
      * @param bmp 地址对应的bmp对象
+     * @param isNeedDoubleCache 是否需要磁盘和内存的双缓存, 如果为false那么只进行内存缓存. 
      */
-    void put(String url, Bitmap bmp, int reqWidth, int reqHeight);
+    void put(String url, Bitmap bmp, int reqWidth, int reqHeight,  boolean isNeedDoubleCache);
 
 
     boolean putRawStream(String url, InputStream in);

@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 
 import com.szysky.customize.siv.SImageView;
+import com.szysky.customize.siv.ImageLoader;
 import com.szysky.customize.siv.util.GraphsTemplate;
 
 
@@ -133,7 +134,16 @@ public class  NormalOnePicStrategy implements IDrawingStrategy {
                     GraphsTemplate.drawBitmap(canvas, opeBitmap, bodySquareSide,bodySquareSide, layoutOffsetX, layoutOffsetY,null, scaleType);
                     return;
                 case SImageView.SCALE_TYPE_CENTER_CROP:
-                    GraphsTemplate.drawBitmap(canvas, opeBitmap, viewWidth,viewHeight, 0, 0,null , scaleType);
+
+                    if (opeBitmap.getHeight() == viewHeight && opeBitmap.getWidth() ==viewWidth){
+                        canvas.drawBitmap(opeBitmap, 0, 0, null);
+                    }else{
+                        Bitmap bitmap = GraphsTemplate.drawBitmap(canvas, opeBitmap, viewWidth, viewHeight, 0, 0, null, scaleType);
+                        if (info.urls.size() == 1){
+                            ImageLoader.getInstance(null).saveCommonlyUsedBitmap(info.urls.get(0),info.displayType, bitmap, info.width, info.height);
+                        }
+                    }
+
                     return;
 
                 case SImageView.SCALE_TYPE_FIX_XY:

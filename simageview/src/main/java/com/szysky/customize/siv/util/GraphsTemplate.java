@@ -51,9 +51,10 @@ public class GraphsTemplate {
         }
     }
 
-    public static void drawBitmap(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight,
+    public static Bitmap drawBitmap(Canvas canvas, Bitmap bitmap, float sideWidth, float sideHeight,
                                   int offsetX, int offsetY, Paint paint , int flag){
 
+        Bitmap resultBmp =null ;
         Matrix matrix = new Matrix();
         float scale = 0;
         float dx = 0;
@@ -91,10 +92,11 @@ public class GraphsTemplate {
 
                     }
                     matrix.postScale(scale, scale);
-                    canvas.drawBitmap(Bitmap.createBitmap(bitmap,  (int) (dx < 0 ? -dx : dx),  (int) (dy < 0 ? -dy : dy),  (int)  (bitmap.getWidth() + 2 * (dx < 0 ? dx : -dx)) ,
-                            (int) (bitmap.getHeight() + 2 * (dy < 0 ? dy : -dy)), matrix, true),offsetX , offsetY , null);
+                    resultBmp = Bitmap.createBitmap(bitmap, (int) (dx < 0 ? -dx : dx), (int) (dy < 0 ? -dy : dy), (int) (bitmap.getWidth() + 2 * (dx < 0 ? dx : -dx)),
+                            (int) (bitmap.getHeight() + 2 * (dy < 0 ? dy : -dy)), matrix, true);
+                    canvas.drawBitmap(resultBmp,offsetX , offsetY , null);
 
-                    return;
+                    return resultBmp;
                 }else{
                     // 画布不是一个正方形
                     float scaleY = sideHeight / bitmap.getHeight();
@@ -113,14 +115,14 @@ public class GraphsTemplate {
                     }
 
                     matrix.postScale(scale, scale);
-                    canvas.drawBitmap(Bitmap.createBitmap(bitmap,  (int) (dx < 0 ? -dx : dx),  (int) (dy < 0 ? -dy : dy),  (int)  (bitmap.getWidth() + 2 * (dx < 0 ? dx : -dx)) ,
-                            (int) (bitmap.getHeight() + 2*(dy < 0 ? dy : -dy)),matrix, true),offsetX , offsetY , null);
 
-                    return;
+                    resultBmp = Bitmap.createBitmap(bitmap,  (int) (dx < 0 ? -dx : dx),  (int) (dy < 0 ? -dy : dy),  (int)  (bitmap.getWidth() + 2 * (dx < 0 ? dx : -dx)) ,
+                            (int) (bitmap.getHeight() + 2*(dy < 0 ? dy : -dy)),matrix, true);
+                    canvas.drawBitmap(resultBmp,offsetX , offsetY , null);
+
+                    return resultBmp;
 
                 }
-
-
 
 
             case SImageView.SCALE_TYPE_FIX_XY:
@@ -134,13 +136,15 @@ public class GraphsTemplate {
                 break;
 
             default:
-                return;
+                return resultBmp;
         }
         if ((scale <= 1) && (scale >= 0.9f)){
             canvas.drawBitmap(bitmap, offsetX + dx, offsetY + dy, null);
         }else{
             canvas.drawBitmap(Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true),offsetX + dx, offsetY + dy, null);
         }
+
+        return resultBmp;
     }
 
     /**

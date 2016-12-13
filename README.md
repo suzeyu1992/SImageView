@@ -1,33 +1,62 @@
 # SImageView
 ◀️想做一个好厉害的控件
 
-## 控件说明
 
-这是一个相对`ImageView`功能的扩展的控件, 但是没有继承`ImageView`直接继承的`View`. 比如`QQ群组头像`,`微信群组头像`, `设置描边`, `设置圆角矩形头像`,`圆形头像`等. 直接设置即可.  对于`多个图片的排列`和`图片的具体显示`进行了接口分离. 可以自定义实现任何排列效果和显示效果. 
+* [控件介绍](#introduction)
+* [效果展示](#effect)
+* [使用说明](#use)
+    * [引用方式](#reference)
+    * [xml声明方式](#xml)
+    * [代码设置方式](#code)
+    * [加载中和加载失败的图片设置](#loading)
+    * [控件其他的方法](#other)
+    * [设置图片网址匹配](#urlfilter)
+* [扩展实现](#expand)
+    * [自定义控件measure测量布局排布方式](#measure)
+    * [自定义控件的图片显示方式](#display)
+    * [缓存策略自定义](#cache)  
+* [建议](#note)
 
-目前只完成了第一阶段. 
 
-* `第一阶段(已完成)`: 完成开发常用的头像处理效果功能集合. 并对`onMeasure``padding`等进行处理, 实现一个可以工作的类. 
-* `第二阶段(下个礼拜吧)`: 支持图片网络地址设置, 相当于内置了图片缓存策略. 这样可以省去一些`图片加载库的依赖`如果项目中对图片的依赖比较严重, 对性能要求高的. 可能还得使用一些高性能的库如`Fresco`. 但大公司可能会有时间去自己实现的. 
-* `第三阶段(没想好..)`: 做一些性能优化吧
+<a name="introduction"/> 
+## 控件介绍
 
-
-废话太多了.... 抱歉, 看效果吧
+这是一个简单到`sImageView.setImageUrls("http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg");`设置一个网址即可显示图片的控件
 
 
+相对`ImageView`功能的扩展的控件, 但是没有继承`ImageView`直接继承的`View`. 比如`QQ群组头像`,`微信群组头像`, `设置描边`, `设置圆角矩形头像`,`圆形头像`等. 几个参数搞定.  对于`多个图片的排列`和`图片的具体显示`进行了接口分离. 可以自定义实现任何排列效果和显示效果. 
 
+网络图片的下载会原图缓存磁盘, 并根据控件的大小加载到到内存并使用显示. 
+
+
+<a name="effect"/> 
 ## 效果展示
 
 图片可能比较大, 如果不出现, 刷新页面试试或者多等一会.
+
+**可以实现的样式**
 
 ![](imgs/sample_1.png)
 
 ![](imgs/sample_2.gif)
 
 
-
+<a name="use"/> 
 ## 使用说明
 
+<a name="reference"/> 
+### 引用方式
+
+`rootDir/app/build.gradle文件`
+
+
+```xml
+dependencies {
+    // ...
+    compile 'com.szysky.customize:simageview:2.2';
+}
+```
+<a name="xml"/> 
 ### xml声明方式
 
 
@@ -38,12 +67,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     
-    <!--范例-->
+    <!--简单的配置, 默认为圆形图像,无描边-->
+   <com.szysky.customize.siv.SImageView
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+       app:img="@mipmap/icon_test"
+       android:layout_width="200dp"
+       android:layout_height="200dp" />
+    
+    <!--稍微完全的配置范例, 下面会有属性的详细说明-->
     <com.szysky.customize.siv.SImageView
        android:id="@+id/siv_main"
-       android:background="@color/colorAccent"
        android:layout_width="match_parent"
        android:layout_height="200dp"
+       android:background="@color/colorAccent"
        app:displayType="rect"
        app:border_color="@color/colorPrimary"
        app:border_width="1dp"
@@ -69,9 +105,50 @@
     * `center_crop`  : 保持控件全部被图片填充. 图片部分可能丢失, 图片比例不变.
     * `fix_XY` : 保持图片的完整性并且控件被全部填充. 图片不会丢失, 不会留白. 图片比例会改变.
     
-### 代码设置
+ <a name="code"/>    
+### 代码设置形式
 
-以下是常用方法, 
+
+**最简单暴力的设置方式**
+
+
+```java
+// 查找控件
+SImageView sImageView = (SImageView) findViewById(R.id.siv_main);
+
+// 直接设置一个图片URL即可, 根据控件大小进行内存缓存, 保存原图到本地磁盘缓存
+sImageView.setImageUrls("http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg");  
+                        
+```
+
+**关于群组头像**
+
+
+```java
+// 如果你想实现QQ群组效果, 很简单因为默认是圆形类型显示, 不需要多余设置
+// 直接传入多个URL, 最多支持5张. 例如
+sImageView.setImageUrls(
+                        "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg",
+                        "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg",
+                        "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg",
+                        "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg",
+                        "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg");
+                        
+                        
+// 需要微信的样式, 那么改一下 布局管理器 , 并设置显示图片类型为 矩形,
+// 最多支持9张.  如下
+sImageView.setDisplayShape(SImageView.TYPE_RECT)
+        .setLayoutManager(new WeChatLayoutManager(getApplicationContext()))
+        .setImageUrls(
+              "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg",
+              "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg",
+              "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg",
+              "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg",
+              "http://img3.cache.netease.com/ent/2009/4/17/20090417104402666a4.jpg");
+```
+
+
+**以下是常用方法** 
 
 ```java
 SImageView sImageView = (SImageView) itemView.findViewById(R.id.siv);
@@ -97,15 +174,42 @@ sImageView.setBorderWidth(1);
  // 默认为qq群组的测量策略. 只要设置图片时传入多张图片的集合即可.
 sImageView.setLayoutManager(new WeChatLayoutManager(context));
 
-// 设置图片
-sImageView.setImages(List<Bitmap>); // 接收一个图片集合, 实现qq群组或者微信群组效果
+// 不仅可以设置url数组, 还支持其他设置图片方式
+sImageView.setImages(List<Bitmap>); // 接收一个bitmap集合, 实现qq群组或者微信群组效果
 sImageView.setIdRes(id);            // 接收图片资源id
 sImageView.setDrawable(Drawable);   // 接收一个Drawable对象
 sImageView.setBitmap(Bitmap);       // 接收一个图片的bitmap
 
 ```
 
-还有一些对外的方法:
+<a name="loading"/> 
+### 加载中的图片和加载失败的图片设置
+
+对于网络下载图片. 会有**下载失败**和**下载中**的图片显示. 默认图片加载类`ImageLoad`类中会内置两张系统两个对应图片来显示. `ImageLoad`类中的`加载中`和`加载失败`图片会作用于全局的`SImageView`控件. 也可以给`SImageView`控件实例设置. 如果控件设置了. 那么优先级会比全局`ImageLoad`中的图片使用优先. 如果控件没有, 那么就使用全局. 
+
+代码设置如下:
+
+
+```java
+
+// 设置当前控件的场景图片, 优先级高于全局
+sImageView.setErrPicResID(R.mipmap.ic_launcher)     // 设置加载错误图片
+        .setLoadingResID(R.mipmap.icon_test)        // 设置加载中图片
+        .setImageUrls("http://xxx.jpg");            // 图片故意填写一个错误
+        
+        
+// 对于图片网址满足条件 判断正则为: "https?://.*?.(jpg|png|bmp|jpeg|gif)"
+//如果不满足, 那么会认为是一个错误地址, 可动态配置, 后面说明
+
+
+
+// 设置全局控件场景图片, (有默认图片可以不设置)
+ImageLoader.getInstance(getApplicationContext()).setLoadErrResId(R.mipmap.icon_test);       ImageLoader.getInstance(getApplicationContext()).setLoadingResId(R.mipmap.ic_launcher);
+```
+
+
+<a name="other"/> 
+### 控件其他的方法
 
 | 方法名称 | 参数说明| 方法作用 |
 |---|---|---|
@@ -118,10 +222,27 @@ sImageView.setBitmap(Bitmap);       // 接收一个图片的bitmap
 对应的`getter()`方法省略. 
 
 
-### 扩展实现
+<a name="urlfilter"/> 
+### 设置图片网址匹配
+
+上面提到过默认过滤图片链接的正则判断为`"https?://.*?.(jpg|png|bmp|jpeg|gif)"`
+
+如果需要实现其他的地址规则. 可重定义过滤策略
+
+
+```java
+ImageLoader.getInstance(getApplicationContext()).setPicUrlRegex("RegexStr");
+
+// 如果设置自定义正则之后需要恢复, 那么直接设置空串即可
+ImageLoader.getInstance(getApplicationContext()).setPicUrlRegex("");
+```
+
+<a name="expand"/> 
+## 扩展实现
 
 > 控件实现了`measure测量布局`和`draw具体绘图实现`的功能分离. 你可以任意实现排列规则, 和具体的绘图显示的规则. 
 
+<a name="measure"/> 
 ### 自定义measure测量布局
 
 布局测量接口`ILayoutManager`. 相当于`RecyclerView`设置布局管理器. 或者`View#onMeasure()`的作用. 
@@ -180,6 +301,7 @@ public interface ILayoutManager {
 }
 ```
 
+<a name="display"/> 
 ### 自定义的图片显示
 
 控件内置了两种图片显示. 例如: 椭圆, 圆角矩形, 描边, 五角星等. 相当于`View#onDraw()`和`Adapter#getView()`作用. 具体显示分离. 
@@ -214,7 +336,23 @@ public interface IDrawingStrategy {
 
 
 
+<a name="cache"/> 
+### 缓存策略自定义
 
-**未完待续... 后期实现支持图片链接的设置并添加内置图片缓存**
+这部分写的自己不是很满意, 写着写着就有点耦合了, 最后精力不够... 好吧这是借口.  反正也能将就自定义, 用默认的就行.... [捂脸]
+
+
+
+## 建议
+
+* 尽量使控件作为头像控件显示, 如果大小低于`100dp`, 内部稍微做了一些特别处理. 性能可以好一些.
+* 由于内置样式较多, 导致了`cpu密集处理`. 和一些对象的开销. 如果项目性能要求较高那么可通过自定义绘图策略注入控件来优化. 这样项目中常用的效果就可以得到性能提升.
+* 类库需要`写外部存储的权限`, 对于新版本的`动态权限`, 一定要先进行权限判断, 再对`ImageLoad`进行初始化(控件的网络图片设置). 否则可能导致, 磁盘缓存无效只有内存缓存. 
+
+
+> 如果发现什么问题, 请提`issue`. 作者会抽时间去修补 ^*^.  
+> 如果看着还不错. 那么`star`一下吧.
+
+`end`
 
 

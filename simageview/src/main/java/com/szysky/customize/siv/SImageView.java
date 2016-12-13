@@ -442,27 +442,30 @@ public class SImageView extends View {
      *      如果通过{@link #setDrawStrategy(IDrawingStrategy)}实现了自定义策略, 那么单张图片开关标记将会
      *      自动设置为关闭.
      */
-    public void setCloseNormalOnePicLoad(boolean isClose) {
+    public SImageView setCloseNormalOnePicLoad(boolean isClose) {
         this.mCloseNormalOnePicLoad = isClose;
+        return this;
     }
 
     /**
      * 设置子元素 绘制图片 的具体显示策略
      */
-    public void setDrawStrategy(IDrawingStrategy mDrawStrategy) {
+    public SImageView setDrawStrategy(IDrawingStrategy mDrawStrategy) {
         this.mDrawStrategy = mDrawStrategy;
         if (mDrawStrategy instanceof ConcreteDrawingStrategy){
             mCloseNormalOnePicLoad = false;
         }else{
             mCloseNormalOnePicLoad = true;
         }
+
+        return this;
     }
 
 
     /**
      * 设置 测量布局 规则
      */
-    public void setLayoutManager(ILayoutManager mLayoutManager) {
+    public SImageView setLayoutManager(ILayoutManager mLayoutManager) {
         this.mLayoutManager = mLayoutManager;
 
         // 兼容qq群组绘制的重叠场景问题
@@ -475,7 +478,7 @@ public class SImageView extends View {
                 ((ConcreteDrawingStrategy)mDrawStrategy).setIsPicRotate(false);
             }
         }
-
+        return this;
     }
 
     /**
@@ -498,16 +501,20 @@ public class SImageView extends View {
      * 设置当前控件的显示类型, 如圆形, 矩形, 五角星等等...
      * @param mCurrentDisplayShape  只能@{@link ShapeDisplay}类型
      */
-    public void setDisplayShape(@ShapeDisplay int mCurrentDisplayShape) {
+    public SImageView setDisplayShape(@ShapeDisplay int mCurrentDisplayShape) {
         this.mCurrentDisplayShape = mCurrentDisplayShape;
         mInfo.displayType = mCurrentDisplayShape;
+
+        return this;
     }
 
     /**
      * 设置图片描边宽度
      */
-    public void setBorderWidth(float dp){
+    public SImageView setBorderWidth(float dp){
         mInfo.borderWidth = (int) UIUtils.dip2px(getContext(), dp);
+
+        return this;
     }
 
     /**
@@ -520,8 +527,10 @@ public class SImageView extends View {
     /**
      * 设置描边颜色
      */
-    public void setBorderColor(@ColorInt int color){
+    public SImageView setBorderColor(@ColorInt int color){
         mInfo.borderColor = color;
+
+        return this;
     }
 
     public @ColorInt int getBorderColor(){
@@ -533,9 +542,11 @@ public class SImageView extends View {
      * 设置展示图片的集合
      * @param bitmaps 接收一个图片集合
      */
-    public void setImages(List<Bitmap> bitmaps){
+    public SImageView setImages(List<Bitmap> bitmaps){
         mInfo.urls.clear();
         updateForList(bitmaps, null);
+
+        return this;
     }
 
     void setImages(List<Bitmap> bitmaps, List<String> urls){
@@ -739,9 +750,10 @@ public class SImageView extends View {
      * 并且使用{@link #mCloseNormalOnePicLoad}的初始值通过使用单张图片的绘制逻辑才有处理效果
      * {@link #mScaleType}
      */
-    public void setScaleType(@ScaleType int mScaleType) {
+    public SImageView setScaleType(@ScaleType int mScaleType) {
         this.mScaleType = mScaleType;
         mInfo.scaleType = mScaleType;
+        return this;
 
     }
 
@@ -756,8 +768,10 @@ public class SImageView extends View {
      *  设置单张图片时 圆角矩形 的圆角弧度系数, 取值为0~2, 默认为1
      *  此设置属性不会立即生效, 需下次圆角矩形加载时才会有效.可手动invalidate刷新
      */
-    public void setRectRoundRadius(float mRectRoundRadius) {
+    public SImageView setRectRoundRadius(float mRectRoundRadius) {
         mNormalOnePicStrategy.setRectRoundRadius(mRectRoundRadius);
+
+        return this;
     }
 
     /**
@@ -765,8 +779,10 @@ public class SImageView extends View {
      * 此设置属性同样不会立即生效, 需下次椭圆显示加载时才会生效, 可手动invalidate刷新
      * @param widthHeightRadio  宽高比. 只能传入大于0, 默认值为宽高比为2/1  也就是2f
      */
-    public  void setOvalRatio(float widthHeightRadio){
+    public  SImageView setOvalRatio(float widthHeightRadio){
         mNormalOnePicStrategy.setOvalWidthOrHeight(widthHeightRadio);
+
+        return this;
     }
 
     /**
@@ -785,7 +801,7 @@ public class SImageView extends View {
     /**
      * 设置控件网络加载错误时候的图片
      */
-    public void setErrPicResID(@DrawableRes int mErrPicResID) {
+    public SImageView setErrPicResID(@DrawableRes int mErrPicResID) {
         if (mInfo.width > 0 && mInfo.height > 0){
             // 解析为和控件一样大的
             mErrPicBitmap = ImageCompression.decodeFixedSizeForResources(getResources(), mErrPicResID, mInfo.width, mInfo.height);
@@ -800,6 +816,8 @@ public class SImageView extends View {
         }else{
             Log.w(TAG, "控件的默认加载错误图片设置失败, 请检测填入的是否是图片资源ID ");
         }
+
+        return this;
     }
 
 
@@ -811,7 +829,7 @@ public class SImageView extends View {
     /**
      * 设置网络加载中的图片资源id
      */
-    public void setLoadingResID(@DrawableRes int mLoadingResID) {
+    public SImageView setLoadingResID(@DrawableRes int mLoadingResID) {
         if (mInfo.width > 0 && mInfo.height > 0){
             // 解析为和控件一样大的
             mLoadingPicBitmap = ImageCompression.decodeFixedSizeForResources(getResources(), mLoadingResID, mInfo.width, mInfo.height);
@@ -828,6 +846,8 @@ public class SImageView extends View {
         }else{
             Log.w(TAG, "控件的默认加载中时图片设置失败, 请检测填入的是否是图片资源ID ");
         }
+
+        return this;
     }
 
 

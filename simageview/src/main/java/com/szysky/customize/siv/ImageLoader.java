@@ -169,7 +169,7 @@ public class ImageLoader {
      * @param reqHeight 需要大小, 可以为0
      *
      */
-    public void setPicture(final String imaUrl, final SImageView sImageView, final int reqWidth, final int reqHeight){
+    void setPicture(final String imaUrl, final SImageView sImageView, final int reqWidth, final int reqHeight){
 
         // 判断图片链接是否符合格式--> http(s)://..... .(jpg|png|bmp|jpeg|gif)
         ArrayList<String> strings = new ArrayList<>();
@@ -182,7 +182,7 @@ public class ImageLoader {
      * 下载多张图片的方法
      * 只针对SImageView控件场景使用
      */
-    public void setMulPicture(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight){
+    void setMulPicture(List<String> urls, SImageView sImageView, int reqWidth, int reqHeight){
 
         ArrayList<String> strings = new ArrayList<>(urls);
         RequestBean requestBean = RequestBean.obtain(strings, sImageView, reqWidth, reqHeight);
@@ -399,7 +399,7 @@ public class ImageLoader {
     /**
      * 利用主线程个Loop来创建一个Handler用来给图片设置bitmap前景
      */
-    public Handler mMainHandler = new Handler(Looper.getMainLooper()) {
+     public final Handler mMainHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
 

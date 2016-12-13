@@ -11,6 +11,7 @@
     * [加载中和加载失败的图片设置](#loading)
     * [控件其他的方法](#other)
     * [设置图片网址匹配](#urlfilter)
+    * [类库运行log开关](#log)
 * [扩展实现](#expand)
     * [自定义控件measure测量布局排布方式](#measure)
     * [自定义控件的图片显示方式](#display)
@@ -105,7 +106,10 @@ dependencies {
     * `center_crop`  : 保持控件全部被图片填充. 图片部分可能丢失, 图片比例不变.
     * `fix_XY` : 保持图片的完整性并且控件被全部填充. 图片不会丢失, 不会留白. 图片比例会改变.
     
- <a name="code"/>    
+    
+    
+    
+<a name="code"/>    
 ### 代码设置形式
 
 
@@ -236,6 +240,17 @@ ImageLoader.getInstance(getApplicationContext()).setPicUrlRegex("RegexStr");
 // 如果设置自定义正则之后需要恢复, 那么直接设置空串即可
 ImageLoader.getInstance(getApplicationContext()).setPicUrlRegex("");
 ```
+
+<a name="log"/> 
+### 输出log开关
+
+默认类库`log`是不输出的, 如果需要打开如下:
+
+
+```java
+LogUtil.GlobalLogPrint = true;      // 输出类库相关log信息
+```
+
 
 <a name="expand"/> 
 ## 扩展实现

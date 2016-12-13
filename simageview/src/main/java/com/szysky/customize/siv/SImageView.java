@@ -181,7 +181,10 @@ public class SImageView extends View {
 
     public SImageView(Context context) {
         super(context);
-
+        mContext = context.getApplicationContext();
+        // new 形式, 设定一些初始值
+        mInfo.height = (int) UIUtils.dip2px(context.getApplicationContext(), 46);
+        mInfo.width = (int) UIUtils.dip2px(context.getApplicationContext(), 46);
 
     }
 
@@ -266,9 +269,9 @@ public class SImageView extends View {
                 }
             }
 
-            // 如果既没有设置前景, 也没有背景, 设置一个像素占位
+            // 如果既没有设置前景, 也没有背景, 设置46dp占位
             if ((mDrawableWidth <=0) && (getSuggestedMinimumWidth() <=0)){
-                w = 1 + pleft + pright;
+                w = (int) UIUtils.dip2px(mContext, 46) + pleft + pright;
             }
         }else if (widthSpecMode == MeasureSpec.EXACTLY){
             w = widthSize;
@@ -304,9 +307,9 @@ public class SImageView extends View {
                 }
             }
 
-            // 如果既没有设置前景, 也没有背景, 设置一个像素占位
+            // 如果既没有设置前景, 也没有背景, 设置46dp占位
             if ((mDrawableHeight <=0) && (getSuggestedMinimumHeight() <=0)){
-                h = 1 + ptop + pbottom;
+                h = (int) UIUtils.dip2px(mContext, 46) + ptop + pbottom;
             }
         }else if (heightSpecMode == MeasureSpec.EXACTLY){
             h = heightSize;

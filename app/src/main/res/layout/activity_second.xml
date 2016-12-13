@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:paddingTop="5dp"
+    android:id="@+id/ll_main"
     android:layout_height="match_parent">
 
     <com.szysky.customize.siv.SImageView

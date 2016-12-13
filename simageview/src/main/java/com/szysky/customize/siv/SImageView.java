@@ -182,6 +182,7 @@ public class SImageView extends View {
     public SImageView(Context context) {
         super(context);
 
+
     }
 
     public SImageView(Context context, AttributeSet attrs) {
@@ -326,11 +327,11 @@ public class SImageView extends View {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
+        // 标记padding
         adjustPadding(left, top, right, bottom);
 
         mInfo.height = getHeight() - mPaddingBottom - mPaddingTop ;
         mInfo.width = getWidth() - mPaddingLeft - mPaddingRight;
-
     }
 
 
@@ -397,6 +398,7 @@ public class SImageView extends View {
     }
 
 
+
     /**
      * 对多张图片进行数据测量
      */
@@ -412,14 +414,14 @@ public class SImageView extends View {
      */
     private void adjustPadding(int left, int top, int right, int bottom) {
         // 对padding进行极限值处理
-        while ((mPaddingBottom + mPaddingTop) >= ( bottom - top )){
-            mPaddingBottom >>= 1;
-            mPaddingTop >>= 1;
+        if ((mPaddingBottom + mPaddingTop) >= ( bottom - top )){
+            mPaddingBottom = (int) ((( bottom - top ) >> 1) * 0.9f);
+            mPaddingTop = (int) ((( bottom - top ) >> 1) * 0.9f);
         }
 
-        while((mPaddingRight + mPaddingLeft) >= (right - left)){
-            mPaddingRight >>= 1;
-            mPaddingLeft >>= 1;
+        if((mPaddingRight + mPaddingLeft) >= (right - left)){
+            mPaddingRight = (int) (((right - left) >> 1) * 0.9f);
+            mPaddingLeft = (int) (((right - left) >> 1) * 0.9f);
         }
     }
 
